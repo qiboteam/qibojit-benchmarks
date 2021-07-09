@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
 import numpy as np
-from qibo import models, gates
+from qibo import gates
 
 
+# TODO: Update this to the class format
 def variational_circuit(nqubits, nlayers=1, theta=None, use_varlayer=False):
     if theta is None:
         theta = 2 * np.pi * np.random.random(2 * nlayers * nqubits)
@@ -31,17 +33,77 @@ def variational_circuit(nqubits, nlayers=1, theta=None, use_varlayer=False):
             yield gates.CZ(0, nqubits - 1)
 
 
-def one_qubit_gate(nqubits, gate_type="H", params={}, nlayers=1):
-    gate = lambda q: getattr(gates, gate_type)(q, **params)
-    for _ in range(nlayers):
-        for i in range(nqubits):
-            yield gate(i)
+class BaseCircuit(ABC):
+
+    def __init__(self, nqubits, params=None):
+        self.nqubits = nqubits
+
+    def parse(params):
+        p = {}
+        if params is not None:
+            for param in params.split(","):
+                k, v = param.split("=")
+                p[k] = v
+        return p
+
+    @abstractmethod
+    def __iter__(self):
+        raise NotImplementedError
 
 
-def two_qubit_gate(nqubits, gate_type="CNOT", params={}, nlayers=1):
-    gate = lambda q: getattr(gates, gate_type)(q, q + 1, **params)
-    for _ in range(nlayers):
-        for i in range(0, nqubits - 1, 2):
-            yield gate(i)
-        for i in range(1, nqubits - 1, 2):
-            yield gate(i)
+class OneQubitGate(BaseCircuit):
+
+    def __init__(self, nqubits, params=None):
+        super().__init__(nqubits)
+        p = self.parse(params)
+        self.nlayers = int(p.pop("nlayers")) if "nlayers" in p else 1
+        self.gate = getattr(gates, p.pop("gate") if "gate" in p else "H")
+        self.params = {k: float(v) for k, v in p.items()}
+
+    def __iter__(self):
+        for _ in range(self.nlayers):
+            for i in range(self.nqubits):
+                yield self.gate(i, **self.params)
+
+
+class TwoQubitGate(BaseCircuit):
+
+    def __init__(self, nqubits, params=None):
+        super().__init__(nqubits)
+        p = self.parse(params)
+        self.nlayers = int(p.pop("nlayers")) if "nlayers" in p else 1
+        self.gate = getattr(gates, p.pop("gate") if "gate" in p else "CNOT")
+        self.params = {k: float(v) for k, v in p.items()}
+
+    def __iter__(self):
+        for _ in range(self.nlayers):
+            for i in range(0, self.nqubits - 1, 2):
+                yield self.gate(i)
+            for i in range(1, self.nqubits - 1, 2):
+                yield self.gate(i)
+
+
+class QFT(BaseCircuit):
+
+    def __init__(self, nqubits, params=None):
+        super().__init__(nqubits)
+        self.swaps = params is not None and "swap" in params
+
+    def __iter__(self):
+        for i1 in range(self.nqubits):
+            yield gates.H(i1)
+            for i2 in range(i1 + 1, self.nqubits):
+                theta = np.pi / 2 ** (i2 - i1)
+                yield gates.CU1(i2, i1, theta)
+
+        if self.swaps:
+            for i in range(self.nqubits // 2):
+                yield gates.SWAP(i, self.nqubits - i - 1)
+
+
+class CircuitConstructor:
+
+    def __new__(cls, circuit_name, params, nqubits):
+        if circuit_name == "qft":
+            return QFT(nqubits, params)
+        raise NotImplementedError
