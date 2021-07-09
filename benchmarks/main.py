@@ -6,7 +6,7 @@ The type of the circuit is selected using the ``--type`` flag.
 import argparse
 import os
 import time
-import json
+import logger
 import numpy as np
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" # disable Tensorflow warnings
 
@@ -59,17 +59,7 @@ def main(nqubits, backend, circuit, precision="double", params=None,
         from utils import limit_gpu_memory
         memory = limit_gpu_memory(memory)
 
-    if filename is not None:
-        if os.path.isfile(filename):
-            with open(filename, "r") as file:
-                logs = json.load(file)
-            print("Extending existing logs from {}.".format(filename))
-        else:
-            print("Creating new logs in {}.".format(filename))
-            logs = []
-    else:
-        logs = []
-
+    logs = logger.JsonLogger(filename)
     # Create log dict
     logs.append({
         "nqubits": nqubits, "circuit": circuit, "params": params,
@@ -127,13 +117,9 @@ def main(nqubits, backend, circuit, precision="double", params=None,
         logs[-1]["measurement_time"] = time.time() - start_time
 
     print()
-    for k, v in logs[-1].items():
-        print("{}: {}".format(k, v))
+    print(logs)
+    logs.dump()
     print()
-
-    if filename is not None:
-        with open(filename, "w") as file:
-            json.dump(logs, file)
 
 
 if __name__ == "__main__":
