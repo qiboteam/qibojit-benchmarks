@@ -38,6 +38,7 @@ class BaseCircuit(ABC):
     def __init__(self, nqubits, params=None):
         self.nqubits = nqubits
 
+    @staticmethod
     def parse(params):
         p = {}
         if params is not None:
@@ -78,9 +79,9 @@ class TwoQubitGate(BaseCircuit):
     def __iter__(self):
         for _ in range(self.nlayers):
             for i in range(0, self.nqubits - 1, 2):
-                yield self.gate(i)
+                yield self.gate(i, i + 1)
             for i in range(1, self.nqubits - 1, 2):
-                yield self.gate(i)
+                yield self.gate(i, i + 1)
 
 
 class QFT(BaseCircuit):
@@ -106,4 +107,8 @@ class CircuitConstructor:
     def __new__(cls, circuit_name, params, nqubits):
         if circuit_name == "qft":
             return QFT(nqubits, params)
-        raise NotImplementedError
+        elif circuit_name == "one-qubit-gate":
+            return OneQubitGate(nqubits, params)
+        elif circuit_name == "two-qubit-gate":
+            return TwoQubitGate(nqubits, params)
+        raise NotImplementedError(f"Cannot find circuit {circuit_name}.")
