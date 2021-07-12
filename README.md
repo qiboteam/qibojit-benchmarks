@@ -66,24 +66,31 @@ Check `python main.py -h` for complete documentation of each flag.
 Before executing the code keep in mind the following:
 - GPUs are the default devices for qibojit and qibotf. If you need CPU performance numbers do `export CUDA_VISIBLES_DEVICE=""` before executing the benchmark script.
 - CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script.
-- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow.
-See `python main.py -h` for more details.
+- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow. See `python main.py -h` for more details.
 
 ## Benchmark output
 
 The benchmark script prints a summary of the circuit and user selected flags together with:
+- import_time: time required to import the `qibo` library and build the selected backend in seconds.
 - creation_time: time required to prepare the circuit for execution in seconds.
 - dry_run_execution_time: first execution performance, includes JIT timings in seconds.
-- dry_run_transfer_time: transfer time of results from GPU to CPU in seconds.
+- dry_run_transfer_time: time required to convert the final state to numpy array in seconds.
 - simulation_times: list of timings for simulation based on `nreps` in seconds.
-- transfer_times: list of timings for transfer of results form GPU to CPU in seconds.
-- simulation_time: average simulation time for `nreps` repetitions in seconds.
-- simulation_time_std: standard deviation of simulation_time in seconds.
-- transfer_time: average transfer time of results from GPU to CPU for `nreps` repetitions in seconds.
-- transfer_time_std: standard deviation of transfer_time in seconds.
+- transfer_times: list of timings for conversion to numpy array in seconds.
+- simulation_times_mean: average simulation time for `nreps` repetitions in seconds.
+- simulation_times_std: standard deviation of simulation_time in seconds.
+- transfer_times_mean: average transfer time for `nreps` repetitions in seconds.
+- transfer_time_std: standard deviation of transfer_times in seconds.
+- measurement_time: time required to sample frequencies for `nshots` measurement shots in seconds (relevant only if the `--nshots` argument is given).
+
+Note that if a GPU is used for simulation then transfer times measure the time required to copy the final state from the GPU memory to CPU.
+
+If `--filename` is given the above logs are saved in json format in the given directory.
 
 
 ## Implemented circuits
 
+- `one-qubit-gate`: circuit consisting of a single one qubit gate. The gate is applied to every qubit in the circuit.
+- `two-qubit-gate`: circuit consisting of a single two qubit gate. The gate is applied to every pair of adjacent qubits in the circuit (assuming one dimensional topology).
 - `qft`: [quantum fourier transform](https://en.wikipedia.org/wiki/Quantum_Fourier_transform)
-- `variational_circuit`: variational quantum circuit layer as defined [in the docs]](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer)
+- `variational`: variational quantum circuit consisting a layer of `RY` rotations followed be a layer of `CZ` entangling gates. Can be created using either standard qibot gates or the optimized [`VariationalLayer`](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer) gate.
