@@ -35,15 +35,16 @@ For more details check the documentation [here](https://qibo.readthedocs.io/en/l
 
 ## Running the benchmarks
 
-The script in `benchmarks/main.py` executes the benchmark code following the supported configuration flags (check `python main.py -h`).
+The script in `benchmarks/main.py` executes the benchmark code following the supported configuration flags:
 
 ```
 $ python main.py -h
 
 usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND]
-               [--precision PRECISION] [--nreps NREPS] [--filename FILENAME]
-               [--circuit CIRCUIT] [--params PARAMS] [--nshots NSHOTS]
-               [--memory MEMORY] [--threading THREADING] [--transfer]
+                    [--circuit CIRCUIT] [--options OPTIONS]
+                    [--nreps NREPS] [--nshots NSHOTS] [--transfer]
+                    [--precision PRECISION] [--memory MEMORY]
+                    [--threading THREADING] [--filename FILENAME]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -60,10 +61,13 @@ optional arguments:
   --transfer
 ```
 
+Check `python main.py -h` for complete documentation of each flag.
+
 Before executing the code keep in mind the following:
 - GPUs are the default devices for qibojit and qibotf. If you need CPU performance numbers do `export CUDA_VISIBLES_DEVICE=""` before executing the benchmark script.
-- CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script (note that ).
-- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation).
+- CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script.
+- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow.
+See `python main.py -h` for more details.
 
 ## Benchmark output
 

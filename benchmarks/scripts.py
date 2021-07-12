@@ -7,33 +7,16 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
                       nreps=1, nshots=None, transfer=False,
                       precision="double", memory=None, threading=None,
                       filename=None):
-    """Runs benchmarks for different circuit types.
+    """Runs benchmark for different circuit types.
 
-    Args:
-        nqubits (int): Number of qubits in the circuit.
-        backend (str): Qibo backend to use for simulation.
-        precision (str): Numerical precision of the simulation.
-            Choose between 'double' and 'single'.
-            Default is 'double'.
-        circuit_name (str): Type of Circuit to use.
-            See ``circuits.py`` for available types.
-        nreps (int): Number of repetitions of circuit execution.
-            Dry run is not included. Default is 1.
-        nshots (int): Number of measurement shots.
-            Logs the time required to sample frequencies (no samples).
-            If ``None`` no measurements are performed.
-            Default is ``None``.
-        transfer (bool): If ``True`` it transfers the array from GPU to CPU.
-        filename (str): Name of file to write logs.
-            If ``None`` logs will not be saved.
+    See ``benchmarks/main.py`` for documentation of each argument.
     """
-    # TODO: Complete docstring
     if backend == "qibojit" and threading is not None:
-        from utils import select_numba_threading
+        from benchmarks.utils import select_numba_threading
         threading = select_numba_threading(threading)
 
     if backend in {"qibotf", "tensorflow"} and memory is not None:
-        from utils import limit_gpu_memory
+        from benchmarks.utils import limit_gpu_memory
         memory = limit_gpu_memory(memory)
 
     logs = JsonLogger(filename)
