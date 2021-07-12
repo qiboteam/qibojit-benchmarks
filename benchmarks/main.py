@@ -16,7 +16,7 @@ parser.add_argument("--nreps", default=1, type=int)
 parser.add_argument("--filename", default=None, type=str)
 
 parser.add_argument("--circuit", default="qft", type=str)
-parser.add_argument("--params", default=None, type=str)
+parser.add_argument("--options", default=None, type=str)
 parser.add_argument("--nshots", default=None, type=int)
 
 parser.add_argument("--memory", default=None, type=int)
@@ -24,7 +24,7 @@ parser.add_argument("--threading", default=None, type=str)
 parser.add_argument("--transfer", action="store_true")
 
 
-def main(nqubits, backend, circuit_name, precision="double", params=None,
+def main(nqubits, backend, circuit_name, precision="double", options=None,
          nreps=1, nshots=None, memory=None, threading=None,
          transfer=False, filename=None):
     """Runs benchmarks for different circuit types.
@@ -57,7 +57,6 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
         memory = limit_gpu_memory(memory)
 
     logs = JsonLogger(filename=filename, nqubits=nqubits,
-                      circuit=circuit_name, params=params,
                       nreps=nreps, nshots=nshots, transfer=transfer,
                       numba_threading=threading, gpu_memory=memory)
 
@@ -73,7 +72,8 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
              version=qibo.__version__)
 
     from circuits import CircuitConstructor
-    gates = CircuitConstructor(circuit_name, nqubits, params)
+    gates = CircuitConstructor(circuit_name, nqubits, options)
+    logs.log(circuit=circuit_name, options=str(gates))
     start_time = time.time()
     circuit = qibo.models.Circuit(nqubits)
     circuit.add(gates)
