@@ -35,12 +35,19 @@ class JsonLogger(list):
             super().__init__()
         self.append(kwargs)
         now = datetime.datetime.now()
-        self[-1]["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        self["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    def __getitem__(self, x):
-        if isinstance(x, str):
-            return self[-1].get(x)
-        return super().__getitem__(x)
+    def __getitem__(self, i):
+        if isinstance(i, str):
+            return self[-1].get(i)
+        else:
+            return super().__getitem__(i)
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            self[-1][key] = value
+        else:
+            super().__setitem__(key, value)
 
     def __str__(self):
         return "\n" + "\n".join(f"{k}: {v}" for k, v in self[-1].items())

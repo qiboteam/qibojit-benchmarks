@@ -66,14 +66,14 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
 
     start_time = time.time()
     import qibo
-    logs[-1]["import_time"] = time.time() - start_time
+    logs["import_time"] = time.time() - start_time
 
     qibo.set_backend(backend)
     qibo.set_precision(precision)
-    logs[-1]["backend"] = qibo.get_backend()
-    logs[-1]["precision"] = qibo.get_precision()
-    logs[-1]["device"] = qibo.get_device()
-    logs[-1]["version"] = qibo.__version__
+    logs["backend"] = qibo.get_backend()
+    logs["precision"] = qibo.get_precision()
+    logs["device"] = qibo.get_device()
+    logs["version"] = qibo.__version__
 
     from circuits import CircuitConstructor
     gates = CircuitConstructor(circuit_name, params, nqubits)
@@ -83,36 +83,36 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
     if nshots is not None:
         # add measurement gates
         circuit.add(qibo.gates.M(*range(nqubits)))
-    logs[-1]["creation_time"] = time.time() - start_time
+    logs["creation_time"] = time.time() - start_time
 
     start_time = time.time()
     result = circuit(nshots=nshots)
-    logs[-1]["dry_run_execution_time"] = time.time() - start_time
+    logs["dry_run_execution_time"] = time.time() - start_time
     start_time = time.time()
     if transfer:
         result = result.numpy()
-    logs[-1]["dry_run_transfer_time"] = time.time() - start_time
+    logs["dry_run_transfer_time"] = time.time() - start_time
 
-    logs[-1]["simulation_times"], logs[-1]["transfer_times"] = [], []
+    logs["simulation_times"], logs["transfer_times"] = [], []
     for _ in range(nreps):
         start_time = time.time()
         result = circuit(nshots=nshots)
-        logs[-1]["simulation_times"].append(time.time() - start_time)
+        logs["simulation_times"].append(time.time() - start_time)
         start_time = time.time()
         if transfer:
             result = result.numpy()
-        logs[-1]["transfer_times"].append(time.time() - start_time)
+        logs["transfer_times"].append(time.time() - start_time)
 
-    logs[-1]["dtype"] = str(result.dtype)
-    logs[-1]["simulation_time"] = np.mean(logs[-1]["simulation_times"])
-    logs[-1]["simulation_time_std"] = np.std(logs[-1]["simulation_times"])
-    logs[-1]["transfer_time"] = np.mean(logs[-1]["transfer_times"])
-    logs[-1]["transfer_time_std"] = np.std(logs[-1]["transfer_times"])
+    logs["dtype"] = str(result.dtype)
+    logs["simulation_time"] = np.mean(logs["simulation_times"])
+    logs["simulation_time_std"] = np.std(logs["simulation_times"])
+    logs["transfer_time"] = np.mean(logs["transfer_times"])
+    logs["transfer_time_std"] = np.std(logs["transfer_times"])
 
     if nshots is not None:
         start_time = time.time()
         freqs = result.frequencies()
-        logs[-1]["measurement_time"] = time.time() - start_time
+        logs["measurement_time"] = time.time() - start_time
 
     print()
     logger.log.info(str(logs))
