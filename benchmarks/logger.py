@@ -11,7 +11,7 @@ class CustomHandler(logging.StreamHandler):
 
     def format(self, record):
         """Format the record with specific format."""
-        fmt = f'[qibojit-benchmarks|%(levelname)s|%(asctime)s]: %(message)s'
+        fmt = f'[benchmarks|%(levelname)s|%(asctime)s]: %(message)s'
         return logging.Formatter(fmt, datefmt='%Y-%m-%d %H:%M:%S').format(record)
 
 
@@ -37,14 +37,19 @@ class JsonLogger(list):
             super().__init__()
         now = datetime.datetime.now()
         kwargs["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
-        self.append(kwargs)
+        self.append(dict())
+        self.log(**kwargs)
 
     def log(self, **kwargs):
         self[-1].update(kwargs)
+        for k, v in kwargs.items():
+            log.info(f"{k}: {v}")
 
     def average(self, key):
         self[-1][f"{key}_mean"] = np.mean(self[-1][key])
         self[-1][f"{key}_std"] = np.std(self[-1][key])
+        log.info("{}_mean: {}".format(key, self[-1][f"{key}_mean"]))
+        log.info("{}_std: {}".format(key, self[-1][f"{key}_std"]))
 
     def __str__(self):
         return "\n" + "\n".join(f"{k}: {v}" for k, v in self[-1].items())

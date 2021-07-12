@@ -5,7 +5,8 @@ The type of the circuit is selected using the ``--type`` flag.
 """
 import argparse
 import time
-import logger
+from logger import JsonLogger
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nqubits", default=20, type=int)
@@ -55,10 +56,10 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
         from utils import limit_gpu_memory
         memory = limit_gpu_memory(memory)
 
-    logs = logger.JsonLogger(filename=filename, nqubits=nqubits,
-                             circuit=circuit_name, params=params,
-                             nreps=nreps, nshots=nshots, transfer=transfer,
-                             numba_threading=threading, gpu_memory=memory)
+    logs = JsonLogger(filename=filename, nqubits=nqubits,
+                      circuit=circuit_name, params=params,
+                      nreps=nreps, nshots=nshots, transfer=transfer,
+                      numba_threading=threading, gpu_memory=memory)
 
     start_time = time.time()
     import qibo
@@ -110,9 +111,6 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
         freqs = result.frequencies()
     logs.log(measurement_time=time.time() - start_time)
 
-    print()
-    logger.log.info(str(logs))
-    print()
     logs.dump()
 
 
