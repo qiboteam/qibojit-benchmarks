@@ -73,7 +73,7 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
              version=qibo.__version__)
 
     from circuits import CircuitConstructor
-    gates = CircuitConstructor(circuit_name, params, nqubits)
+    gates = CircuitConstructor(circuit_name, nqubits, params)
     start_time = time.time()
     circuit = qibo.models.Circuit(nqubits)
     circuit.add(gates)
