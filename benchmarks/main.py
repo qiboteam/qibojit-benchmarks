@@ -56,9 +56,9 @@ def main(nqubits, backend, circuit_name, precision="double", options=None,
         from utils import limit_gpu_memory
         memory = limit_gpu_memory(memory)
 
-    logs = JsonLogger(filename=filename, nqubits=nqubits,
-                      nreps=nreps, nshots=nshots, transfer=transfer,
-                      numba_threading=threading, gpu_memory=memory)
+    logs = JsonLogger(filename)
+    logs.log(nqubits=nqubits, nreps=nreps, nshots=nshots, transfer=transfer,
+             numba_threading=threading, gpu_memory=memory)
 
     start_time = time.time()
     import qibo

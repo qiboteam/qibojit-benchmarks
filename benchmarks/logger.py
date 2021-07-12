@@ -22,7 +22,7 @@ log.addHandler(CustomHandler())
 
 class JsonLogger(list):
 
-    def __init__(self, filename=None, **kwargs):
+    def __init__(self, filename=None):
         self.filename = filename
         if filename is not None:
             if os.path.isfile(filename):
@@ -35,10 +35,9 @@ class JsonLogger(list):
         else:
             log.warning("Filename was not provided and logs will not be saved.")
             super().__init__()
-        now = datetime.datetime.now()
-        kwargs["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
         self.append(dict())
-        self.log(**kwargs)
+        now = datetime.datetime.now()
+        self.log(datetime=now.strftime("%Y-%m-%d %H:%M:%S"))
 
     def log(self, **kwargs):
         self[-1].update(kwargs)
