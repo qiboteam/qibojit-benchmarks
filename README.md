@@ -26,8 +26,8 @@ Before executing the simulation please:
 
 ## Supported simulation backends
 
-- [qibojit](https://github.com/qiboteam/qibojit): uses numba and cupy for custom kernel operations.
-- [qibotf](https://github.com/qiboteam/qibotf): uses tf primitives with custom operators.
+- [qibojit](https://github.com/qiboteam/qibojit): uses numba on CPU and cupy on GPU for custom operations.
+- [qibotf](https://github.com/qiboteam/qibotf): uses tf primitives with custom operators on CPU and GPU.
 - [tensorflow](https://www.tensorflow.org/): uses tf default primitives.
 - [numpy](https://numpy.org/): single-threaded CPU implementation.
 
@@ -37,10 +37,33 @@ For more details check the documentation [here](https://qibo.readthedocs.io/en/l
 
 The script in `benchmarks/main.py` executes the benchmark code following the supported configuration flags (check `python main.py -h`).
 
+```
+$ python main.py -h
+
+usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND]
+               [--precision PRECISION] [--nreps NREPS] [--filename FILENAME]
+               [--circuit CIRCUIT] [--params PARAMS] [--nshots NSHOTS]
+               [--memory MEMORY] [--threading THREADING] [--transfer]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --nqubits NQUBITS
+  --backend BACKEND
+  --precision PRECISION
+  --nreps NREPS
+  --filename FILENAME
+  --circuit CIRCUIT
+  --params PARAMS
+  --nshots NSHOTS
+  --memory MEMORY
+  --threading THREADING
+  --transfer
+```
+
 Before executing the code keep in mind the following:
 - GPUs are the default devices for qibojit and qibotf. If you need CPU performance numbers do `export CUDA_VISIBLES_DEVICE=""` before executing the benchmark script.
-- CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` before executing the bencharmk script.
-- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology.
+- CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script (note that ).
+- The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation).
 
 ## Benchmark output
 
@@ -59,4 +82,4 @@ The benchmark script prints a summary of the circuit and user selected flags tog
 ## Implemented circuits
 
 - `qft`: [quantum fourier transform](https://en.wikipedia.org/wiki/Quantum_Fourier_transform)
-- `variational_circuit`: [variational quantum circuit layer as defined](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer)
+- `variational_circuit`: variational quantum circuit layer as defined [in the docs]](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer)
