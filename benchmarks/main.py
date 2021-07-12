@@ -59,13 +59,10 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
         from utils import limit_gpu_memory
         memory = limit_gpu_memory(memory)
 
-    logs = logger.JsonLogger(filename)
-    # Create log dict
-    logs.append({
-        "nqubits": nqubits, "circuit": circuit_name, "params": params,
-        "nreps": nreps, "nshots": nshots, "transfer": transfer,
-        "numba-threading": threading, "gpu-memory": memory
-        })
+    logs = logger.JsonLogger(filename=filename, nqubits=nqubits,
+                             circuit=circuit_name, params=params,
+                             nreps=nreps, nshots=nshots, transfer=transfer,
+                             numba_threading=threading, gpu_memory=memory)
 
     start_time = time.time()
     import qibo
@@ -76,6 +73,7 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
     logs[-1]["backend"] = qibo.get_backend()
     logs[-1]["precision"] = qibo.get_precision()
     logs[-1]["device"] = qibo.get_device()
+    logs[-1]["version"] = qibo.__version__
 
     from circuits import CircuitConstructor
     gates = CircuitConstructor(circuit_name, params, nqubits)
@@ -117,9 +115,9 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
         logs[-1]["measurement_time"] = time.time() - start_time
 
     print()
-    print(logs)
-    logs.dump()
+    logger.log.info(str(logs))
     print()
+    logs.dump()
 
 
 if __name__ == "__main__":
