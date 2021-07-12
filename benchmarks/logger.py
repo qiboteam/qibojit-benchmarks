@@ -2,6 +2,8 @@ import os
 import datetime
 import logging
 import json
+import numpy as np
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" # disable Tensorflow warnings
 
 
 class CustomHandler(logging.StreamHandler):
@@ -33,21 +35,16 @@ class JsonLogger(list):
         else:
             log.warning("Filename was not provided and logs will not be saved.")
             super().__init__()
-        self.append(kwargs)
         now = datetime.datetime.now()
-        self["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        kwargs["datetime"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.append(kwargs)
 
-    def __getitem__(self, i):
-        if isinstance(i, str):
-            return self[-1].get(i)
-        else:
-            return super().__getitem__(i)
+    def log(self, **kwargs):
+        self[-1].update(kwargs)
 
-    def __setitem__(self, key, value):
-        if isinstance(key, str):
-            self[-1][key] = value
-        else:
-            super().__setitem__(key, value)
+    def average(self, key):
+        self[-1][f"{key}_mean"] = np.mean(self[-1][key])
+        self[-1][f"{key}_std"] = np.std(self[-1][key])
 
     def __str__(self):
         return "\n" + "\n".join(f"{k}: {v}" for k, v in self[-1].items())

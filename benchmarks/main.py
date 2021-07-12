@@ -4,12 +4,8 @@ Generic benchmark script that runs circuits defined in `benchmark_models.py`.
 The type of the circuit is selected using the ``--type`` flag.
 """
 import argparse
-import os
 import time
 import logger
-import numpy as np
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" # disable Tensorflow warnings
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nqubits", default=20, type=int)
@@ -66,14 +62,14 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
 
     start_time = time.time()
     import qibo
-    logs["import_time"] = time.time() - start_time
+    logs.log(import_time=time.time() - start_time)
 
     qibo.set_backend(backend)
     qibo.set_precision(precision)
-    logs["backend"] = qibo.get_backend()
-    logs["precision"] = qibo.get_precision()
-    logs["device"] = qibo.get_device()
-    logs["version"] = qibo.__version__
+    logs.log(backend=qibo.get_backend(),
+             precision=qibo.get_precision(),
+             device=qibo.get_device(),
+             version=qibo.__version__)
 
     from circuits import CircuitConstructor
     gates = CircuitConstructor(circuit_name, params, nqubits)
@@ -83,36 +79,36 @@ def main(nqubits, backend, circuit_name, precision="double", params=None,
     if nshots is not None:
         # add measurement gates
         circuit.add(qibo.gates.M(*range(nqubits)))
-    logs["creation_time"] = time.time() - start_time
+    logs.log(creation_time=time.time() - start_time)
 
     start_time = time.time()
     result = circuit(nshots=nshots)
-    logs["dry_run_execution_time"] = time.time() - start_time
+    logs.log(dry_run_time=time.time() - start_time)
     start_time = time.time()
     if transfer:
         result = result.numpy()
-    logs["dry_run_transfer_time"] = time.time() - start_time
+    logs.log(dry_run_transfer_time=time.time() - start_time)
 
-    logs["simulation_times"], logs["transfer_times"] = [], []
+    simulation_times, transfer_times = [], []
     for _ in range(nreps):
         start_time = time.time()
         result = circuit(nshots=nshots)
-        logs["simulation_times"].append(time.time() - start_time)
+        simulation_times.append(time.time() - start_time)
         start_time = time.time()
         if transfer:
             result = result.numpy()
-        logs["transfer_times"].append(time.time() - start_time)
+        transfer_times.append(time.time() - start_time)
 
-    logs["dtype"] = str(result.dtype)
-    logs["simulation_time"] = np.mean(logs["simulation_times"])
-    logs["simulation_time_std"] = np.std(logs["simulation_times"])
-    logs["transfer_time"] = np.mean(logs["transfer_times"])
-    logs["transfer_time_std"] = np.std(logs["transfer_times"])
+    logs.log(dtype=str(result.dtype),
+             simulation_times=simulation_times,
+             transfer_times=transfer_times)
+    logs.average("simulation_times")
+    logs.average("transfer_times")
 
+    start_time = time.time()
     if nshots is not None:
-        start_time = time.time()
         freqs = result.frequencies()
-        logs["measurement_time"] = time.time() - start_time
+    logs.log(measurement_time=time.time() - start_time)
 
     print()
     logger.log.info(str(logs))
