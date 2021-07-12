@@ -27,7 +27,7 @@ parser.add_argument("--threading", default=None, type=str)
 parser.add_argument("--transfer", action="store_true")
 
 
-def main(nqubits, backend, circuit, precision="double", params=None,
+def main(nqubits, backend, circuit_name, precision="double", params=None,
          nreps=1, nshots=None, memory=None, threading=None,
          transfer=False, filename=None):
     """Runs benchmarks for different circuit types.
@@ -38,7 +38,7 @@ def main(nqubits, backend, circuit, precision="double", params=None,
         precision (str): Numerical precision of the simulation.
             Choose between 'double' and 'single'.
             Default is 'double'.
-        circuit (str): Type of Circuit to use.
+        circuit_name (str): Type of Circuit to use.
             See ``circuits.py`` for available types.
         nreps (int): Number of repetitions of circuit execution.
             Dry run is not included. Default is 1.
@@ -62,7 +62,7 @@ def main(nqubits, backend, circuit, precision="double", params=None,
     logs = logger.JsonLogger(filename)
     # Create log dict
     logs.append({
-        "nqubits": nqubits, "circuit": circuit, "params": params,
+        "nqubits": nqubits, "circuit": circuit_name, "params": params,
         "nreps": nreps, "nshots": nshots, "transfer": transfer,
         "numba-threading": threading, "gpu-memory": memory
         })
@@ -78,7 +78,7 @@ def main(nqubits, backend, circuit, precision="double", params=None,
     logs[-1]["device"] = qibo.get_device()
 
     from circuits import CircuitConstructor
-    gates = CircuitConstructor(circuit, params, nqubits)
+    gates = CircuitConstructor(circuit_name, params, nqubits)
     start_time = time.time()
     circuit = qibo.models.Circuit(nqubits)
     circuit.add(gates)
@@ -124,4 +124,5 @@ def main(nqubits, backend, circuit, precision="double", params=None,
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
+    args["circuit_name"] = args.pop("circuit")
     main(**args)
