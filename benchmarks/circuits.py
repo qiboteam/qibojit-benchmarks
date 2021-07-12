@@ -48,9 +48,9 @@ class TwoQubitGate(OneQubitGate):
 
 class QFT(BaseCircuit):
 
-    def __init__(self, nqubits, swaps="swaps"):
+    def __init__(self, nqubits, swaps="True"):
         super().__init__(nqubits)
-        self.swaps = "swaps" in swaps
+        self.swaps = swaps == "True"
         self.parameters = {"nqubits": nqubits, "swaps": self.swaps}
 
     def __iter__(self):
@@ -67,10 +67,10 @@ class QFT(BaseCircuit):
 
 class VariationalCircuit(BaseCircuit):
 
-    def __init__(self, nqubits, nlayers=1, varlayer=""):
+    def __init__(self, nqubits, nlayers=1, varlayer="False"):
         super().__init__(nqubits)
         self.nlayers = int(nlayers)
-        self.varlayer = "varlayer" in varlayer
+        self.varlayer = varlayer == "True"
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
                            "varlayer": self.varlayer}
 
@@ -128,6 +128,9 @@ class CircuitConstructor:
         kwargs = {}
         if options is not None:
             for parameter in options.split(","):
-                k, v = parameter.split("=")
-                kwargs[k] = v
+                if "=" in parameter:
+                    k, v = parameter.split("=")
+                    kwargs[k] = v
+                else:
+                    raise ValueError(f"Cannot parse parameter {parameter}.")
         return kwargs

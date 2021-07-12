@@ -1,6 +1,6 @@
 """Benchmark scripts."""
 import time
-from logger import JsonLogger
+from benchmarks.logger import JsonLogger
 
 
 def circuit_benchmark(nqubits, backend, circuit_name, options=None,
@@ -51,7 +51,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
              device=qibo.get_device(),
              version=qibo.__version__)
 
-    from circuits import CircuitConstructor
+    from benchmarks.circuits import CircuitConstructor
     gates = CircuitConstructor(circuit_name, nqubits, options)
     logs.log(circuit=circuit_name, options=str(gates))
     start_time = time.time()
@@ -92,3 +92,4 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     logs.log(measurement_time=time.time() - start_time)
 
     logs.dump()
+    return logs
