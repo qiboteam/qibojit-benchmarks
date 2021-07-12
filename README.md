@@ -35,33 +35,45 @@ For more details check the documentation [here](https://qibo.readthedocs.io/en/l
 
 ## Running the benchmarks
 
-The script in `benchmarks/main.py` executes the benchmark code following the supported configuration flags:
+The script in `benchmarks/main.py` executes the benchmark code following the supported configuration flags (check `python main.py -h`):
 
 ```
 $ python main.py -h
 
-usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND]
-                    [--circuit CIRCUIT] [--options OPTIONS]
-                    [--nreps NREPS] [--nshots NSHOTS] [--transfer]
-                    [--precision PRECISION] [--memory MEMORY]
-                    [--threading THREADING] [--filename FILENAME]
+usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND] [--circuit CIRCUIT]
+               [--options OPTIONS] [--nreps NREPS] [--nshots NSHOTS] [--transfer]
+               [--precision PRECISION] [--memory MEMORY] [--threading THREADING]
+               [--filename FILENAME]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --nqubits NQUBITS
-  --backend BACKEND
+  --nqubits NQUBITS     Number of qubits in the circuit.
+  --backend BACKEND     Qibo backend to use for simulation.
+  --circuit CIRCUIT     Type of circuit to use. See README for the list of available circuits.
+  --options OPTIONS     String with options for circuit creation. It should have the form
+                        'arg1=value1,arg2=value2,...' .See README for the list of arguments
+                        that are available for each circuit.
+  --nreps NREPS         Number of repetitions of the circuit execution. Dry run is not
+                        included.
+  --nshots NSHOTS       Number of measurement shots. If used the time required to measure
+                        frequencies (no samples) is measured and logged. If it is ``None`` no
+                        measurements are performed.
+  --transfer            If used the final state array is converted to numpy.If the simulation
+                        device is GPU this requires a transfer from GPU memory to CPU.
   --precision PRECISION
-  --nreps NREPS
-  --filename FILENAME
-  --circuit CIRCUIT
-  --params PARAMS
-  --nshots NSHOTS
-  --memory MEMORY
+                        Numerical precision of the simulation.Choose between 'double' and
+                        'single'.
+  --memory MEMORY       Limit the GPU memory usage when using Tensorflow based backends. The
+                        memory limit should be given in MB. Tensorflow reserves the full
+                        available memory by default.
   --threading THREADING
-  --transfer
+                        Switches the numba threading layer when using the qibojit backend on
+                        CPU. See https://numba.pydata.org/numba-doc/latest/user/threading-
+                        layer.html#selecting-a-named-threading-layer for a list of available
+                        threading layers.
+  --filename FILENAME   Directory of file to save the logs in json format.If not given the
+                        logs only be printed and not saved.
 ```
-
-Check `python main.py -h` for complete documentation of each flag.
 
 Before executing the code keep in mind the following:
 - GPUs are the default devices for qibojit and qibotf. If you need CPU performance numbers do `export CUDA_VISIBLES_DEVICE=""` before executing the benchmark script.
@@ -90,7 +102,16 @@ If `--filename` is given the above logs are saved in json format in the given di
 
 ## Implemented circuits
 
-- `one-qubit-gate`: circuit consisting of a single one qubit gate. The gate is applied to every qubit in the circuit.
+- `one-qubit-gate`: circuit consisting of a single one qubit gate. The gate is applied to every qubit in the circuit. Available options:
+  - `gate`: String defining the one qubit gate to be benchmarked (eg. "H"). Default is "H"
+  - `nlayers`: Number of times that the gate is applied to each qubit. Default is 1.
+  - additional parameters (eg. `theta`, etc.) required for parametrized gates.
 - `two-qubit-gate`: circuit consisting of a single two qubit gate. The gate is applied to every pair of adjacent qubits in the circuit (assuming one dimensional topology).
+  - `gate`: String defining the one qubit gate to be benchmarked. Default is CNOT.
+  - `nlayers`: Number of times that the gate is applied to each qubit. Default is 1.
+  - additional parameters (eg. `theta`, etc.) required for parametrized gates.
 - `qft`: [quantum fourier transform](https://en.wikipedia.org/wiki/Quantum_Fourier_transform)
-- `variational`: variational quantum circuit consisting a layer of `RY` rotations followed be a layer of `CZ` entangling gates. Can be created using either standard qibot gates or the optimized [`VariationalLayer`](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer) gate.
+  - `swaps`: Boolean controling if swaps are applied after the main QFT circuit. Default is True.
+- `variational`: variational quantum circuit consisting a layer of RY rotations followed be a layer of CZ entangling gates. Can be created using either standard qibot gates or the optimized [VariationalLayer](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer) gate.
+  - `nlayers`: Number of times that the gate is applied to each qubit.
+  - `varlayer`: Boolean controling whether the VariationalLayer or standard gates are used. Default is False.
