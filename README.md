@@ -80,6 +80,8 @@ Before executing the code keep in mind the following:
 - CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script.
 - The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow. See `python main.py -h` for more details.
 
+The `scripts/` folder contains some example bash scripts that execute circuit benchmarks for different numbers of qubits.
+
 ## Benchmark output
 
 The benchmark script prints a summary of the circuit and user selected flags together with:
