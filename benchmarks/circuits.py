@@ -134,6 +134,47 @@ class BernsteinVazirani(BaseCircuit):
             yield gates.M(i)
 
 
+class HiddenShift(BaseCircuit):
+    """Applies the Hidden Shift algorithm.
+
+    See `https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py`
+    for the Cirq code.
+    Note that the shift (hidden bitstring) is randomly generated using
+    `np.random.randint`.
+    """
+
+    def __init__(self, nqubits):
+        super().__init__(nqubits)
+        self.parameters = {"nqubits": nqubits}
+
+    def oracle(self):
+        for i in range(self.nqubits // 2):
+            yield gates.CZ(2 * i, 2 * i + 1)
+
+    def hs_circuit(self, shift):
+        for i in range(self.nqubits):
+            yield gates.H(i)
+        for i, ish in enumerate(shift):
+            if ish:
+                yield gates.X(i)
+        for gate in self.oracle():
+            yield gate
+        for i, ish in enumerate(shift):
+            if ish:
+                yield gates.X(i)
+        for i in range(self.nqubits):
+            yield gates.H(i)
+        for gate in self.oracle():
+            yield gate
+        for i in range(self.nqubits):
+            yield gates.H(i)
+        yield gates.M(*range(self.nqubits))
+
+    def __iter__(self):
+        shift = np.random.randint(0, 2, size=(self.nqubits,))
+        return self.hs_circuit(shift)
+
+
 class CircuitConstructor:
 
     circuit_map = {
@@ -145,6 +186,8 @@ class CircuitConstructor:
         "variational-circuit": VariationalCircuit,
         "bernstein-vazirani": BernsteinVazirani,
         "bv": BernsteinVazirani,
+        "hidden-shift": HiddenShift,
+        "hs": HiddenShift,
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):
