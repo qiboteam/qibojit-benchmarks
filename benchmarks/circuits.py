@@ -26,7 +26,7 @@ class OneQubitGate(BaseCircuit):
         self.gate = getattr(gates, gate)
         self.angles = {k: float(v) for k, v in params.items()}
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
-                           "gate": gate, "angles": self.angles}
+                           "gate": gate, "angles": angles}
 
     def __iter__(self):
         for _ in range(self.nlayers):
@@ -54,7 +54,7 @@ class QFT(BaseCircuit):
     def __init__(self, nqubits, swaps="True"):
         super().__init__(nqubits)
         self.swaps = swaps == "True"
-        self.parameters = {"nqubits": nqubits, "swaps": self.swaps}
+        self.parameters = {"nqubits": nqubits, "swaps": swaps}
 
     def __iter__(self):
         for i1 in range(self.nqubits):
@@ -76,7 +76,7 @@ class VariationalCircuit(BaseCircuit):
         self.nlayers = int(nlayers)
         self.varlayer = varlayer == "True"
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
-                           "varlayer": self.varlayer}
+                           "varlayer": varlayer}
 
     def varlayer_circuit(self, theta):
         theta = theta.reshape((2 * self.nlayers, self.nqubits))
@@ -139,13 +139,21 @@ class HiddenShift(BaseCircuit):
 
     See `https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py`
     for the Cirq code.
-    Note that the shift (hidden bitstring) is randomly generated using
-    `np.random.randint`.
+    If the shift (hidden bitstring) is not given then it is randomly generated
+    using `np.random.randint`.
     """
 
-    def __init__(self, nqubits):
+    def __init__(self, nqubits, shift=""):
         super().__init__(nqubits)
-        self.parameters = {"nqubits": nqubits}
+        if len(shift):
+            if len(shift) != nqubits:
+                raise ValueError("Shift bitstring of length {} was given for "
+                                 "circuit of {} qubits."
+                                 "".format(len(shift), nqubits))
+            self.shift = [int(x) for x in shift]
+        else:
+            self.shift = None
+        self.parameters = {"nqubits": nqubits, "shift": shift}
 
     def oracle(self):
         for i in range(self.nqubits // 2):
@@ -171,7 +179,10 @@ class HiddenShift(BaseCircuit):
         yield gates.M(*range(self.nqubits))
 
     def __iter__(self):
-        shift = np.random.randint(0, 2, size=(self.nqubits,))
+        if self.shift:
+            shift = self.shift
+        else:
+            shift = np.random.randint(0, 2, size=(self.nqubits,))
         return self.hs_circuit(shift)
 
 

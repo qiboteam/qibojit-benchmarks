@@ -24,3 +24,14 @@ def test_bernstein_vazirani_circuit():
     assert circuit.nqubits == 28
     assert circuit.depth == 30
     assert circuit.ngates == 83
+
+
+def test_hidden_shift_circuit():
+    import numpy as np
+    shift = "0111001011001001111011001101"
+    circuit = Circuit(28)
+    gates = circuits.HiddenShift(28, shift=shift)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.depth == 7
+    assert circuit.ngates == 144
