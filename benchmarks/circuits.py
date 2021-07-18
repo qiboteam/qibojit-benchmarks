@@ -18,6 +18,7 @@ class BaseCircuit:
 
 
 class OneQubitGate(BaseCircuit):
+    """Applies a specific one qubit gate to all qubits."""
 
     def __init__(self, nqubits, nlayers="1", gate="H", **params):
         super().__init__(nqubits)
@@ -34,6 +35,7 @@ class OneQubitGate(BaseCircuit):
 
 
 class TwoQubitGate(OneQubitGate):
+    """Applies a specific two qubit gate to all pairs of adjacent qubits."""
 
     def __init__(self, nqubits, nlayers="1", gate="CNOT", **params):
         super().__init__(nqubits, nlayers, gate, **params)
@@ -47,6 +49,7 @@ class TwoQubitGate(OneQubitGate):
 
 
 class QFT(BaseCircuit):
+    """Applies the Quantum Fourier Transform."""
 
     def __init__(self, nqubits, swaps="True"):
         super().__init__(nqubits)
@@ -66,6 +69,7 @@ class QFT(BaseCircuit):
 
 
 class VariationalCircuit(BaseCircuit):
+    """Example variational circuit consisting of alternating layers of RY and CZ gates."""
 
     def __init__(self, nqubits, nlayers=1, varlayer="False"):
         super().__init__(nqubits)
@@ -106,6 +110,30 @@ class VariationalCircuit(BaseCircuit):
             return self.standard_circuit(theta)
 
 
+class BernsteinVazirani(BaseCircuit):
+    """Applies the Bernstein-Vazirani algorithm from Qiskit/openqasm.
+
+    See `https://github.com/Qiskit/openqasm/tree/0af8b8489f32d46692b3a3a1421e98c611cd86cc/benchmarks/bv`
+    for the OpenQASM code.
+    Note that `Barrier` gates are excluded for simulation.
+    """
+
+    def __init__(self, nqubits):
+        super().__init__(nqubits)
+        self.parameters = {"nqubits": nqubits}
+
+    def __iter__(self):
+        yield gates.X(self.nqubits - 1)
+        for i in range(self.nqubits):
+            yield gates.H(i)
+        for i in range(self.nqubits - 1):
+            yield gates.CNOT(i, self.nqubits - 1)
+        for i in range(self.nqubits - 1):
+            yield gates.H(i)
+        for i in range(self.nqubits - 1):
+            yield gates.M(i)
+
+
 class CircuitConstructor:
 
     circuit_map = {
@@ -114,7 +142,9 @@ class CircuitConstructor:
         "one-qubit-gate": OneQubitGate,
         "two-qubit-gate": TwoQubitGate,
         "variational": VariationalCircuit,
-        "variational-circuit": VariationalCircuit
+        "variational-circuit": VariationalCircuit,
+        "bernstein-vazirani": BernsteinVazirani,
+        "bv": BernsteinVazirani,
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):

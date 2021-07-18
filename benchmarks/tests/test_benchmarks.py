@@ -38,4 +38,14 @@ def test_variational_benchmark(nqubits, backend, varlayer):
     assert logs[-1]["options"] == target_options
 
 
-# TODO: Complete tests
+# TODO: Test OneQubitGate and TwoQubitGate circuits
+
+
+@pytest.mark.parametrize("nqubits", [5, 6])
+@pytest.mark.parametrize("backend", ["qibojit", "qibotf"])
+def test_bernstein_vazirani_benchmark(nqubits, backend):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="bv")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}"
+    assert logs[-1]["circuit"] == "bv"
+    assert logs[-1]["options"] == target_options
