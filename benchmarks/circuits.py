@@ -181,12 +181,19 @@ class HiddenShift(BaseCircuit):
 
 class QAOA(BaseCircuit):
 
-    def __init__(self, nqubits, nparams="2"):
+    def __init__(self, nqubits, nparams="2", graph=""):
         super().__init__(nqubits)
         import networkx
         self.nparams = int(nparams)
-        self.networkx = networkx
-        self.parameters = {"nqubits": nqubits, "nparams": nparams}
+        if len(graph):
+            import json
+            with open(graph, "r") as file:
+                data = json.load(file)
+            self.graph = networkx.readwrite.json_graph.node_link_graph(data)
+        else:
+            self.graph = networkx.random_regular_graph(3, self.nqubits)
+        self.parameters = {"nqubits": nqubits, "nparams": nparams,
+                           "graph": graph}
 
     @staticmethod
     def RZZ(q0, q1, theta):
@@ -195,23 +202,28 @@ class QAOA(BaseCircuit):
         matrix = np.diag([phasec, phase, phase, phasec])
         return gates.Unitary(matrix, q0, q1)
 
-    def maxcut_unitary(self, betas, gammas, graph):
+    def maxcut_unitary(self, betas, gammas):
         for beta, gamma in zip(betas, gammas):
-            for i, j in graph.edges:
+            for i, j in self.graph.edges:
                 yield self.RZZ(i, j, -0.5 * gamma)
             for i in range(self.nqubits):
                 yield gates.RX(i, theta=2 * beta)
 
+    def dump(self, dir):
+        """Saves graph data as JSON in given directory."""
+        import json
+        data = networkx.readwrite.json_graph.node_link_data(self.graph)
+        with open(dir, "w") as file:
+            json.dump(data, file)
+
     def __iter__(self):
-        graph = self.networkx.random_regular_graph(3, self.nqubits)
         betas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
         gammas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
-
         # Prepare uniform superposition
         for i in range(self.nqubits):
             yield gates.H(i)
         # Apply QAOA unitary
-        for gate in self.maxcut_unitary(betas, gammas, graph):
+        for gate in self.maxcut_unitary(betas, gammas):
             yield gate
         # Measure
         yield gates.M(*range(self.nqubits))

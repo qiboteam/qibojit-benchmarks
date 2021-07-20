@@ -36,11 +36,12 @@ def test_hidden_shift_circuit():
     assert circuit.ngates == 144
 
 
-@pytest.mark.skip
 def test_qaoa_circuit():
+    import pathlib
+    folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph28.json")
     circuit = Circuit(28)
-    gates = circuits.QAOA(28)
+    gates = circuits.QAOA(28, graph=folder)
     circuit.add(gates)
     assert circuit.nqubits == 28
-    assert circuit.depth == 7
-    assert circuit.ngates == 144
+    assert circuit.ngates == 168
+    assert circuit.depth == 18
