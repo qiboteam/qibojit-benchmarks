@@ -186,6 +186,44 @@ class HiddenShift(BaseCircuit):
         return self.hs_circuit(shift)
 
 
+class QAOA(BaseCircuit):
+
+    def __init__(self, nqubits, nparams="2"):
+        super().__init__(nqubits)
+        import networkx
+        self.nparams = int(nparams)
+        self.networkx = networkx
+        self.parameters = {"nqubits": nqubits, "nparams": nparams}
+
+    @staticmethod
+    def RZZ(q0, q1, theta):
+        phase = np.exp(1j * theta)
+        phasec = np.conj(phase)
+        matrix = np.diag([phasec, phase, phase, phasec])
+        return gates.Unitary(matrix, q0, q1)
+
+    def maxcut_unitary(self, betas, gammas, graph):
+        for beta, gamma in zip(betas, gammas):
+            for i, j in graph.edges:
+                yield self.RZZ(i, j, -0.5 * gamma)
+            for i in range(self.nqubits):
+                yield gates.RX(i, theta=2 * beta)
+
+    def __iter__(self):
+        graph = self.networkx.random_regular_graph(3, self.nqubits)
+        betas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
+        gammas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
+
+        # Prepare uniform superposition
+        for i in range(self.nqubits):
+            yield gates.H(i)
+        # Apply QAOA unitary
+        for gate in self.maxcut_unitary(betas, gammas, graph):
+            yield gate
+        # Measure
+        yield gates.M(*range(self.nqubits))
+
+
 class CircuitConstructor:
 
     circuit_map = {
@@ -199,6 +237,7 @@ class CircuitConstructor:
         "bv": BernsteinVazirani,
         "hidden-shift": HiddenShift,
         "hs": HiddenShift,
+        "qaoa": QAOA
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):

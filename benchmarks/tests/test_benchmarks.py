@@ -45,10 +45,17 @@ def test_bernstein_vazirani_benchmark(nqubits, backend):
 @pytest.mark.parametrize("random", [True, False])
 def test_hidden_shift_benchmark(nqubits, backend, random):
     shift = "" if random else nqubits * "0"
-    print(shift)
     logs = circuit_benchmark(nqubits, backend, circuit_name="hs",
                              options=f"shift={shift}")
     assert_logs(logs, nqubits, backend)
     target_options = f"nqubits={nqubits}, shift={shift}"
     assert logs[-1]["circuit"] == "hs"
+    assert logs[-1]["options"] == target_options
+
+
+def test_qaoa_benchmark(backend):
+    logs = circuit_benchmark(4, backend, circuit_name="qaoa")
+    assert_logs(logs, 4, backend)
+    target_options = f"nqubits=4, nparams=2"
+    assert logs[-1]["circuit"] == "qaoa"
     assert logs[-1]["options"] == target_options
