@@ -239,6 +239,37 @@ class QAOA(BaseCircuit):
         yield gates.M(*range(self.nqubits))
 
 
+class SupremacyCircuit(BaseCircuit):
+    """Random circuit by Boixo et al 2018 for demonstrating quantum supremacy.
+
+    See `https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py`
+    for the Cirq code.
+    """
+
+    def __init__(self, nqubits, depth="2", seed="123"):
+        super().__init__(nqubits)
+        self.depth = int(depth)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
+        self.gate_map = {
+            "H": gates.H,
+            "X**0.5": lambda i: gates.RX(i, theta=np.pi / 2.0),
+            "Y**0.5": lambda i: gates.RY(i, theta=np.pi / 2.0),
+            "T": lambda i: gates.U1(i, theta=np.pi / 4.0),
+            "CZ": gates.CZ
+            }
+
+    def __iter__(self):
+        import cirq
+        from cirq.experiments import google_v2_supremacy_circuit as spc
+        qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
+        circuit = spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
+        for moment in circuit:
+            for op in moment:
+                gate = self.gate_map.get(str(op.gate))
+                yield gate(*(q.row for q in op.qubits))
+
+
 class CircuitConstructor:
 
     circuit_map = {
@@ -252,7 +283,8 @@ class CircuitConstructor:
         "bv": BernsteinVazirani,
         "hidden-shift": HiddenShift,
         "hs": HiddenShift,
-        "qaoa": QAOA
+        "qaoa": QAOA,
+        "supremacy": SupremacyCircuit
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):

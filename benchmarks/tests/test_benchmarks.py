@@ -59,3 +59,13 @@ def test_qaoa_benchmark(backend):
     target_options = f"nqubits=4, nparams=2, graph="
     assert logs[-1]["circuit"] == "qaoa"
     assert logs[-1]["options"] == target_options
+
+
+@pytest.mark.parametrize("depth", ["2", "5", "10"])
+def test_supremacy_benchmark(nqubits, backend, depth):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="supremacy",
+                             options=f"depth={depth}")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}, depth={depth}, seed=123"
+    assert logs[-1]["circuit"] == "supremacy"
+    assert logs[-1]["options"] == target_options

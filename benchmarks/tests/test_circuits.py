@@ -45,3 +45,12 @@ def test_qaoa_circuit():
     assert circuit.nqubits == 28
     assert circuit.ngates == 168
     assert circuit.depth == 18
+
+
+def test_supremacy_circuit():
+    circuit = Circuit(28)
+    gates = circuits.SupremacyCircuit(28, depth="40")
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.ngates == 880
+    assert circuit.depth == 42
