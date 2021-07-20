@@ -180,6 +180,16 @@ class HiddenShift(BaseCircuit):
 
 
 class QAOA(BaseCircuit):
+    """Example QAOA circuit for a MaxCut problem instance.
+
+    See `https://github.com/quantumlib/Cirq/blob/master/examples/qaoa.py` for
+    the Cirq code.
+    If a JSON file containing the node link structure is given then the graph
+    is loaded using `networkx.readwrite.json_graph.node_link_graph`, otherwise
+    the graph is generated randomly using `networkx.random_regular_graph`.
+    Note that different graphs may lead to different performance as the graph
+    structure affects circuit depth.
+    """
 
     def __init__(self, nqubits, nparams="2", graph=""):
         super().__init__(nqubits)
