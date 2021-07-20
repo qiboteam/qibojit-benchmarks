@@ -36,6 +36,7 @@ def test_hidden_shift_circuit():
     assert circuit.ngates == 144
 
 
+@pytest.mark.skip
 def test_qaoa_circuit():
     circuit = Circuit(28)
     gates = circuits.QAOA(28)

@@ -152,22 +152,22 @@ class HiddenShift(BaseCircuit):
                                  "".format(len(shift), nqubits))
             self.shift = [int(x) for x in shift]
         else:
-            self.shift = None
+            self.shift = np.random.randint(0, 2, size=(self.nqubits,))
         self.parameters = {"nqubits": nqubits, "shift": shift}
 
     def oracle(self):
         for i in range(self.nqubits // 2):
             yield gates.CZ(2 * i, 2 * i + 1)
 
-    def hs_circuit(self, shift):
+    def __iter__(self):
         for i in range(self.nqubits):
             yield gates.H(i)
-        for i, ish in enumerate(shift):
+        for i, ish in enumerate(self.shift):
             if ish:
                 yield gates.X(i)
         for gate in self.oracle():
             yield gate
-        for i, ish in enumerate(shift):
+        for i, ish in enumerate(self.shift):
             if ish:
                 yield gates.X(i)
         for i in range(self.nqubits):
@@ -177,13 +177,6 @@ class HiddenShift(BaseCircuit):
         for i in range(self.nqubits):
             yield gates.H(i)
         yield gates.M(*range(self.nqubits))
-
-    def __iter__(self):
-        if self.shift:
-            shift = self.shift
-        else:
-            shift = np.random.randint(0, 2, size=(self.nqubits,))
-        return self.hs_circuit(shift)
 
 
 class QAOA(BaseCircuit):
