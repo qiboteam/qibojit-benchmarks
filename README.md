@@ -12,7 +12,7 @@ Before executing the simulation please:
     pip install qibo --pre
     ```
 
-2. Install qibojit simulation backends with:
+2. Install `qibojit >= 0.0.2` simulation backend with:
     ```
     pip install qibojit
     ```
