@@ -259,6 +259,8 @@ class SupremacyCircuit(BaseCircuit):
 
     See `https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py`
     for the Cirq code.
+    This circuit is constructed using `cirq` by exporting to OpenQASM and
+    importing back to Qibo.
     """
 
     def __init__(self, nqubits, depth="2", seed="123"):
@@ -266,23 +268,17 @@ class SupremacyCircuit(BaseCircuit):
         self.depth = int(depth)
         self.seed = int(seed)
         self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
-        self.gate_map = {
-            "H": gates.H,
-            "X**0.5": lambda i: gates.RX(i, theta=np.pi / 2.0),
-            "Y**0.5": lambda i: gates.RY(i, theta=np.pi / 2.0),
-            "T": lambda i: gates.U1(i, theta=np.pi / 4.0),
-            "CZ": gates.CZ
-            }
+        circuit = self.cirq_circuit()
+        self.qasm_circuit = QASMCircuit(nqubits, qasm=circuit.to_qasm())
 
-    def __iter__(self):
+    def cirq_circuit(self):
         import cirq
         from cirq.experiments import google_v2_supremacy_circuit as spc
         qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
-        circuit = spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
-        for moment in circuit:
-            for op in moment:
-                gate = self.gate_map.get(str(op.gate))
-                yield gate(*(q.row for q in op.qubits))
+        return spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
+
+    def __iter__(self):
+        return self.qasm_circuit.__iter__()
 
 
 class BasisChange(BaseCircuit):
