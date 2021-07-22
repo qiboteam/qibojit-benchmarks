@@ -239,6 +239,21 @@ class QAOA(BaseCircuit):
         yield gates.M(*range(self.nqubits))
 
 
+class QASMCircuit(BaseCircuit):
+    """Circuit constructed from OpenQASM code."""
+
+    def __init__(self, nqubits, qasm=""):
+        super().__init__(nqubits)
+        self.qasm = qasm
+        self.parameters = {"nqubits": nqubits, "qasm": qasm}
+        from qibo.models import Circuit
+        self.circuit = Circuit.from_qasm(self.qasm)
+
+    def __iter__(self):
+        for gate in self.circuit.queue:
+            yield gate
+
+
 class SupremacyCircuit(BaseCircuit):
     """Random circuit by Boixo et al 2018 for demonstrating quantum supremacy.
 
@@ -270,18 +285,48 @@ class SupremacyCircuit(BaseCircuit):
                 yield gate(*(q.row for q in op.qubits))
 
 
-class QASMCircuit(BaseCircuit):
+class BasisChange(BaseCircuit):
+    """Basis change fermionic circuit.
 
-    def __init__(self, nqubits, qasm=""):
+    See `https://quantumai.google/openfermion/tutorials/circuits_1_basis_change`
+    for OpenFermion/Cirq code.
+    This circuit is constructed using `openfermion` and `cirq` by exporting
+    to OpenQASM and importing back to Qibo.
+    """
+
+    def __init__(self, nqubits, simulation_time="1", seed="123"):
         super().__init__(nqubits)
-        self.qasm = qasm
-        self.parameters = {"nqubits": nqubits, "qasm": qasm}
-        from qibo.models import Circuit
-        self.circuit = Circuit.from_qasm(self.qasm)
+        self.simulation_time = float(simulation_time)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "simulation_time": simulation_time,
+                           "seed": seed}
+        circuit = self.openfermion_circuit()
+        self.qasm_circuit = QASMCircuit(nqubits, qasm=circuit.to_qasm())
+
+    def openfermion_circuit(self):
+        import cirq
+        import openfermion
+        # Generate the random one-body operator.
+        T = openfermion.random_hermitian_matrix(self.nqubits, seed=self.seed)
+        # Diagonalize T and obtain basis transformation matrix (aka "u").
+        eigenvalues, eigenvectors = np.linalg.eigh(T)
+        basis_transformation_matrix = eigenvectors.transpose()
+        # Initialize the qubit register.
+        qubits = cirq.LineQubit.range(self.nqubits)
+        # Start circuit with the inverse basis rotation, print out this step.
+        inverse_basis_rotation = cirq.inverse(openfermion.bogoliubov_transform(qubits, basis_transformation_matrix))
+        circuit = cirq.Circuit(inverse_basis_rotation)
+        # Add diagonal phase rotations to circuit.
+        for k, eigenvalue in enumerate(eigenvalues):
+            phase = -eigenvalue * self.simulation_time
+            circuit.append(cirq.rz(rads=phase).on(qubits[k]))
+        # Finally, restore basis.
+        basis_rotation = openfermion.bogoliubov_transform(qubits, basis_transformation_matrix)
+        circuit.append(basis_rotation)
+        return circuit
 
     def __iter__(self):
-        for gate in self.circuit.queue:
-            yield gate
+        return self.qasm_circuit.__iter__()
 
 
 class CircuitConstructor:
@@ -298,7 +343,10 @@ class CircuitConstructor:
         "hidden-shift": HiddenShift,
         "hs": HiddenShift,
         "qaoa": QAOA,
-        "supremacy": SupremacyCircuit
+        "qasm": QASMCircuit,
+        "supremacy": SupremacyCircuit,
+        "basis-change": BasisChange,
+        "bc": BasisChange
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):

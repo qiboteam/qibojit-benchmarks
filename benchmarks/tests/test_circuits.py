@@ -47,15 +47,6 @@ def test_qaoa_circuit():
     assert circuit.depth == 18
 
 
-def test_supremacy_circuit():
-    circuit = Circuit(28)
-    gates = circuits.SupremacyCircuit(28, depth="40")
-    circuit.add(gates)
-    assert circuit.nqubits == 28
-    assert circuit.ngates == 880
-    assert circuit.depth == 42
-
-
 def test_qasm_circuit():
     qasm = """OPENQASM 2.0;
     include "qelib1.inc";
@@ -71,3 +62,21 @@ def test_qasm_circuit():
     assert circuit.nqubits == 5
     assert circuit.depth == 4
     assert circuit.ngates == 5
+
+
+def test_supremacy_circuit():
+    circuit = Circuit(28)
+    gates = circuits.SupremacyCircuit(28, depth="40")
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.ngates == 880
+    assert circuit.depth == 42
+
+
+def test_basis_change_circuit():
+    circuit = Circuit(28)
+    gates = circuits.BasisChange(28)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.ngates == 9912
+    assert circuit.depth == 1117

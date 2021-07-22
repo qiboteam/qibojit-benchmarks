@@ -69,3 +69,13 @@ def test_supremacy_benchmark(nqubits, backend, depth):
     target_options = f"nqubits={nqubits}, depth={depth}, seed=123"
     assert logs[-1]["circuit"] == "supremacy"
     assert logs[-1]["options"] == target_options
+
+
+@pytest.mark.parametrize("simtime", ["1", "2.5"])
+def test_basis_change_benchmark(nqubits, backend, simtime):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="bc",
+                             options=f"simulation_time={simtime}")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}, simulation_time={simtime}, seed=123"
+    assert logs[-1]["circuit"] == "bc"
+    assert logs[-1]["options"] == target_options
