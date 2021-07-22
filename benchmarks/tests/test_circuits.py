@@ -80,3 +80,12 @@ def test_basis_change_circuit():
     assert circuit.nqubits == 28
     assert circuit.ngates == 9912
     assert circuit.depth == 1117
+
+
+def test_quantum_volume_circuit():
+    circuit = Circuit(28)
+    gates = circuits.QuantumVolume(28, depth=10)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.ngates == 1540
+    assert circuit.depth == 70

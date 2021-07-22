@@ -325,6 +325,32 @@ class BasisChange(BaseCircuit):
         return self.qasm_circuit.__iter__()
 
 
+class QuantumVolume(BaseCircuit):
+    """Quantum Volume circuit from Qiskit.
+
+    See `https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html`
+    for the Qiskit model.
+    This circuit is constructed using `qiskit` by exporting to OpenQASM and
+    importing back to Qibo.
+    """
+
+    def __init__(self, nqubits, depth="1", seed="123"):
+        super().__init__(nqubits)
+        self.depth = int(depth)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
+        from qiskit.circuit.library import QuantumVolume
+        circuit = QuantumVolume(self.nqubits, self.depth, seed=self.seed)
+        circuit = circuit.decompose().decompose()
+        qasm = circuit.qasm()
+        qasm = qasm.replace("1/(15*pi)", str(1 / (15 * np.pi)))
+        qasm = qasm.replace("pi/2", str(np.pi / 2.0))
+        self.qasm_circuit = QASMCircuit(nqubits, qasm=qasm)
+
+    def __iter__(self):
+        return self.qasm_circuit.__iter__()
+
+
 class CircuitConstructor:
 
     circuit_map = {
@@ -342,7 +368,9 @@ class CircuitConstructor:
         "qasm": QASMCircuit,
         "supremacy": SupremacyCircuit,
         "basis-change": BasisChange,
-        "bc": BasisChange
+        "bc": BasisChange,
+        "quantum-volume": QuantumVolume,
+        "qv": QuantumVolume
         }
 
     def __new__(cls, circuit_name, nqubits, options=None):

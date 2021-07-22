@@ -79,3 +79,13 @@ def test_basis_change_benchmark(nqubits, backend, simtime):
     target_options = f"nqubits={nqubits}, simulation_time={simtime}, seed=123"
     assert logs[-1]["circuit"] == "bc"
     assert logs[-1]["options"] == target_options
+
+
+@pytest.mark.parametrize("depth", ["2", "5", "8"])
+def test_quantum_volume_benchmark(nqubits, backend, depth):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="qv",
+                             options=f"depth={depth}")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}, depth={depth}, seed=123"
+    assert logs[-1]["circuit"] == "qv"
+    assert logs[-1]["options"] == target_options
