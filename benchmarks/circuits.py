@@ -270,6 +270,20 @@ class SupremacyCircuit(BaseCircuit):
                 yield gate(*(q.row for q in op.qubits))
 
 
+class QASMCircuit(BaseCircuit):
+
+    def __init__(self, nqubits, qasm=""):
+        super().__init__(nqubits)
+        self.qasm = qasm
+        self.parameters = {"nqubits": nqubits, "qasm": qasm}
+        from qibo.models import Circuit
+        self.circuit = Circuit.from_qasm(self.qasm)
+
+    def __iter__(self):
+        for gate in self.circuit.queue:
+            yield gate
+
+
 class CircuitConstructor:
 
     circuit_map = {

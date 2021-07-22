@@ -54,3 +54,20 @@ def test_supremacy_circuit():
     assert circuit.nqubits == 28
     assert circuit.ngates == 880
     assert circuit.depth == 42
+
+
+def test_qasm_circuit():
+    qasm = """OPENQASM 2.0;
+    include "qelib1.inc";
+    qreg q[5];
+    rz(pi*-0.4229927754) q[4];
+    rz(pi*0.25) q[3];
+    rz(pi*-0.25) q[4];
+    cx q[3],q[4];
+    h q[3];"""
+    circuit = Circuit(5)
+    gates = circuits.QASMCircuit(5, qasm=qasm)
+    circuit.add(gates)
+    assert circuit.nqubits == 5
+    assert circuit.depth == 4
+    assert circuit.ngates == 5
