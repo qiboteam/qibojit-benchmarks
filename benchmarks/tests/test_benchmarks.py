@@ -11,10 +11,24 @@ def assert_logs(logs, nqubits, backend, nreps=1):
     assert len(logs[-1]["transfer_times"]) == nreps
 
 
-@pytest.mark.parametrize("transfer", [False, True])
+@pytest.mark.parametrize("nreps", [1, 5])
+@pytest.mark.parametrize("nlayers", ["1", "4"])
+@pytest.mark.parametrize("gate", ["H", "X", "Y", "Z"])
+def test_one_qubit_gate_benchmark(nqubits, backend, transfer, nreps,
+                                  nlayers, gate):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="one-qubit-gate",
+                             nreps=nreps, transfer=transfer,
+                             options=f"gate={gate},nlayers={nlayers}")
+    assert_logs(logs, nqubits, backend, nreps)
+    target_options = f"nqubits={nqubits}, nlayers={nlayers}, "
+    target_options += f"gate={gate}, params={{}}"
+    assert logs[-1]["circuit"] == "one-qubit-gate"
+    assert logs[-1]["options"] == target_options
+
+
 @pytest.mark.parametrize("nreps", [1, 5])
 @pytest.mark.parametrize("swaps", [False, True])
-def test_qft_benchmark(nqubits, backend, nreps, transfer, swaps):
+def test_qft_benchmark(nqubits, backend, transfer, nreps, swaps):
     logs = circuit_benchmark(nqubits, backend, circuit_name="qft",
                              nreps=nreps, transfer=transfer,
                              options=f"swaps={swaps}")
@@ -33,7 +47,6 @@ def test_variational_benchmark(nqubits, backend, varlayer):
     assert logs[-1]["circuit"] == "variational"
     assert logs[-1]["options"] == target_options
 
-# TODO: Test OneQubitGate and TwoQubitGate circuits
 
 def test_bernstein_vazirani_benchmark(nqubits, backend):
     logs = circuit_benchmark(nqubits, backend, circuit_name="bv")

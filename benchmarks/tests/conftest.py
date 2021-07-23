@@ -7,3 +7,5 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("nqubits", NQUBITS)
     if "backend" in metafunc.fixturenames:
         metafunc.parametrize("backend", BACKENDS)
+    if "transfer" in metafunc.fixturenames:
+        metafunc.parametrize("transfer", [False, True])

@@ -26,7 +26,7 @@ class OneQubitGate(BaseCircuit):
         self.gate = getattr(gates, gate)
         self.angles = {k: float(v) for k, v in params.items()}
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
-                           "gate": gate, "angles": angles}
+                           "gate": gate, "params": params}
 
     def __iter__(self):
         for _ in range(self.nlayers):
