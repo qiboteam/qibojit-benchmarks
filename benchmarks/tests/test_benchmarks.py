@@ -26,6 +26,58 @@ def test_one_qubit_gate_benchmark(nqubits, backend, transfer, nreps,
     assert logs[-1]["options"] == target_options
 
 
+@pytest.mark.parametrize("gate,params",
+                         [("RX", "theta=0.1"), ("RZ", "theta=0.2"),
+                          ("U1", "theta=0.3"), ("U2", "phi=0.2,lam=0.3"),
+                          ("U3", "theta=0.1,phi=0.2,lam=0.3")])
+def test_one_qubit_gate_param_benchmark(nqubits, backend, gate, params):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="one-qubit-gate",
+                             options=f"gate={gate},{params}")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}, nlayers=1, gate={gate}"
+    paramdict = {}
+    for param in params.split(","):
+        k, v = param.split("=")
+        paramdict[k] = v
+    target_options = f"{target_options}, params={paramdict}"
+    assert logs[-1]["circuit"] == "one-qubit-gate"
+    assert logs[-1]["options"] == target_options
+
+
+@pytest.mark.parametrize("nreps", [1, 5])
+@pytest.mark.parametrize("nlayers", ["1", "4"])
+@pytest.mark.parametrize("gate", ["CNOT", "SWAP", "CZ"])
+def test_two_qubit_gate_benchmark(nqubits, backend, transfer, nreps,
+                                  nlayers, gate):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="two-qubit-gate",
+                             nreps=nreps, transfer=transfer,
+                             options=f"gate={gate},nlayers={nlayers}")
+    assert_logs(logs, nqubits, backend, nreps)
+    target_options = f"nqubits={nqubits}, nlayers={nlayers}, "
+    target_options += f"gate={gate}, params={{}}"
+    assert logs[-1]["circuit"] == "two-qubit-gate"
+    assert logs[-1]["options"] == target_options
+
+
+@pytest.mark.parametrize("gate,params",
+                         [("CRX", "theta=0.1"), ("CRZ", "theta=0.2"),
+                          ("CU1", "theta=0.3"), ("CU2", "phi=0.2,lam=0.3"),
+                          ("CU3", "theta=0.1,phi=0.2,lam=0.3"),
+                          ("fSim", "theta=0.1,phi=0.2")])
+def test_two_qubit_gate_param_benchmark(nqubits, backend, gate, params):
+    logs = circuit_benchmark(nqubits, backend, circuit_name="two-qubit-gate",
+                             options=f"gate={gate},{params}")
+    assert_logs(logs, nqubits, backend)
+    target_options = f"nqubits={nqubits}, nlayers=1, gate={gate}"
+    paramdict = {}
+    for param in params.split(","):
+        k, v = param.split("=")
+        paramdict[k] = v
+    target_options = f"{target_options}, params={paramdict}"
+    assert logs[-1]["circuit"] == "two-qubit-gate"
+    assert logs[-1]["options"] == target_options
+
+
 @pytest.mark.parametrize("nreps", [1, 5])
 @pytest.mark.parametrize("swaps", [False, True])
 def test_qft_benchmark(nqubits, backend, transfer, nreps, swaps):
