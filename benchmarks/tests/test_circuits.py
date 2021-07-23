@@ -17,6 +17,20 @@ def test_qft_circuit(swaps):
         assert circuit.ngates == 406
 
 
+@pytest.mark.parametrize("varlayer", ["True", "False"])
+def test_variational_circuit(varlayer):
+    circuit = Circuit(28)
+    gates = circuits.VariationalCircuit(28, varlayer=varlayer)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    if varlayer == "True":
+        assert circuit.depth == 2
+        assert circuit.ngates == 28
+    else:
+        assert circuit.depth == 4
+        assert circuit.ngates == 84
+
+
 def test_bernstein_vazirani_circuit():
     circuit = Circuit(28)
     gates = circuits.BernsteinVazirani(28)
