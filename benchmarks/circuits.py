@@ -222,6 +222,7 @@ class QAOA(BaseCircuit):
     def dump(self, dir):
         """Saves graph data as JSON in given directory."""
         import json
+        import networkx
         data = networkx.readwrite.json_graph.node_link_data(self.graph)
         with open(dir, "w") as file:
             json.dump(data, file)
