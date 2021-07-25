@@ -136,3 +136,8 @@ Here is a list of the available circuits for benchmarks. As described above the 
 - `quantum-volume` (`qv`): [Quantum volume](https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html) circuit model from Qiskit. *Requirements: [Qiskit](https://qiskit.org/).*
   - `depth`: Layers of SU(4) operations in circuit.
   - `seed`: Seed for random gate generator.
+
+
+## Example data
+
+The folder `data/` contains some example logs for Quantum Fourier Transform benchmarks on GPU and CPU. These include runs from 3 to 30 qubits with and without the `--transfer` flag. The results are transformed in markdown tables for presentation using pandas DataFrame's in the `data.ipynb` notebook.
