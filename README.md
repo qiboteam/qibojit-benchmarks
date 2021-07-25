@@ -117,3 +117,8 @@ If `--filename` is given the above logs are saved in json format in the given di
 - `variational`: variational quantum circuit consisting a layer of RY rotations followed be a layer of CZ entangling gates. Can be created using either standard qibot gates or the optimized [VariationalLayer](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer) gate.
   - `nlayers`: Number of times that the gate is applied to each qubit.
   - `varlayer`: Boolean controling whether the VariationalLayer or standard gates are used. Default is False.
+
+
+## Example data
+
+The folder `data/` contains some example logs for Quantum Fourier Transform benchmarks on GPU and CPU. These include runs from 3 to 30 qubits with and without the `--transfer` flag. The results are transformed in markdown tables for presentation using pandas DataFrame's in the `data.ipynb` notebook.
