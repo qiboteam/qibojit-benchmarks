@@ -41,9 +41,9 @@ class TwoQubitGate(OneQubitGate):
     def __iter__(self):
         for _ in range(self.nlayers):
             for i in range(0, self.nqubits - 1, 2):
-                yield self.gate(i, i + 1, **self.params)
+                yield self.gate(i, i + 1, **self.angles)
             for i in range(1, self.nqubits - 1, 2):
-                yield self.gate(i, i + 1, **self.params)
+                yield self.gate(i, i + 1, **self.angles)
 
 
 class QFT(BaseCircuit):
