@@ -80,7 +80,7 @@ Before executing the code keep in mind the following:
 - CPU simulations by default use physical cores as number of threads with qibojit and qibotf. To control this behaviour without touching the code do `export OMP_NUM_THREADS=<threads>` (or `export NUMBA_NUM_THREADS=<threads>` for qibojit numba backend) before executing the benchmark script.
 - The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow. See `python main.py -h` for more details.
 
-The `scripts/` folder contains some example bash scripts that execute circuit benchmarks for different numbers of qubits.
+The `scripts/` folder contains example bash scripts that execute circuit benchmarks for different numbers of qubits. We refer to the README inside this folder for more details.
 
 ## Benchmark output
 
@@ -101,8 +101,12 @@ Note that if a GPU is used for simulation then transfer times measure the time r
 
 If `--filename` is given the above logs are saved in json format in the given directory.
 
+The `data/` folder contains example logs. We refer to the README inside this folder for more details. The results are transformed in markdown tables for presentation using pandas DataFrame's in the `data.ipynb` notebook.
+
 
 ## Implemented circuits
+
+Here is a list of the available circuits for benchmarks. As described above the circuit should be selected using the `--circuit` flag and one of the following circuit names. Additional options can be passed using the `--options` flag. The options supported by each circuit are analyzed below. Note that some circuits require additional Python libraries to work as stated below.
 
 - `one-qubit-gate`: circuit consisting of a single one qubit gate. The gate is applied to every qubit in the circuit. Available options:
   - `gate`: String defining the one qubit gate to be benchmarked (eg. "H"). Default is "H"
@@ -117,8 +121,20 @@ If `--filename` is given the above logs are saved in json format in the given di
 - `variational`: variational quantum circuit consisting a layer of RY rotations followed be a layer of CZ entangling gates. Can be created using either standard qibot gates or the optimized [VariationalLayer](https://qibo.readthedocs.io/en/latest/qibo.html#variational-layer) gate.
   - `nlayers`: Number of times that the gate is applied to each qubit.
   - `varlayer`: Boolean controling whether the VariationalLayer or standard gates are used. Default is False.
-
-
-## Example data
-
-The folder `data/` contains some example logs for Quantum Fourier Transform benchmarks on GPU and CPU. These include runs from 3 to 30 qubits with and without the `--transfer` flag. The results are transformed in markdown tables for presentation using pandas DataFrame's in the `data.ipynb` notebook.
+- `bernstein-vazirani` (`bv`): circuit that applies the [Bernstein-Vazirani algorithm](https://qiskit.org/textbook/ch-algorithms/bernstein-vazirani.html#example) based on the related [OpenQASM example](https://github.com/Qiskit/openqasm/tree/0af8b8489f32d46692b3a3a1421e98c611cd86cc/benchmarks/bv).
+- `hidden-shift` (`hs`): circuit that solves the [Hidden shift problem](https://en.wikipedia.org/wiki/Hidden_shift_problem), based on the [Cirq implementation](https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py).
+  - `shift`: The hidden bitstring for which the two oracle functions in the hidden shift problem differ. If not given this bitstring will be generated randomly using `np.random.randint`.
+- `qaoa`: Example implementation of the [Quantum Approximate Optization Algorithm (QAOA)](https://arxiv.org/abs/1411.4028) for solving the MaxCut problem. Follows the [Cirq example](https://github.com/quantumlib/Cirq/blob/master/examples/qaoa.py). Requirements: [networkx](https://networkx.org/).
+  - `nparams`: Number of variational parameters.
+  - `graph`: Name of json file to load the problem graph structure. The graph will be loaded using `networkx.readwrite.json_graph.node_link_graph`. If not given the graph will be generated randomly using `networkx.random_regular_graph`.
+- `qasm`: Creates benchmark circuit using [OpenQASM](https://github.com/Qiskit/openqasm) code.
+  - `qasm`: OpenQASM code that generates the circuit as a Python string.
+- `supremacy`: Random circuit [proposed for demonstrating quantum supremacy](https://arxiv.org/abs/1807.10749). Based on Cirq's [`generate_boixo_2018_supremacy_circuits_v2`](https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py) method. *Requirements: [Cirq](https://quantumai.google/cirq).*
+  - `depth`: Number of layers with CZ gates.
+  - `seed`: Seed for random circuit instance generator.
+- `basis-change` (`bc`): Basis transformations that implement exact evolution under a random one-body fermionic Hamiltonian. See [OpenFermion's tutorial](https://quantumai.google/openfermion/tutorials/circuits_1_basis_change) for more details. *Requirements: [Cirq](https://quantumai.google/cirq), [OpenFermion](https://github.com/quantumlib/OpenFermion).*
+  - `simulation_time`: Evolution time.
+  - `seed`: Seed to use for the random Hamiltonian generation.
+- `quantum-volume` (`qv`): [Quantum volume](https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html) circuit model from Qiskit. *Requirements: [Qiskit](https://qiskit.org/).*
+  - `depth`: Layers of SU(4) operations in circuit.
+  - `seed`: Seed for random gate generator.
