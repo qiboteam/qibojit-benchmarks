@@ -6,13 +6,13 @@ from benchmarks import circuits
 from benchmarks.external import qasm, libraries
 
 
-def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter):
+def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-10):
     circuit = backend.from_qasm(qasm_circuit.to_qasm())
     final_state = backend(circuit)
     target_circuit = models.Circuit(qibo_circuit_iter.nqubits)
     target_circuit.add(qibo_circuit_iter)
     target_state = target_circuit()
-    np.testing.assert_allclose(final_state, target_state)
+    np.testing.assert_allclose(final_state, target_state, atol=atol)
 
 
 @pytest.mark.parametrize("nlayers", ["1", "4"])

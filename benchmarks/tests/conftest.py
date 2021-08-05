@@ -1,6 +1,6 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "qibotf", "tensorflow", "numpy"]
-LIBRARIES = ["qibo"]
+LIBRARIES = ["qibo", "qiskit"]
 
 
 def pytest_generate_tests(metafunc):
