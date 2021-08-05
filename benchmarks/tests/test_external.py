@@ -26,11 +26,12 @@ def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("gate,qibo_gate,params",
                          [("rx", "RX", {"theta": 0.1}),
                           ("rz", "RZ", {"theta": 0.2}),
                           ("u1", "U1", {"theta": 0.3}),
-                          #("u2", "U2", {"phi": 0.2, "lam": 0.3}),
+                          ("u2", "U2", {"phi": 0.2, "lam": 0.3}),
                           ("u3", "U3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     order = ["theta", "phi", "lam"]
