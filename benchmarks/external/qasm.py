@@ -78,13 +78,15 @@ class QFT(BaseCircuit):
 class VariationalCircuit(BaseCircuit):
     """Example variational circuit consisting of alternating layers of RY and CZ gates."""
 
-    def __init__(self, nqubits, nlayers="1"):
+    def __init__(self, nqubits, nlayers="1", seed="123"):
         super().__init__(nqubits)
         self.nlayers = int(nlayers)
-        self.parameters = {"nqubits": nqubits, "nlayers": nlayers}
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "nlayers": nlayers, "seed": seed}
 
     def __iter__(self):
         nparams = 2 * self.nlayers * self.nqubits
+        np.random.seed(self.seed)
         theta = iter(2 * np.pi * np.random.random(nparams))
         for l in range(self.nlayers):
             for i in range(self.nqubits):

@@ -95,7 +95,7 @@ def test_variational_benchmark(nqubits, backend, varlayer):
     logs = circuit_benchmark(nqubits, backend, circuit_name="variational",
                              options=f"varlayer={varlayer}")
     assert_logs(logs, nqubits, backend)
-    target_options = f"nqubits={nqubits}, nlayers=1, varlayer={varlayer}"
+    target_options = f"nqubits={nqubits}, nlayers=1, seed=123, varlayer={varlayer}"
     assert logs[-1]["circuit"] == "variational"
     assert logs[-1]["options"] == target_options
 

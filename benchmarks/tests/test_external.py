@@ -46,7 +46,6 @@ def test_qft_benchmark(nqubits, library, swaps):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize("nlayers", ["2", "5"])
 def test_variational_benchmark(nqubits, library, nlayers):
     # TODO: Make `theta` parameters equivalent between two circuits
