@@ -25,26 +25,28 @@ class BaseCircuit:
 class OneQubitGate(BaseCircuit):
     """Applies a specific one qubit gate to all qubits."""
 
-    def __init__(self, nqubits, nlayers="1", gate="h", **params):
+    def __init__(self, nqubits, nlayers="1", gate="h", angles=""):
         super().__init__(nqubits)
         self.gate = gate
         self.nlayers = int(nlayers)
-        self.angles = {k: float(v) for k, v in params.items()}
+        self.angles = angles
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
-                           "gate": gate, "params": params}
+                           "gate": gate, "params": angles}
 
     def __iter__(self):
-        # TODO: Fix angles
         for _ in range(self.nlayers):
             for i in range(self.nqubits):
-                yield "{} q[{}];".format(self.gate, i)
+                if self.angles:
+                    yield "{}({}) q[{}];".format(self.gate, self.angles, i)
+                else:
+                    yield "{} q[{}];".format(self.gate, i)
 
 
 class TwoQubitGate(OneQubitGate):
     """Applies a specific two qubit gate to all pairs of adjacent qubits."""
 
-    def __init__(self, nqubits, nlayers="1", gate="cx", **params):
-        super().__init__(nqubits, nlayers, gate, **params)
+    def __init__(self, nqubits, nlayers="1", gate="cx", angles=""):
+        super().__init__(nqubits, nlayers, gate, angles)
 
     def __iter__(self):
         # TODO: Fix angles

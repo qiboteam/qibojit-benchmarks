@@ -18,10 +18,25 @@ def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-1
 @pytest.mark.parametrize("nlayers", ["1", "4"])
 @pytest.mark.parametrize("gate, qibo_gate",
                          [("h", "H"), ("x", "X"), ("y", "Y"), ("z", "Z")])
-def test_one_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
+def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.OneQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = circuits.OneQubitGate(nqubits, nlayers=nlayers,
                                            gate=qibo_gate)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+@pytest.mark.parametrize("gate,qibo_gate,params",
+                         [("rx", "RX", {"theta": 0.1}),
+                          ("rz", "RZ", {"theta": 0.2}),
+                          ("u1", "U1", {"theta": 0.3}),
+                          #("u2", "U2", {"phi": 0.2, "lam": 0.3}),
+                          ("u3", "U3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
+def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
+    order = ["theta", "phi", "lam"]
+    angles = ",".join(str(params.get(n)) for n in order if n in params)
+    qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
+    target_circuit = circuits.OneQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
