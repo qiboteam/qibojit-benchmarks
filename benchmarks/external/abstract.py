@@ -102,7 +102,7 @@ class ParserBackend(AbstractBackend):
                     registers[register][idx] = qubits[qubit]
                 else:
                     registers[register] = {idx: qubits[qubit]}
-                    gate_list.append(("M", register, None))
+                    gate_list.append(("M", register))
 
             else:
                 pieces = [x for x in re.split("[()]", command) if x]
@@ -145,5 +145,7 @@ class ParserBackend(AbstractBackend):
                         raise_error(ValueError, "Qubit {} is not defined in QASM "
                                                 "code.".format(qubit))
                     qubit_list.append(qubits[qubit])
-                gate_list.append((self.QASM_GATES[gatename], list(qubit_list), params))
+                if params is not None:
+                    qubit_list.extend(params)
+                gate_list.append((self.QASM_GATES[gatename], list(qubit_list)))
         return len(qubits), gate_list
