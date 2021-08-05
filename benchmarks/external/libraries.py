@@ -1,18 +1,7 @@
-from abc import abstractmethod
+from benchmarks.external import abstract
 
 
-class AbstractBackend:
-
-    @abstractmethod
-    def from_qasm(self, qasm):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __call__(self, circuit):
-        raise NotImplementedError
-
-
-class Qibo(AbstractBackend):
+class Qibo(abstract.AbstractBackend):
 
     def __init__(self):
         from qibo import models
@@ -25,7 +14,7 @@ class Qibo(AbstractBackend):
         return circuit()
 
 
-class Qiskit(AbstractBackend):
+class Qiskit(abstract.AbstractBackend):
 
     def __init__(self):
         from qiskit import QuantumCircuit
@@ -42,9 +31,45 @@ class Qiskit(AbstractBackend):
         return result.get_statevector(circuit)
 
 
+class Qulacs(abstract.ParserBackend):
+
+    def __init__(self):
+        import numpy as np
+        import qulacs
+        self.np = np
+        self.qulacs = qulacs
+
+    def CU1(self, control, target, theta):
+        matrix = self.np.diag([1, self.np.exp(1j * theta)])
+        gate = self.qulacs.gate.DenseMatrix([target], matrix)
+        gate.add_control_qubit(control, 1)
+        return gate
+
+    def from_qasm(self, qasm):
+        nqubits, gatelist = self.parse(qasm)
+        circuit = self.qulacs.QuantumCircuit(nqubits)
+        for gatename, args, params in gatelist:
+            if params is not None:
+                args.extend(params)
+            try:
+                gate = getattr(self.qulacs.gate, gatename)
+            except AttributeError:
+                gate = getattr(self, gatename)
+            circuit.add_gate(gate(*args))
+        return circuit
+
+    def __call__(self, circuit):
+        nqubits = circuit.get_qubit_count()
+        state = self.qulacs.StateVector(nqubits)
+        circuit.update_quantum_state(state)
+        return state.get_vector()
+
+
 def get(backend_name):
     if backend_name == "qibo":
         return Qibo()
     elif backend_name == "qiskit":
         return Qiskit()
+    elif backend_name == "qulacs":
+        return Qulacs()
     raise KeyError(f"Unknown simulation library {backend_name}.")
