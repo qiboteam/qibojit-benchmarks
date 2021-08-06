@@ -11,6 +11,9 @@ class AbstractBackend(ABC):
     def __call__(self, circuit):
         raise NotImplementedError
 
+    def transpose_state(self, x):
+        return x
+
 
 class ParserBackend(AbstractBackend):
 

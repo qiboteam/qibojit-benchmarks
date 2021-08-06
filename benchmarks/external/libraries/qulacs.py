@@ -10,6 +10,7 @@ class Qulacs(abstract.ParserBackend):
         self.qulacs = qulacs
 
     def CU1(self, control, target, theta):
+        # See `https://github.com/qulacs/qulacs/issues/278` for CU1 on Qulacs
         matrix = self.np.diag([1, self.np.exp(1j * theta)])
         gate = self.qulacs.gate.DenseMatrix([target], matrix)
         gate.add_control_qubit(control, 1)
