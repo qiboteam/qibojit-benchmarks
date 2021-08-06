@@ -37,6 +37,7 @@ def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
 def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     order = ["theta", "phi", "lam"]
     if "lam" in params: # correct phase for different U2, U3 Qiskit conventions
+        # see `https://qiskit.org/documentation/stubs/qiskit.circuit.library.U2Gate.html`
         params["lam"] = 4 * np.pi - params["phi"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
@@ -53,6 +54,25 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = circuits.TwoQubitGate(nqubits, nlayers=nlayers,
                                            gate=qibo_gate)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+# disabled gates that are not supported by Qiskit OpenQASM
+@pytest.mark.parametrize("gate,qibo_gate,params",
+                         [#("crx", "CRX", {"theta": 0.1}),
+                          #("crz", "CRZ", {"theta": 0.2}),
+                          ("cu1", "CU1", {"theta": 0.3}),
+                          #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
+                          ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
+def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
+    order = ["theta", "phi", "lam"]
+    if "lam" in params: # correct phase for different U2, U3 Qiskit conventions
+        # see `https://qiskit.org/documentation/stubs/qiskit.circuit.library.U2Gate.html`
+        params["lam"] = 4 * np.pi - params["phi"]
+    angles = ",".join(str(params.get(n)) for n in order if n in params)
+    qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
+    target_circuit = circuits.TwoQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 

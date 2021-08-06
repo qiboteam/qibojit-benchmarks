@@ -33,13 +33,16 @@ class OneQubitGate(BaseCircuit):
         self.parameters = {"nqubits": nqubits, "nlayers": nlayers,
                            "gate": gate, "params": angles}
 
+    def base_command(self, i):
+        if self.angles:
+            return "{}({}) q[{}];".format(self.gate, self.angles, i)
+        else:
+            return "{} q[{}];".format(self.gate, i)
+
     def __iter__(self):
         for _ in range(self.nlayers):
             for i in range(self.nqubits):
-                if self.angles:
-                    yield "{}({}) q[{}];".format(self.gate, self.angles, i)
-                else:
-                    yield "{} q[{}];".format(self.gate, i)
+                yield self.base_command(i)
 
 
 class TwoQubitGate(OneQubitGate):
@@ -48,13 +51,18 @@ class TwoQubitGate(OneQubitGate):
     def __init__(self, nqubits, nlayers="1", gate="cx", angles=""):
         super().__init__(nqubits, nlayers, gate, angles)
 
+    def base_command(self, i):
+        if self.angles:
+            return "{}({}) q[{}],q[{}];".format(self.gate, self.angles, i, i + 1)
+        else:
+            return "{} q[{}],q[{}];".format(self.gate, i, i + 1)
+
     def __iter__(self):
-        # TODO: Fix angles
         for _ in range(self.nlayers):
             for i in range(0, self.nqubits - 1, 2):
-                yield "{} q[{}],q[{}];".format(self.gate, i, i + 1)
+                yield self.base_command(i)
             for i in range(1, self.nqubits - 1, 2):
-                yield "{} q[{}],q[{}];".format(self.gate, i, i + 1)
+                yield self.base_command(i)
 
 
 class QFT(BaseCircuit):
