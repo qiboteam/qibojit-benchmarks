@@ -1,29 +1,49 @@
+import numpy as np
 from benchmarks.external.libraries import abstract
 
 
 class Qulacs(abstract.ParserBackend):
 
     def __init__(self):
-        import numpy as np
         import qulacs
-        self.np = np
         self.qulacs = qulacs
+
+    def RX(self, target, theta):
+        return self.qulacs.gate.RX(target, -theta)
+
+    def RY(self, target, theta):
+        return self.qulacs.gate.RY(target, -theta)
+
+    def RZ(self, target, theta):
+        return self.qulacs.gate.RZ(target, -theta)
 
     def CU1(self, control, target, theta):
         # See `https://github.com/qulacs/qulacs/issues/278` for CU1 on Qulacs
-        matrix = self.np.diag([1, self.np.exp(1j * theta)])
+        matrix = np.diag([1, np.exp(1j * theta)])
         gate = self.qulacs.gate.DenseMatrix([target], matrix)
         gate.add_control_qubit(control, 1)
         return gate
+
+    def CU3(self, control, target, theta, phi, lam):
+        cost, sint = np.cos(theta / 2.0), np.sin(theta / 2.0)
+        pplus, pminus = np.exp(0.5j * (phi + lam)), np.exp(0.5j * (phi - lam))
+        matrix = np.array([[np.conj(pplus) * cost, -np.conj(pminus) * sint],
+                           [pminus * sint, pminus * cost]])
+        gate = self.qulacs.gate.DenseMatrix([target], matrix)
+        gate.add_control_qubit(control, 1)
+        return gate
+
+    def __getattr__(self, x):
+        return getattr(self.qulacs.gate, x)
+
+    def __getitem__(self, x):
+        return getattr(self.qulacs.gate, x)
 
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
         circuit = self.qulacs.QuantumCircuit(nqubits)
         for gatename, args in gatelist:
-            try:
-                gate = getattr(self.qulacs.gate, gatename)
-            except AttributeError:
-                gate = getattr(self, gatename)
+            gate = getattr(self, gatename)
             circuit.add_gate(gate(*args))
         return circuit
 

@@ -12,3 +12,6 @@ class Qibo(abstract.AbstractBackend):
 
     def __call__(self, circuit):
         return circuit()
+
+    def transpose_state(self, x):
+        return x

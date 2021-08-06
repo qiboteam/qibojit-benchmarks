@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 
 
 class AbstractBackend(ABC):
@@ -12,7 +13,12 @@ class AbstractBackend(ABC):
         raise NotImplementedError
 
     def transpose_state(self, x):
-        return x
+        """Switch order of qubits in state vector to be compatible to Qibo."""
+        shape = tuple(x.shape)
+        nqubits = int(np.log2(shape[0]))
+        x = np.reshape(x, nqubits * (2,))
+        x = np.transpose(x, range(nqubits - 1, -1, -1))
+        return np.reshape(x, shape)
 
 
 class ParserBackend(AbstractBackend):
