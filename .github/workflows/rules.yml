@@ -22,7 +22,7 @@ jobs:
         pip install pytest
         pip install --pre qibo
         pip install qibotf qibojit
-        pip install qiskit openfermion
+        pip install qiskit openfermion qulacs
     - name: Test with jit enabled
       run: |
         pytest
