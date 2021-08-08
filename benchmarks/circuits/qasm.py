@@ -1,28 +1,8 @@
 import numpy as np
-from abc import abstractmethod
+from benchmarks.circuits import abstract
 
 
-class BaseCircuit:
-
-    def __init__(self, nqubits):
-        self.nqubits = nqubits
-        self.parameters = {}
-
-    @abstractmethod
-    def __iter__(self):
-        raise NotImplementedError
-
-    def to_qasm(self):
-        code = ['OPENQASM 2.0;', 'include "qelib1.inc";',
-                f'qreg q[{self.nqubits}];', f'creg m[{self.nqubits}];']
-        code.extend(iter(self))
-        return "\n".join(code)
-
-    def __str__(self):
-        return ", ".join(f"{k}={v}" for k, v in self.parameters.items())
-
-
-class OneQubitGate(BaseCircuit):
+class OneQubitGate(abstract.AbstractCircuit):
     """Applies a specific one qubit gate to all qubits."""
 
     def __init__(self, nqubits, nlayers="1", gate="h", angles=""):
@@ -65,7 +45,7 @@ class TwoQubitGate(OneQubitGate):
                 yield self.base_command(i)
 
 
-class QFT(BaseCircuit):
+class QFT(abstract.AbstractCircuit):
     """Applies the Quantum Fourier Transform."""
 
     def __init__(self, nqubits, swaps="True"):
@@ -85,7 +65,7 @@ class QFT(BaseCircuit):
                 yield f"swap q[{i}],q[{self.nqubits - i - 1}];"
 
 
-class VariationalCircuit(BaseCircuit):
+class VariationalCircuit(abstract.AbstractCircuit):
     """Example variational circuit consisting of alternating layers of RY and CZ gates."""
 
     def __init__(self, nqubits, nlayers="1", seed="123"):
@@ -110,7 +90,7 @@ class VariationalCircuit(BaseCircuit):
             yield f"cz q[{0}],q[{self.nqubits - 1}];"
 
 
-class BernsteinVazirani(BaseCircuit):
+class BernsteinVazirani(abstract.AbstractCircuit):
     """Applies the Bernstein-Vazirani algorithm from Qiskit/openqasm.
 
     See `https://github.com/Qiskit/openqasm/tree/0af8b8489f32d46692b3a3a1421e98c611cd86cc/benchmarks/bv`
@@ -134,7 +114,7 @@ class BernsteinVazirani(BaseCircuit):
         #    yield f"measure m[{i}];"
 
 
-class HiddenShift(BaseCircuit):
+class HiddenShift(abstract.AbstractCircuit):
     """Applies the Hidden Shift algorithm.
 
     See `https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py`
@@ -179,9 +159,70 @@ class HiddenShift(BaseCircuit):
         #for i in range(self.nqubits):
         #    yield f"measure m[{i}];"
 
-# TODO: Add QAOA circuit
 
-class SupremacyCircuit(BaseCircuit):
+class QAOA(abstract.AbstractCircuit):
+    """Example QAOA circuit for a MaxCut problem instance.
+
+    See `https://github.com/quantumlib/Cirq/blob/master/examples/qaoa.py` for
+    the Cirq code.
+    If a JSON file containing the node link structure is given then the graph
+    is loaded using `networkx.readwrite.json_graph.node_link_graph`, otherwise
+    the graph is generated randomly using `networkx.random_regular_graph`.
+    Note that different graphs may lead to different performance as the graph
+    structure affects circuit depth.
+    """
+
+    def __init__(self, nqubits, nparams="2", graph=""):
+        super().__init__(nqubits)
+        import networkx
+        self.nparams = int(nparams)
+        if len(graph):
+            import json
+            with open(graph, "r") as file:
+                data = json.load(file)
+            self.graph = networkx.readwrite.json_graph.node_link_graph(data)
+        else:
+            self.graph = networkx.random_regular_graph(3, self.nqubits)
+        self.parameters = {"nqubits": nqubits, "nparams": nparams,
+                           "graph": graph}
+
+    @staticmethod
+    def RX(q, theta):
+        yield f"rx({theta}) q[{i}];"
+
+    @staticmethod
+    def RZZ(q0, q1, theta): # TODO: Implement this
+        raise NotImplementedError
+
+    def maxcut_unitary(self, betas, gammas):
+        for beta, gamma in zip(betas, gammas):
+            for i, j in self.graph.edges:
+                yield self.RZZ(i, j, -0.5 * gamma)
+            for i in range(self.nqubits):
+                yield self.RX(i, 2 * beta)
+
+    def dump(self, dir):
+        """Saves graph data as JSON in given directory."""
+        import json
+        import networkx
+        data = networkx.readwrite.json_graph.node_link_data(self.graph)
+        with open(dir, "w") as file:
+            json.dump(data, file)
+
+    def __iter__(self):
+        betas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
+        gammas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
+        # Prepare uniform superposition
+        for i in range(self.nqubits):
+            yield f"h q[{i}];"
+        # Apply QAOA unitary
+        for gate in self.maxcut_unitary(betas, gammas):
+            yield gate
+        # Measure
+        # yield gates.M(*range(self.nqubits))
+
+
+class SupremacyCircuit(abstract.AbstractCircuit):
     """Random circuit by Boixo et al 2018 for demonstrating quantum supremacy.
 
     See `https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py`
@@ -195,7 +236,13 @@ class SupremacyCircuit(BaseCircuit):
         self.depth = int(depth)
         self.seed = int(seed)
         self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
-        self.cirq_circuit = None
+        self.cirq_circuit = self.create_cirq_circuit()
+
+    def create_cirq_circuit(self):
+        import cirq
+        from cirq.experiments import google_v2_supremacy_circuit as spc
+        qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
+        return spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
 
     def __iter__(self):
         raise NotImplementedError("Iteration is not available for "
@@ -203,17 +250,91 @@ class SupremacyCircuit(BaseCircuit):
                                   "using Cirq.")
 
     def to_qasm(self):
-        if self.cirq_circuit is None:
-            import cirq
-            from cirq.experiments import google_v2_supremacy_circuit as spc
-            qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
-            self.cirq_circuit = spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
         return self.cirq_circuit.to_qasm()
 
-# TODO: Add BasisChange circuit
-# TODO: Add QuantumVolume circuit
 
-class CircuitConstructor:
+class BasisChange(abstract.AbstractCircuit):
+    """Basis change fermionic circuit.
+
+    See `https://quantumai.google/openfermion/tutorials/circuits_1_basis_change`
+    for OpenFermion/Cirq code.
+    This circuit is constructed using `openfermion` and `cirq` by exporting
+    to OpenQASM and importing back to Qibo.
+    """
+
+    def __init__(self, nqubits, simulation_time="1", seed="123"):
+        super().__init__(nqubits)
+        self.simulation_time = float(simulation_time)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "simulation_time": simulation_time,
+                           "seed": seed}
+        self.openfermion_circuit = self.create_openfermion_circuit()
+
+    def create_openfermion_circuit(self):
+        import cirq
+        import openfermion
+        # Generate the random one-body operator.
+        T = openfermion.random_hermitian_matrix(self.nqubits, seed=self.seed)
+        # Diagonalize T and obtain basis transformation matrix (aka "u").
+        eigenvalues, eigenvectors = np.linalg.eigh(T)
+        basis_transformation_matrix = eigenvectors.transpose()
+        # Initialize the qubit register.
+        qubits = cirq.LineQubit.range(self.nqubits)
+        # Start circuit with the inverse basis rotation, print out this step.
+        inverse_basis_rotation = cirq.inverse(openfermion.bogoliubov_transform(qubits, basis_transformation_matrix))
+        circuit = cirq.Circuit(inverse_basis_rotation)
+        # Add diagonal phase rotations to circuit.
+        for k, eigenvalue in enumerate(eigenvalues):
+            phase = -eigenvalue * self.simulation_time
+            circuit.append(cirq.rz(rads=phase).on(qubits[k]))
+        # Finally, restore basis.
+        basis_rotation = openfermion.bogoliubov_transform(qubits, basis_transformation_matrix)
+        circuit.append(basis_rotation)
+        return circuit
+
+    def __iter__(self):
+        raise NotImplementedError("Iteration is not available for "
+                                  "`BasisChange` because it is prepared "
+                                  "using OpenFermion.")
+
+    def to_qasm(self):
+        return self.openfermion_circuit.to_qasm()
+
+
+class QuantumVolume(abstract.AbstractCircuit):
+    """Quantum Volume circuit from Qiskit.
+
+    See `https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html`
+    for the Qiskit model.
+    This circuit is constructed using `qiskit` by exporting to OpenQASM and
+    importing back to Qibo.
+    """
+
+    def __init__(self, nqubits, depth="1", seed="123"):
+        super().__init__(nqubits)
+        self.depth = int(depth)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
+        self.qiskit_circuit = self.create_qiskit_circuit()
+
+    def create_qiskit_circuit(self):
+        from qiskit.circuit.library import QuantumVolume
+        circuit = QuantumVolume(self.nqubits, self.depth, seed=self.seed)
+        return circuit.decompose().decompose()
+
+    def __iter__(self):
+        raise NotImplementedError("Iteration is not available for "
+                                  "`QuantumVolume` because it is prepared "
+                                  "using Qiskit.")
+
+    def to_qasm(self):
+        qasm = self.qiskit_circuit.qasm()
+        qasm = qasm.replace("1/(15*pi)", str(1 / (15 * np.pi)))
+        qasm = qasm.replace("pi/2", str(np.pi / 2.0))
+        return qasm
+
+
+class CircuitConstructor(abstract.AbstractConstructor):
 
     circuit_map = {
         "qft": QFT,
@@ -226,28 +347,10 @@ class CircuitConstructor:
         "bv": BernsteinVazirani,
         "hidden-shift": HiddenShift,
         "hs": HiddenShift,
-        # "qaoa": QAOA,
+        "qaoa": QAOA,
         "supremacy": SupremacyCircuit,
-        #"basis-change": BasisChange,
-        #"bc": BasisChange,
-        #"quantum-volume": QuantumVolume,
-        #"qv": QuantumVolume
+        "basis-change": BasisChange,
+        "bc": BasisChange,
+        "quantum-volume": QuantumVolume,
+        "qv": QuantumVolume
         }
-
-    def __new__(cls, circuit_name, nqubits, options=None):
-        if circuit_name not in cls.circuit_map:
-            raise NotImplementedError(f"Cannot find circuit {circuit_name}.")
-        kwargs = cls.parse(options)
-        return cls.circuit_map.get(circuit_name)(nqubits, **kwargs)
-
-    @staticmethod
-    def parse(options):
-        kwargs = {}
-        if options is not None:
-            for parameter in options.split(","):
-                if "=" in parameter:
-                    k, v = parameter.split("=")
-                    kwargs[k] = v
-                else:
-                    raise ValueError(f"Cannot parse parameter {parameter}.")
-        return kwargs

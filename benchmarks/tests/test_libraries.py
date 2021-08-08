@@ -2,7 +2,8 @@
 import pytest
 import numpy as np
 from qibo import models, gates
-from benchmarks import circuits, qasm, libraries
+from benchmarks import libraries
+from benchmarks.circuits import qasm, qibo
 
 
 def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-10):
@@ -20,8 +21,7 @@ def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-1
                          [("h", "H"), ("x", "X"), ("y", "Y"), ("z", "Z")])
 def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.OneQubitGate(nqubits, nlayers=nlayers, gate=gate)
-    target_circuit = circuits.OneQubitGate(nqubits, nlayers=nlayers,
-                                           gate=qibo_gate)
+    target_circuit = qibo.OneQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -40,7 +40,7 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
         params["lam"] = 4 * np.pi - params["phi"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
-    target_circuit = circuits.OneQubitGate(nqubits, gate=qibo_gate, **params)
+    target_circuit = qibo.OneQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -51,8 +51,7 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
                           ("cz", "CZ")])
 def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
-    target_circuit = circuits.TwoQubitGate(nqubits, nlayers=nlayers,
-                                           gate=qibo_gate)
+    target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -71,7 +70,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
         params["lam"] = 4 * np.pi - params["phi"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
-    target_circuit = circuits.TwoQubitGate(nqubits, gate=qibo_gate, **params)
+    target_circuit = qibo.TwoQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -79,7 +78,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 @pytest.mark.parametrize("swaps", ["False", "True"])
 def test_qft(nqubits, library, swaps):
     qasm_circuit = qasm.QFT(nqubits, swaps=swaps)
-    target_circuit = circuits.QFT(nqubits, swaps=swaps)
+    target_circuit = qibo.QFT(nqubits, swaps=swaps)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -87,14 +86,14 @@ def test_qft(nqubits, library, swaps):
 @pytest.mark.parametrize("nlayers", ["2", "5"])
 def test_variational(nqubits, library, nlayers):
     qasm_circuit = qasm.VariationalCircuit(nqubits, nlayers=nlayers)
-    target_circuit = circuits.VariationalCircuit(nqubits, nlayers=nlayers)
+    target_circuit = qibo.VariationalCircuit(nqubits, nlayers=nlayers)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 def test_bernstein_vazirani(nqubits, library):
     qasm_circuit = qasm.BernsteinVazirani(nqubits)
-    target_circuit = circuits.BernsteinVazirani(nqubits)
+    target_circuit = qibo.BernsteinVazirani(nqubits)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -102,7 +101,7 @@ def test_bernstein_vazirani(nqubits, library):
 def test_hidden_shift(nqubits, library):
     shift = "".join(str(x) for x in np.random.randint(0, 2, size=(nqubits,)))
     qasm_circuit = qasm.HiddenShift(nqubits, shift=shift)
-    target_circuit = circuits.HiddenShift(nqubits, shift=shift)
+    target_circuit = qibo.HiddenShift(nqubits, shift=shift)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
@@ -110,6 +109,6 @@ def test_hidden_shift(nqubits, library):
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
 def test_supremacy_circuit(nqubits, library, depth):
     qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
-    target_circuit = circuits.SupremacyCircuit(nqubits, depth=depth)
+    target_circuit = qibo.SupremacyCircuit(nqubits, depth=depth)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)

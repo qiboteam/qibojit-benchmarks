@@ -34,7 +34,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
              device=qibo.get_device(),
              version=qibo.__version__)
 
-    from benchmarks.circuits import CircuitConstructor
+    from benchmarks.circuits.qibo import CircuitConstructor
     gates = CircuitConstructor(circuit_name, nqubits, options)
     logs.log(circuit=circuit_name, options=str(gates))
     start_time = time.time()
@@ -97,7 +97,7 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
              device=backend.get_device(),
              version=backend.__version__)
 
-    from benchmarks.qasm import CircuitConstructor
+    from benchmarks.circuits.qasm import CircuitConstructor
     gates = CircuitConstructor(circuit_name, nqubits, options)
     logs.log(circuit=circuit_name, options=str(gates))
     start_time = time.time()
