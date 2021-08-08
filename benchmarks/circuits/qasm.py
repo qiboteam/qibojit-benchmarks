@@ -336,6 +336,8 @@ class QuantumVolume(AbstractCircuit):
         self.seed = int(seed)
         self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
         self.qiskit_circuit = self.create_qiskit_circuit()
+        self.expression_symbols = {"*", "/"}
+        self.expression_symbols.update(str(x) for x in range(10))
 
     def create_qiskit_circuit(self):
         from qiskit.circuit.library import QuantumVolume
@@ -347,25 +349,23 @@ class QuantumVolume(AbstractCircuit):
                                   "`QuantumVolume` because it is prepared "
                                   "using Qiskit.")
 
-    @staticmethod
-    def eval_pi(qasm):
-        import sympy
-        expression_symbols = {"*", "/"}
-        expression_symbols.update(str(x) for x in range(10))
+    def evaluate_pi(self, qasm):
         left = qasm.find("pi")
-        while left > 0:
-            right = left + 2
-            left = left - 1
-            while qasm[left] in expression_symbols:
-                left -= 1
-            while qasm[right] in expression_symbols:
-                right += 1
-            expr = qasm[left + 1: right]
-            evaluated = sympy.sympify(expr).evalf()
-            qasm = qasm.replace(expr, str(evaluated))
-            left = qasm.find("pi")
-        return qasm
+        if left < 0:
+            return qasm
+
+        import sympy
+        right = left + 2
+        left = left - 1
+        while qasm[left] in self.expression_symbols:
+            left -= 1
+        while qasm[right] in self.expression_symbols:
+            right += 1
+        expr = qasm[left + 1: right]
+        evaluated = sympy.sympify(expr).evalf()
+        return self.evaluate_pi(qasm.replace(expr, str(evaluated)))
 
     def to_qasm(self):
-        qasm = self.eval_pi(self.qiskit_circuit.qasm())
-        return qasm
+        qasm = self.qiskit_circuit.qasm()
+        qasm = qasm.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
+        return self.evaluate_pi(qasm)
