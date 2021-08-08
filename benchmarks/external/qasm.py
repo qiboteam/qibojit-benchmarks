@@ -108,3 +108,73 @@ class VariationalCircuit(BaseCircuit):
             for i in range(1, self.nqubits - 2, 2):
                 yield f"cz q[{i}],q[{i + 1}];"
             yield f"cz q[{0}],q[{self.nqubits - 1}];"
+
+
+class BernsteinVazirani(BaseCircuit):
+    """Applies the Bernstein-Vazirani algorithm from Qiskit/openqasm.
+
+    See `https://github.com/Qiskit/openqasm/tree/0af8b8489f32d46692b3a3a1421e98c611cd86cc/benchmarks/bv`
+    for the OpenQASM code.
+    Note that `Barrier` gates are excluded for simulation.
+    """
+
+    def __init__(self, nqubits):
+        super().__init__(nqubits)
+        self.parameters = {"nqubits": nqubits}
+
+    def __iter__(self):
+        yield f"x q[{self.nqubits - 1}];"
+        for i in range(self.nqubits):
+            yield f"h q[{i}];"
+        for i in range(self.nqubits - 1):
+            yield f"cx q[{i}],q[{self.nqubits - 1}];"
+        for i in range(self.nqubits - 1):
+            yield f"h q[{i}];"
+        #for i in range(self.nqubits - 1):
+        #    yield f"measure m[{i}];"
+
+
+class HiddenShift(BaseCircuit):
+    """Applies the Hidden Shift algorithm.
+
+    See `https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py`
+    for the Cirq code.
+    If the shift (hidden bitstring) is not given then it is randomly generated
+    using `np.random.randint`.
+    """
+
+    def __init__(self, nqubits, shift=""):
+        super().__init__(nqubits)
+        if len(shift):
+            if len(shift) != nqubits:
+                raise ValueError("Shift bitstring of length {} was given for "
+                                 "circuit of {} qubits."
+                                 "".format(len(shift), nqubits))
+            self.shift = [int(x) for x in shift]
+        else:
+            self.shift = np.random.randint(0, 2, size=(self.nqubits,))
+        self.parameters = {"nqubits": nqubits, "shift": shift}
+
+    def oracle(self):
+        for i in range(self.nqubits // 2):
+            yield f"cz q[{2 * i}],q[{2 * i + 1}];"
+
+    def __iter__(self):
+        for i in range(self.nqubits):
+            yield f"h q[{i}];"
+        for i, ish in enumerate(self.shift):
+            if ish:
+                yield f"x q[{i}];"
+        for gate in self.oracle():
+            yield gate
+        for i, ish in enumerate(self.shift):
+            if ish:
+                yield f"x q[{i}];"
+        for i in range(self.nqubits):
+            yield f"h q[{i}];"
+        for gate in self.oracle():
+            yield gate
+        for i in range(self.nqubits):
+            yield f"h q[{i}];"
+        #for i in range(self.nqubits):
+        #    yield f"measure m[{i}];"

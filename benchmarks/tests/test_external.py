@@ -1,4 +1,4 @@
-"""Check that execution of circuits from external library agrees with Qibo."""
+"""Check that execution of circuits from external libraries agrees with Qibo."""
 import pytest
 import numpy as np
 from qibo import models, gates
@@ -78,7 +78,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 
 
 @pytest.mark.parametrize("swaps", ["False", "True"])
-def test_qft_benchmark(nqubits, library, swaps):
+def test_qft(nqubits, library, swaps):
     qasm_circuit = qasm.QFT(nqubits, swaps=swaps)
     target_circuit = circuits.QFT(nqubits, swaps=swaps)
     backend = libraries.get(library)
@@ -86,8 +86,23 @@ def test_qft_benchmark(nqubits, library, swaps):
 
 
 @pytest.mark.parametrize("nlayers", ["2", "5"])
-def test_variational_benchmark(nqubits, library, nlayers):
+def test_variational(nqubits, library, nlayers):
     qasm_circuit = qasm.VariationalCircuit(nqubits, nlayers=nlayers)
     target_circuit = circuits.VariationalCircuit(nqubits, nlayers=nlayers)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+def test_bernstein_vazirani(nqubits, library):
+    qasm_circuit = qasm.BernsteinVazirani(nqubits)
+    target_circuit = circuits.BernsteinVazirani(nqubits)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+def test_hidden_shift(nqubits, library):
+    shift = "".join(str(x) for x in np.random.randint(0, 2, size=(nqubits,)))
+    qasm_circuit = qasm.HiddenShift(nqubits, shift=shift)
+    target_circuit = circuits.HiddenShift(nqubits, shift=shift)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)

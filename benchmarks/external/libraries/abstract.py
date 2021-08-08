@@ -54,7 +54,7 @@ class ParserBackend(AbstractBackend):
                 if name:
                     index = next(_args)
                     if not index.isdigit():
-                        raise_error(ValueError, "Invalid QASM qubit arguments:", args)
+                        raise ValueError("Invalid QASM qubit arguments: {}".format(args))
                     yield name, int(index)
 
         # Remove comment lines
@@ -63,7 +63,7 @@ class ParserBackend(AbstractBackend):
         lines = (line for line in lines.split(";") if line)
 
         if next(lines) != "OPENQASM 2.0":
-            raise_error(ValueError, "QASM code should start with 'OPENQASM 2.0'.")
+            raise ValueError("QASM code should start with 'OPENQASM 2.0'.")
 
         qubits = {} # Dict[Tuple[str, int], int]: map from qubit tuple to qubit id
         cregs_size = {} # Dict[str, int]: map from `creg` name to its size
@@ -90,24 +90,24 @@ class ParserBackend(AbstractBackend):
             elif command == "measure":
                 args = args.split("->")
                 if len(args) != 2:
-                    raise_error(ValueError, "Invalid QASM measurement:", line)
+                    raise ValueError("Invalid QASM measurement: {}".format(line))
                 qubit = next(read_args(args[0]))
                 if qubit not in qubits:
-                    raise_error(ValueError, "Qubit {} is not defined in QASM code."
-                                            "".format(qubit))
+                    raise ValueError("Qubit {} is not defined in QASM code."
+                                     "".format(qubit))
 
                 register, idx = next(read_args(args[1]))
                 if register not in cregs_size:
-                    raise_error(ValueError, "Classical register name {} is not defined "
-                                            "in QASM code.".format(register))
+                    raise ValueError("Classical register name {} is not defined "
+                                     "in QASM code.".format(register))
                 if idx >= cregs_size[register]:
-                    raise_error(ValueError, "Cannot access index {} of register {} "
-                                            "with {} qubits."
-                                            "".format(idx, register, cregs_size[register]))
+                    raise ValueError("Cannot access index {} of register {} "
+                                     "with {} qubits."
+                                     "".format(idx, register, cregs_size[register]))
                 if register in registers:
                     if idx in registers[register]:
-                        raise_error(KeyError, "Key {} of register {} has already "
-                                              "been used.".format(idx, register))
+                        raise KeyError("Key {} of register {} has already "
+                                       "been used.".format(idx, register))
                     registers[register][idx] = qubits[qubit]
                 else:
                     registers[register] = {idx: qubits[qubit]}
@@ -118,17 +118,17 @@ class ParserBackend(AbstractBackend):
                 if len(pieces) == 1:
                     gatename, params = pieces[0], None
                     if gatename not in self.QASM_GATES:
-                        raise_error(ValueError, "QASM command {} is not recognized."
-                                                "".format(command))
+                        raise ValueError("QASM command {} is not recognized."
+                                         "".format(command))
                     if gatename in self.PARAMETRIZED_GATES:
-                        raise_error(ValueError, "Missing parameters for QASM "
-                                                "gate {}.".format(gatename))
+                        raise ValueError("Missing parameters for QASM "
+                                         "gate {}.".format(gatename))
 
                 elif len(pieces) == 2:
                     gatename, params = pieces
                     if gatename not in self.PARAMETRIZED_GATES:
-                        raise_error(ValueError, "Invalid QASM command {}."
-                                                "".format(command))
+                        raise ValueError("Invalid QASM command {}."
+                                         "".format(command))
                     params = params.replace(" ", "").split(",")
                     try:
                         for i, p in enumerate(params):
@@ -140,19 +140,19 @@ class ParserBackend(AbstractBackend):
                                 p = reduce(mul, [float(j) for j in s], 1)
                             params[i] = float(p)
                     except ValueError:
-                        raise_error(ValueError, "Invalid value {} for gate parameters."
-                                                "".format(params))
+                        raise ValueError("Invalid value {} for gate parameters."
+                                         "".format(params))
 
                 else:
-                    raise_error(ValueError, "QASM command {} is not recognized."
-                                            "".format(command))
+                    raise ValueError("QASM command {} is not recognized."
+                                     "".format(command))
 
                 # Add gate to gate list
                 qubit_list = []
                 for qubit in read_args(args):
                     if qubit not in qubits:
-                        raise_error(ValueError, "Qubit {} is not defined in QASM "
-                                                "code.".format(qubit))
+                        raise ValueError("Qubit {} is not defined in QASM "
+                                         "code.".format(qubit))
                     qubit_list.append(qubits[qubit])
                 if params is not None:
                     qubit_list.extend(params)
