@@ -105,10 +105,28 @@ def test_hidden_shift(nqubits, library):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
+# TODO: Implement and test QAOA circuit
 
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
 def test_supremacy_circuit(nqubits, library, depth):
     qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
     target_circuit = qibo.SupremacyCircuit(nqubits, depth=depth)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+@pytest.mark.parametrize("simtime", ["1", "2.5"])
+def test_basis_change(nqubits, library, simtime):
+    qasm_circuit = qasm.BasisChange(nqubits, simulation_time=simtime)
+    target_circuit = qibo.BasisChange(nqubits, simulation_time=simtime)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+@pytest.mark.skip("Does not pass because U3 evaluation in Qibo is different.")
+@pytest.mark.parametrize("depth", ["2", "5", "8"])
+def test_quantum_volume(nqubits, library, depth):
+    qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)
+    target_circuit = qibo.QuantumVolume(nqubits, depth=depth)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)

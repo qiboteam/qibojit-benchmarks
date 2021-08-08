@@ -347,8 +347,25 @@ class QuantumVolume(AbstractCircuit):
                                   "`QuantumVolume` because it is prepared "
                                   "using Qiskit.")
 
+    @staticmethod
+    def eval_pi(qasm):
+        import sympy
+        expression_symbols = {"*", "/"}
+        expression_symbols.update(str(x) for x in range(10))
+        left = qasm.find("pi")
+        while left > 0:
+            right = left + 2
+            left = left - 1
+            while qasm[left] in expression_symbols:
+                left -= 1
+            while qasm[right] in expression_symbols:
+                right += 1
+            expr = qasm[left + 1: right]
+            evaluated = sympy.sympify(expr).evalf()
+            qasm = qasm.replace(expr, str(evaluated))
+            left = qasm.find("pi")
+        return qasm
+
     def to_qasm(self):
-        qasm = self.qiskit_circuit.qasm()
-        qasm = qasm.replace("1/(15*pi)", str(1 / (15 * np.pi)))
-        qasm = qasm.replace("pi/2", str(np.pi / 2.0))
+        qasm = self.eval_pi(self.qiskit_circuit.qasm())
         return qasm
