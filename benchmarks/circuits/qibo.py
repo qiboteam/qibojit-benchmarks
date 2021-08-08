@@ -1,6 +1,6 @@
 import numpy as np
 from qibo import gates
-from benchmarks.circuits import abstract, qasm
+from benchmarks.circuits import qasm
 
 
 class OneQubitGate(qasm.OneQubitGate):
@@ -200,25 +200,3 @@ class QuantumVolume(qasm.QuantumVolume):
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
             yield gate
-
-
-class CircuitConstructor(abstract.AbstractConstructor):
-
-    circuit_map = {
-        "qft": QFT,
-        "QFT": QFT,
-        "one-qubit-gate": OneQubitGate,
-        "two-qubit-gate": TwoQubitGate,
-        "variational": VariationalCircuit,
-        "variational-circuit": VariationalCircuit,
-        "bernstein-vazirani": BernsteinVazirani,
-        "bv": BernsteinVazirani,
-        "hidden-shift": HiddenShift,
-        "hs": HiddenShift,
-        "qaoa": QAOA,
-        "supremacy": SupremacyCircuit,
-        "basis-change": BasisChange,
-        "bc": BasisChange,
-        "quantum-volume": QuantumVolume,
-        "qv": QuantumVolume
-        }

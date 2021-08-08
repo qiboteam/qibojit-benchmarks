@@ -1,8 +1,28 @@
 import numpy as np
-from benchmarks.circuits import abstract
+from abc import abstractmethod
 
 
-class OneQubitGate(abstract.AbstractCircuit):
+class AbstractCircuit:
+
+    def __init__(self, nqubits):
+        self.nqubits = nqubits
+        self.parameters = {}
+
+    @abstractmethod
+    def __iter__(self):
+        raise NotImplementedError
+
+    def to_qasm(self):
+        code = ['OPENQASM 2.0;', 'include "qelib1.inc";',
+                f'qreg q[{self.nqubits}];', f'creg m[{self.nqubits}];']
+        code.extend(iter(self))
+        return "\n".join(code)
+
+    def __str__(self):
+        return ", ".join(f"{k}={v}" for k, v in self.parameters.items())
+
+
+class OneQubitGate(AbstractCircuit):
     """Applies a specific one qubit gate to all qubits."""
 
     def __init__(self, nqubits, nlayers="1", gate="h", angles=""):
@@ -45,7 +65,7 @@ class TwoQubitGate(OneQubitGate):
                 yield self.base_command(i)
 
 
-class QFT(abstract.AbstractCircuit):
+class QFT(AbstractCircuit):
     """Applies the Quantum Fourier Transform."""
 
     def __init__(self, nqubits, swaps="True"):
@@ -65,7 +85,7 @@ class QFT(abstract.AbstractCircuit):
                 yield f"swap q[{i}],q[{self.nqubits - i - 1}];"
 
 
-class VariationalCircuit(abstract.AbstractCircuit):
+class VariationalCircuit(AbstractCircuit):
     """Example variational circuit consisting of alternating layers of RY and CZ gates."""
 
     def __init__(self, nqubits, nlayers="1", seed="123"):
@@ -90,7 +110,7 @@ class VariationalCircuit(abstract.AbstractCircuit):
             yield f"cz q[{0}],q[{self.nqubits - 1}];"
 
 
-class BernsteinVazirani(abstract.AbstractCircuit):
+class BernsteinVazirani(AbstractCircuit):
     """Applies the Bernstein-Vazirani algorithm from Qiskit/openqasm.
 
     See `https://github.com/Qiskit/openqasm/tree/0af8b8489f32d46692b3a3a1421e98c611cd86cc/benchmarks/bv`
@@ -114,7 +134,7 @@ class BernsteinVazirani(abstract.AbstractCircuit):
         #    yield f"measure m[{i}];"
 
 
-class HiddenShift(abstract.AbstractCircuit):
+class HiddenShift(AbstractCircuit):
     """Applies the Hidden Shift algorithm.
 
     See `https://github.com/quantumlib/Cirq/blob/master/examples/hidden_shift_algorithm.py`
@@ -160,7 +180,7 @@ class HiddenShift(abstract.AbstractCircuit):
         #    yield f"measure m[{i}];"
 
 
-class QAOA(abstract.AbstractCircuit):
+class QAOA(AbstractCircuit):
     """Example QAOA circuit for a MaxCut problem instance.
 
     See `https://github.com/quantumlib/Cirq/blob/master/examples/qaoa.py` for
@@ -222,7 +242,7 @@ class QAOA(abstract.AbstractCircuit):
         # yield gates.M(*range(self.nqubits))
 
 
-class SupremacyCircuit(abstract.AbstractCircuit):
+class SupremacyCircuit(AbstractCircuit):
     """Random circuit by Boixo et al 2018 for demonstrating quantum supremacy.
 
     See `https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py`
@@ -253,7 +273,7 @@ class SupremacyCircuit(abstract.AbstractCircuit):
         return self.cirq_circuit.to_qasm()
 
 
-class BasisChange(abstract.AbstractCircuit):
+class BasisChange(AbstractCircuit):
     """Basis change fermionic circuit.
 
     See `https://quantumai.google/openfermion/tutorials/circuits_1_basis_change`
@@ -301,7 +321,7 @@ class BasisChange(abstract.AbstractCircuit):
         return self.openfermion_circuit.to_qasm()
 
 
-class QuantumVolume(abstract.AbstractCircuit):
+class QuantumVolume(AbstractCircuit):
     """Quantum Volume circuit from Qiskit.
 
     See `https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html`
@@ -332,25 +352,3 @@ class QuantumVolume(abstract.AbstractCircuit):
         qasm = qasm.replace("1/(15*pi)", str(1 / (15 * np.pi)))
         qasm = qasm.replace("pi/2", str(np.pi / 2.0))
         return qasm
-
-
-class CircuitConstructor(abstract.AbstractConstructor):
-
-    circuit_map = {
-        "qft": QFT,
-        "QFT": QFT,
-        "one-qubit-gate": OneQubitGate,
-        "two-qubit-gate": TwoQubitGate,
-        "variational": VariationalCircuit,
-        "variational-circuit": VariationalCircuit,
-        "bernstein-vazirani": BernsteinVazirani,
-        "bv": BernsteinVazirani,
-        "hidden-shift": HiddenShift,
-        "hs": HiddenShift,
-        "qaoa": QAOA,
-        "supremacy": SupremacyCircuit,
-        "basis-change": BasisChange,
-        "bc": BasisChange,
-        "quantum-volume": QuantumVolume,
-        "qv": QuantumVolume
-        }
