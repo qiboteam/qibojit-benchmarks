@@ -1,4 +1,4 @@
-from benchmarks.external.libraries import abstract
+from benchmarks.libraries import abstract
 
 
 class Qiskit(abstract.AbstractBackend):

@@ -1,9 +1,8 @@
-"""Check that execution of circuits from external libraries agrees with Qibo."""
+"""Check that execution of circuits from external simulation libraries agrees with Qibo."""
 import pytest
 import numpy as np
 from qibo import models, gates
-from benchmarks import circuits
-from benchmarks.external import qasm, libraries
+from benchmarks import circuits, qasm, libraries
 
 
 def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-10):

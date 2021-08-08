@@ -1,5 +1,5 @@
 import numpy as np
-from benchmarks.external.libraries import abstract
+from benchmarks.libraries import abstract
 
 
 class Qulacs(abstract.ParserBackend):

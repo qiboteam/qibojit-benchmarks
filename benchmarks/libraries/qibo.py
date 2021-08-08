@@ -1,4 +1,4 @@
-from benchmarks.external.libraries import abstract
+from benchmarks.libraries import abstract
 
 
 class Qibo(abstract.AbstractBackend):
