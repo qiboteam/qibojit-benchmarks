@@ -178,3 +178,34 @@ class HiddenShift(BaseCircuit):
             yield f"h q[{i}];"
         #for i in range(self.nqubits):
         #    yield f"measure m[{i}];"
+
+# TODO: Add QAOA circuit
+
+class SupremacyCircuit(BaseCircuit):
+    """Random circuit by Boixo et al 2018 for demonstrating quantum supremacy.
+
+    See `https://github.com/quantumlib/Cirq/blob/v0.11.0/cirq-core/cirq/experiments/google_v2_supremacy_circuit.py`
+    for the Cirq code.
+    This circuit is constructed using `cirq` by exporting to OpenQASM and
+    importing back to Qibo.
+    """
+
+    def __init__(self, nqubits, depth="2", seed="123"):
+        super().__init__(nqubits)
+        self.depth = int(depth)
+        self.seed = int(seed)
+        self.parameters = {"nqubits": nqubits, "depth": depth, "seed": seed}
+        self.cirq_circuit = None
+
+    def __iter__(self):
+        raise NotImplementedError("Iteration is not available for "
+                                  "`SupremacyCircuit` because it is prepared "
+                                  "using Cirq.")
+
+    def to_qasm(self):
+        if self.cirq_circuit is None:
+            import cirq
+            from cirq.experiments import google_v2_supremacy_circuit as spc
+            qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
+            self.cirq_circuit = spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
+        return self.cirq_circuit.to_qasm()

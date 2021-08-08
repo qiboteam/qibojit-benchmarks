@@ -106,3 +106,11 @@ def test_hidden_shift(nqubits, library):
     target_circuit = circuits.HiddenShift(nqubits, shift=shift)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
+
+@pytest.mark.parametrize("depth", ["2", "5", "10"])
+def test_supremacy_circuit(nqubits, library, depth):
+    qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
+    target_circuit = circuits.SupremacyCircuit(nqubits, depth=depth)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
