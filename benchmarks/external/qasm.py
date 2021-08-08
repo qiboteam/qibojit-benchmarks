@@ -209,3 +209,45 @@ class SupremacyCircuit(BaseCircuit):
             qubits = [cirq.GridQubit(i, 0) for i in range(self.nqubits)]
             self.cirq_circuit = spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
         return self.cirq_circuit.to_qasm()
+
+# TODO: Add BasisChange circuit
+# TODO: Add QuantumVolume circuit
+
+class CircuitConstructor:
+
+    circuit_map = {
+        "qft": QFT,
+        "QFT": QFT,
+        "one-qubit-gate": OneQubitGate,
+        "two-qubit-gate": TwoQubitGate,
+        "variational": VariationalCircuit,
+        "variational-circuit": VariationalCircuit,
+        "bernstein-vazirani": BernsteinVazirani,
+        "bv": BernsteinVazirani,
+        "hidden-shift": HiddenShift,
+        "hs": HiddenShift,
+        # "qaoa": QAOA,
+        "supremacy": SupremacyCircuit,
+        #"basis-change": BasisChange,
+        #"bc": BasisChange,
+        #"quantum-volume": QuantumVolume,
+        #"qv": QuantumVolume
+        }
+
+    def __new__(cls, circuit_name, nqubits, options=None):
+        if circuit_name not in cls.circuit_map:
+            raise NotImplementedError(f"Cannot find circuit {circuit_name}.")
+        kwargs = cls.parse(options)
+        return cls.circuit_map.get(circuit_name)(nqubits, **kwargs)
+
+    @staticmethod
+    def parse(options):
+        kwargs = {}
+        if options is not None:
+            for parameter in options.split(","):
+                if "=" in parameter:
+                    k, v = parameter.split("=")
+                    kwargs[k] = v
+                else:
+                    raise ValueError(f"Cannot parse parameter {parameter}.")
+        return kwargs

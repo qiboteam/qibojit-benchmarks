@@ -4,6 +4,10 @@ import numpy as np
 
 class AbstractBackend(ABC):
 
+    def __init__(self):
+        self.name = None
+        self.__version__ = None
+
     @abstractmethod
     def from_qasm(self, qasm):
         raise NotImplementedError
@@ -19,6 +23,14 @@ class AbstractBackend(ABC):
         x = np.reshape(x, nqubits * (2,))
         x = np.transpose(x, range(nqubits - 1, -1, -1))
         return np.reshape(x, shape)
+
+    @abstractmethod
+    def get_precision(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_device(self):
+        raise NotImplementedError
 
 
 class ParserBackend(AbstractBackend):

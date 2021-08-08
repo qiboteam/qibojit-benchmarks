@@ -6,7 +6,9 @@ class Qulacs(abstract.ParserBackend):
 
     def __init__(self):
         import qulacs
+        self.name = "qulacs"
         self.qulacs = qulacs
+        self.__version__ = None
 
     def RX(self, target, theta):
         return self.qulacs.gate.RX(target, -theta)
@@ -52,3 +54,9 @@ class Qulacs(abstract.ParserBackend):
         state = self.qulacs.StateVector(nqubits)
         circuit.update_quantum_state(state)
         return state.get_vector()
+
+    def get_precision(self):
+        return "double"
+
+    def get_device(self):
+        return None
