@@ -208,11 +208,11 @@ class QAOA(AbstractCircuit):
 
     @staticmethod
     def RX(q, theta):
-        yield f"rx({theta}) q[{i}];"
+        return f"rx({theta}) q[{q}];"
 
     @staticmethod
-    def RZZ(q0, q1, theta): # TODO: Implement this
-        raise NotImplementedError
+    def RZZ(q0, q1, theta):
+        return f"rzz({theta}) q[{q0}],q[{q1}];"
 
     def maxcut_unitary(self, betas, gammas):
         for beta, gamma in zip(betas, gammas):

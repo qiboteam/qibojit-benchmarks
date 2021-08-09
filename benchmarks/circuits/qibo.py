@@ -148,7 +148,7 @@ class QAOA(qasm.QAOA):
 
     @staticmethod
     def RZZ(q0, q1, theta):
-        phase = np.exp(1j * theta)
+        phase = np.exp(0.5j * theta)
         phasec = np.conj(phase)
         matrix = np.diag([phasec, phase, phase, phasec])
         return gates.Unitary(matrix, q0, q1)

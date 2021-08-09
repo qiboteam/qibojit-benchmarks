@@ -105,7 +105,17 @@ def test_hidden_shift(nqubits, library):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
-# TODO: Implement and test QAOA circuit
+
+def test_qaoa_circuit(library):
+    if library == "qibo":
+        pytest.skip()
+    import pathlib
+    folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
+    qasm_circuit = qasm.QAOA(8, graph=folder)
+    target_circuit = qibo.QAOA(8, graph=folder)
+    backend = libraries.get(library)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+
 
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
 def test_supremacy_circuit(nqubits, library, depth):
