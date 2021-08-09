@@ -82,6 +82,10 @@ Before executing the code keep in mind the following:
 
 The `scripts/` folder contains example bash scripts that execute circuit benchmarks for different numbers of qubits. We refer to the README inside this folder for more details.
 
+#### Comparing simulation libraries
+
+In addition to the above `main.py` benchmark, we provide the `compare.py` benchmark for comparing the performance of different simulation libraries. The usage is similar to `main.py` with the `--backend` flag replaced by the `--library` flag which can be used to select one of the available quantum simulation libraries. Currently the available libraries are [Qiskit](https://qiskit.org/) and [Qulacs](https://github.com/qulacs/qulacs), as defined under `backends/libraries`. All the circuits described below are available for both `main.py` and `compare.py`.
+
 ## Benchmark output
 
 The benchmark script prints a summary of the circuit and user selected flags together with:
