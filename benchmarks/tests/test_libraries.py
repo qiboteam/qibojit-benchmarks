@@ -108,7 +108,7 @@ def test_hidden_shift(nqubits, library):
 
 def test_qaoa_circuit(library):
     if library == "qibo":
-        pytest.skip()
+        pytest.skip("Qibo does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
     qasm_circuit = qasm.QAOA(8, graph=folder)

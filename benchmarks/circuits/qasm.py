@@ -192,10 +192,11 @@ class QAOA(AbstractCircuit):
     structure affects circuit depth.
     """
 
-    def __init__(self, nqubits, nparams="2", graph=""):
+    def __init__(self, nqubits, nparams="2", graph="", seed="123"):
         super().__init__(nqubits)
         import networkx
         self.nparams = int(nparams)
+        self.seed = int(123)
         if len(graph):
             import json
             with open(graph, "r") as file:
@@ -204,7 +205,7 @@ class QAOA(AbstractCircuit):
         else:
             self.graph = networkx.random_regular_graph(3, self.nqubits)
         self.parameters = {"nqubits": nqubits, "nparams": nparams,
-                           "graph": graph}
+                           "graph": graph, "seed": seed}
 
     @staticmethod
     def RX(q, theta):
@@ -230,6 +231,7 @@ class QAOA(AbstractCircuit):
             json.dump(data, file)
 
     def __iter__(self):
+        np.random.seed(self.seed)
         betas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
         gammas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
         # Prepare uniform superposition

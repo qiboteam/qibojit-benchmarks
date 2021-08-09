@@ -35,6 +35,13 @@ class Qulacs(abstract.ParserBackend):
         gate.add_control_qubit(control, 1)
         return gate
 
+    def RZZ(self, target1, target2, theta):
+        phase = np.exp(0.5j * theta)
+        phasec = np.conj(phase)
+        matrix = np.diag([phasec, phase, phase, phasec])
+        gate = self.qulacs.gate.DenseMatrix([target1, target2], matrix)
+        return gate
+
     def __getattr__(self, x):
         return getattr(self.qulacs.gate, x)
 

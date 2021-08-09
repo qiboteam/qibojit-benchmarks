@@ -154,6 +154,7 @@ class QAOA(qasm.QAOA):
         return gates.Unitary(matrix, q0, q1)
 
     def __iter__(self):
+        np.random.seed(self.seed)
         betas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
         gammas = np.random.uniform(-np.pi, np.pi, size=self.nparams)
         # Prepare uniform superposition
