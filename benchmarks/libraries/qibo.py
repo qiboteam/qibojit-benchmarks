@@ -25,3 +25,19 @@ class Qibo(abstract.AbstractBackend):
 
     def get_device(self):
         return self.qibo.get_device()
+
+
+class QiboJit(Qibo):
+
+    def __init__(self):
+        super().__init__()
+        self.qibo.set_backend("qibojit")
+        self.name = "qibojit"
+
+
+class QiboTF(Qibo):
+
+    def __init__(self):
+        super().__init__()
+        self.qibo.set_backend("qibotf")
+        self.name = "qibotf"

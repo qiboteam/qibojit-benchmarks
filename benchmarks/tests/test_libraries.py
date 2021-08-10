@@ -107,7 +107,7 @@ def test_hidden_shift(nqubits, library):
 
 
 def test_qaoa_circuit(library):
-    if library == "qibo":
+    if library == "qibo" or library == "qibojit" or library == "qibotf":
         pytest.skip("Qibo does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
