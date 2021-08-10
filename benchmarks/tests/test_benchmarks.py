@@ -121,7 +121,7 @@ def test_hidden_shift_benchmark(nqubits, backend, random):
 def test_qaoa_benchmark(backend):
     logs = circuit_benchmark(4, backend, circuit_name="qaoa")
     assert_logs(logs, 4, backend)
-    target_options = f"nqubits=4, nparams=2, graph="
+    target_options = f"nqubits=4, nparams=2, graph=, seed=123"
     assert logs[-1]["circuit"] == "qaoa"
     assert logs[-1]["options"] == target_options
 
