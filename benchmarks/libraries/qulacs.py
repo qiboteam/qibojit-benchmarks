@@ -9,6 +9,7 @@ class Qulacs(abstract.ParserBackend):
         self.name = "qulacs"
         self.qulacs = qulacs
         self.__version__ = None
+        self.QuantumState = self.qulacs.QuantumState
 
     def RX(self, target, theta):
         return self.qulacs.gate.RX(target, -theta)
@@ -58,7 +59,7 @@ class Qulacs(abstract.ParserBackend):
 
     def __call__(self, circuit):
         nqubits = circuit.get_qubit_count()
-        state = self.qulacs.StateVector(nqubits)
+        state = self.QuantumState(nqubits)
         circuit.update_quantum_state(state)
         return state.get_vector()
 
@@ -67,3 +68,11 @@ class Qulacs(abstract.ParserBackend):
 
     def get_device(self):
         return None
+
+
+class QulacsGpu(Qulacs):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "qulacs-gpu"
+        self.QuantumState = self.qulacs.QuantumStateGpu

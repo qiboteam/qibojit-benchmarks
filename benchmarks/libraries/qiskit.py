@@ -25,3 +25,17 @@ class Qiskit(abstract.AbstractBackend):
 
     def get_device(self):
         return None
+
+
+class QiskitNoFusion(Qiskit):
+
+    def __init__(self):
+        super().__init__(fusion_enable=False)
+        self.name = "qiskit-nofusion"
+
+
+class QiskitGpu(Qiskit):
+
+    def __init__(self):
+        super().__init__(method="statevector_gpu")
+        self.name = "qiskit-gpu"
