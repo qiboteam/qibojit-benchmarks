@@ -11,6 +11,9 @@ def get(backend_name):
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit
         return Qiskit()
+    elif backend_name == "qiskit-nofusion":
+        from benchmarks.libraries.qiskit import Qiskit
+        return Qiskit(fusion_enable=False)
     elif backend_name == "qulacs":
         from benchmarks.libraries.qulacs import Qulacs
         return Qulacs()

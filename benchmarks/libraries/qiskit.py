@@ -3,14 +3,14 @@ from benchmarks.libraries import abstract
 
 class Qiskit(abstract.AbstractBackend):
 
-    def __init__(self):
+    def __init__(self, **backend_options):
         import qiskit
         from qiskit import QuantumCircuit
-        from qiskit import Aer
+        from qiskit.providers.aer import StatevectorSimulator
         self.name = "qiskit"
         self.__version__ = qiskit.__version__
         self.QuantumCircuit = QuantumCircuit
-        self.simulator = Aer.get_backend('statevector_simulator')
+        self.simulator = StatevectorSimulator(**backend_options)
 
     def from_qasm(self, qasm):
         # TODO: Consider using `circ = transpile(circ, simulator)`
