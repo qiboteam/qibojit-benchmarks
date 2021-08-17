@@ -26,4 +26,8 @@ def get(backend_name):
         from benchmarks.libraries.qulacs import QulacsGpu
         return QulacsGpu()
 
+    elif backend_name == "qcgpu":
+        from benchmarks.libraries.qcgpu import QCGPU
+        return QCGPU()
+
     raise KeyError(f"Unknown simulation library {backend_name}.")

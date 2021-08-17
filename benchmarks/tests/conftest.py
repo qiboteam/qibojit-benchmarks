@@ -1,6 +1,10 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "qibotf", "tensorflow", "numpy"]
 LIBRARIES = ["qibo", "qibotf", "qiskit", "qiskit-nofusion", "qulacs"]
+LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
+
+# disable GPU because it is not supported by GitHub CI
+# LIBRARIES.extend(LIBRARIES_GPU)
 
 
 def pytest_generate_tests(metafunc):

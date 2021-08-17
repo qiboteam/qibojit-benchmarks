@@ -6,7 +6,12 @@ from benchmarks import libraries
 from benchmarks.circuits import qasm, qibo
 
 
-def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=1e-10):
+def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=None):
+    if atol is None:
+        if backend.get_precision() == "single":
+            atol = 1e-6
+        else:
+            atol = 1e-10
     circuit = backend.from_qasm(qasm_circuit.to_qasm())
     final_state = backend(circuit)
     final_state = backend.transpose_state(final_state)
@@ -107,8 +112,8 @@ def test_hidden_shift(nqubits, library):
 
 
 def test_qaoa_circuit(library):
-    if library == "qibo" or library == "qibojit" or library == "qibotf":
-        pytest.skip("Qibo does not have built-in RZZ gate.")
+    if library in {"qibo", "qibojit", "qibotf", "qcgpu"}:
+        pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
     qasm_circuit = qasm.QAOA(8, graph=folder)
