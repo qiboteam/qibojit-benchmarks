@@ -19,6 +19,10 @@ def get(backend_name):
         from benchmarks.libraries.qiskit import QiskitGpu
         return QiskitGpu()
 
+    elif backend_name == "cirq":
+        from benchmarks.libraries.cirq import Cirq
+        return Cirq()
+
     elif backend_name == "qulacs":
         from benchmarks.libraries.qulacs import Qulacs
         return Qulacs()
