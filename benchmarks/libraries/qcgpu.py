@@ -47,16 +47,17 @@ class QCGPU(abstract.ParserBackend):
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
         circuit = self.QCGPUCircuit(nqubits)
-        for gate, args in gatelist:
+        for gate, qubits, params in gatelist:
+            args = list(qubits)
+            if params is not None:
+                args.extend(params)
             if gate == "SWAP":
-                target1, target2 = args
+                target1, target2 = qubits
                 circuit.append(("cx", (target1, target2)))
                 circuit.append(("cx", (target2, target1)))
                 circuit.append(("cx", (target1, target2)))
-
             elif gate in {"RX", "RY", "RZ", "U1"}:
                 circuit.append(getattr(self, gate)(*args))
-
             else:
                 circuit.append((gate.lower(), args))
         return circuit

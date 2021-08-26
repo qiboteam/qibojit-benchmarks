@@ -69,7 +69,7 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
                           ("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
-    if ((gate in {"crx", "crz", "cu2"}) or (library == "cirq") and gate in {"cu1", "cu3"}):
+    if (gate in {"crx", "crz", "cu2"}) or (library == "cirq" and gate  == "cu3"):
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
     order = ["theta", "phi", "lam"]
