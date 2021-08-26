@@ -18,7 +18,10 @@ def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=None
     target_circuit = models.Circuit(qibo_circuit_iter.nqubits)
     target_circuit.add(qibo_circuit_iter)
     target_state = target_circuit()
-    np.testing.assert_allclose(final_state, target_state, atol=atol)
+    # check fidelity instead of absolute states due to different definitions
+    # of the phase of U gates in different backends
+    fidelity = np.abs(np.conj(target_state).dot(np.array(final_state)))
+    np.testing.assert_allclose(fidelity, 1.0, atol=atol)
 
 
 @pytest.mark.parametrize("nlayers", ["1", "4"])
@@ -40,9 +43,6 @@ def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
                           ("u3", "U3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     order = ["theta", "phi", "lam"]
-    if "lam" in params: # correct phase for different U2, U3 Qiskit conventions
-        # see `https://qiskit.org/documentation/stubs/qiskit.circuit.library.U2Gate.html`
-        params["lam"] = 4 * np.pi - params["phi"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
     target_circuit = qibo.OneQubitGate(nqubits, gate=qibo_gate, **params)
@@ -63,16 +63,16 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
 
 # disabled gates that are not supported by Qiskit OpenQASM
 @pytest.mark.parametrize("gate,qibo_gate,params",
-                         [#("crx", "CRX", {"theta": 0.1}),
-                          #("crz", "CRZ", {"theta": 0.2}),
+                         [("crx", "CRX", {"theta": 0.1}),
+                          ("crz", "CRZ", {"theta": 0.2}),
                           ("cu1", "CU1", {"theta": 0.3}),
-                          #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
+                          ("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
+    if ((gate in {"crx", "crz", "cu2"}) or (library == "cirq") and gate in {"cu1", "cu3"}):
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
     order = ["theta", "phi", "lam"]
-    if "lam" in params: # correct phase for different U2, U3 Qiskit conventions
-        # see `https://qiskit.org/documentation/stubs/qiskit.circuit.library.U2Gate.html`
-        params["lam"] = 4 * np.pi - params["phi"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
     target_circuit = qibo.TwoQubitGate(nqubits, gate=qibo_gate, **params)

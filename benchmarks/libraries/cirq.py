@@ -18,6 +18,9 @@ class Cirq(abstract.AbstractBackend):
         result = self.simulator.simulate(circuit)
         return result.final_state_vector
 
+    def transpose_state(self, x):
+        return x
+
     def get_precision(self):
         return "double"
 
