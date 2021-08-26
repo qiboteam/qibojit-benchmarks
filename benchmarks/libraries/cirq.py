@@ -24,7 +24,8 @@ class Cirq(abstract.ParserBackend):
         return self.cirq.CZPowGate(exponent=theta)
 
     def CU3(self, theta, phi, lam):
-        raise NotImplementedError
+        gate = self.cirq.circuits.qasm_output.QasmUGate(theta, phi, lam)
+        return gate.controlled(num_controls=1)
 
     def RZZ(self, theta):
         return self.cirq.ZZPowGate(exponent=theta)
