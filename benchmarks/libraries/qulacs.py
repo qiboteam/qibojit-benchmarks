@@ -52,8 +52,11 @@ class Qulacs(abstract.ParserBackend):
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
         circuit = self.qulacs.QuantumCircuit(nqubits)
-        for gatename, args in gatelist:
+        for gatename, qubits, params in gatelist:
             gate = getattr(self, gatename)
+            args = list(qubits)
+            if params is not None:
+                args.extend(params)
             circuit.add_gate(gate(*args))
         return circuit
 

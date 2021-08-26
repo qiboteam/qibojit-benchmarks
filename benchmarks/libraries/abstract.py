@@ -166,7 +166,5 @@ class ParserBackend(AbstractBackend):
                         raise ValueError("Qubit {} is not defined in QASM "
                                          "code.".format(qubit))
                     qubit_list.append(qubits[qubit])
-                if params is not None:
-                    qubit_list.extend(params)
-                gate_list.append((self.QASM_GATES[gatename], list(qubit_list)))
+                gate_list.append((self.QASM_GATES[gatename], list(qubit_list), params))
         return len(qubits), gate_list
