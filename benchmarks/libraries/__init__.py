@@ -8,6 +8,9 @@ def get(backend_name):
     elif backend_name == "qibotf":
         from benchmarks.libraries.qibo import QiboTF
         return QiboTF()
+    elif backend_name == "qibo-fusion":
+        from benchmarks.libraries.qibo import QiboFusion
+        return QiboFusion()
 
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit

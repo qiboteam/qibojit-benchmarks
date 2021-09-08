@@ -41,3 +41,14 @@ class QiboTF(Qibo):
         super().__init__()
         self.qibo.set_backend("qibotf")
         self.name = "qibotf"
+
+
+class QiboFusion(Qibo):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "qibo-fusion"
+
+    def from_qasm(self, qasm):
+        circuit = super().from_qasm(qasm)
+        return circuit.fuse()
