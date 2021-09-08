@@ -18,6 +18,9 @@ def get(backend_name):
     elif backend_name == "qiskit-nofusion":
         from benchmarks.libraries.qiskit import QiskitNoFusion
         return QiskitNoFusion()
+    elif backend_name == "qiskit-twoqubitfusion":
+        from benchmarks.libraries.qiskit import QiskitTwoQubitFusion
+        return QiskitTwoQubitFusion()
     elif backend_name == "qiskit-gpu":
         from benchmarks.libraries.qiskit import QiskitGpu
         return QiskitGpu()
