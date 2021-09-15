@@ -129,3 +129,57 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
     logs.average("transfer_times")
     logs.dump()
     return logs
+
+
+def qiskit_fusion_benchmark(nqubits, fusion_max_qubit, no_fusion, circuit_name,
+                            options=None, nreps=1, filename=None):
+    """Runs Qiskit benchmark for various fusion configurations.
+
+    See ``benchmarks/qiskit_fusion.py`` for documentation of each argument.
+    """
+    logs = JsonLogger(filename)
+    logs.log(nqubits=nqubits, nreps=nreps)
+
+    start_time = time.time()
+    from benchmarks.libraries.qiskit import Qiskit
+    if no_fusion:
+        backend = Qiskit(fusion_enable=False)
+    else:
+        backend = Qiskit(fusion_max_qubit=fusion_max_qubit)
+    logs.log(import_time=time.time() - start_time)
+
+    logs.log(library=backend.name,
+             using_fusion=not no_fusion,
+             fusion_max_qubit=fusion_max_qubit,
+             precision=backend.get_precision(),
+             device=backend.get_device(),
+             version=backend.__version__)
+
+    from benchmarks import circuits
+    gates = circuits.get(circuit_name, nqubits, options)
+    logs.log(circuit=circuit_name, options=str(gates))
+    start_time = time.time()
+    circuit = backend.from_qasm(gates.to_qasm())
+    logs.log(creation_time=time.time() - start_time)
+
+    start_time = time.time()
+    result = backend(circuit)
+    logs.log(dry_run_time=time.time() - start_time)
+    start_time = time.time()
+    logs.log(dry_run_transfer_time=time.time() - start_time)
+
+    simulation_times, transfer_times = [], []
+    for _ in range(nreps):
+        start_time = time.time()
+        result = backend(circuit)
+        simulation_times.append(time.time() - start_time)
+        start_time = time.time()
+        transfer_times.append(time.time() - start_time)
+
+    logs.log(dtype=str(result.dtype),
+             simulation_times=simulation_times,
+             transfer_times=transfer_times)
+    logs.average("simulation_times")
+    logs.average("transfer_times")
+    logs.dump()
+    return logs
