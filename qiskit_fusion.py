@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--nqubits", default=20, type=int,
                     help="Number of qubits in the circuit.")
 
-parser.add_argument("--fusion_max_qubit", default=5, type=int,
+parser.add_argument("--fusion-max-qubit", default=5, type=int,
                     help="Maximum qubit number to use in fusion algorithm.")
 parser.add_argument("--no-fusion", action="store_true",
                     help="Disable fusion.")
