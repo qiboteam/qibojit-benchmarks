@@ -26,7 +26,6 @@ jobs:
         pip install tfq_nightly
         pip install qibo
         pip install qibojit
-        pip install qibotf --no-deps
     - name: Test
       run: |
         pytest
