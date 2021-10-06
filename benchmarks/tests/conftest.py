@@ -1,6 +1,6 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "qibotf", "tensorflow", "numpy"]
-LIBRARIES = ["qibo", "qiskit", "qiskit-nofusion", "cirq", "tfq", "qulacs"]
+LIBRARIES = ["qibo", "qiskit", "qiskit-default", "cirq", "tfq", "qulacs"]
 LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
 
 # disable GPU because it is not supported by GitHub CI

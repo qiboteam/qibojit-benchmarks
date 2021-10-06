@@ -1,13 +1,13 @@
 from benchmarks.libraries import abstract
 
 
-class Qiskit(abstract.AbstractBackend):
+class QiskitDefault(abstract.AbstractBackend):
 
     def __init__(self, **backend_options):
         import qiskit
         from qiskit import QuantumCircuit
         from qiskit.providers.aer import StatevectorSimulator
-        self.name = "qiskit"
+        self.name = "qiskit-default"
         self.__version__ = qiskit.__version__
         self.QuantumCircuit = QuantumCircuit
         self.simulator = StatevectorSimulator(**backend_options)
@@ -27,11 +27,11 @@ class Qiskit(abstract.AbstractBackend):
         return None
 
 
-class QiskitNoFusion(Qiskit):
+class Qiskit(QiskitDefault):
 
     def __init__(self):
         super().__init__(fusion_enable=False)
-        self.name = "qiskit-nofusion"
+        self.name = "qiskit"
 
 
 class QiskitTwoQubitFusion(Qiskit):
