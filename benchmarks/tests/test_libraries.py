@@ -64,15 +64,15 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-# disabled gates that are not supported by Qiskit OpenQASM
 @pytest.mark.parametrize("gate,qibo_gate,params",
                          [("crx", "CRX", {"theta": 0.1}),
                           ("crz", "CRZ", {"theta": 0.2}),
                           ("cu1", "CU1", {"theta": 0.3}),
-                          ("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
+                          #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}), # not supported by OpenQASM
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
-    if gate in {"crx", "crz", "cu2"}:
+    skip_libraries = {"qiskit", "qiskit-default", "cirq", "tfq", "qulacs"}
+    if gate in {"crx", "crz"} and library in skip_libraries:
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
     if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
@@ -117,9 +117,8 @@ def test_hidden_shift(nqubits, library):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-@pytest.mark.skip
 def test_qaoa_circuit(library):
-    if library in {"qibo", "qibojit", "qibotf", "qcgpu", "cirq"}:
+    if library in {"qibo", "qibojit", "qcgpu", "cirq", "tfq"}:
         pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
