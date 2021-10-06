@@ -28,6 +28,9 @@ def get(backend_name):
     elif backend_name == "cirq":
         from benchmarks.libraries.cirq import Cirq
         return Cirq()
+    elif backend_name == "tfq":
+        from benchmarks.libraries.cirq import TensorflowQuantum
+        return TensorflowQuantum()
 
     elif backend_name == "qulacs":
         from benchmarks.libraries.qulacs import Qulacs

@@ -42,7 +42,7 @@ class Cirq(abstract.ParserBackend):
             return circuit_from_qasm(qasm)
         except exception.QasmException:
             nqubits, gatelist = self.parse(qasm)
-            qubits = [self.cirq.LineQubit(i) for i in range(nqubits)]
+            qubits = [self.cirq.GridQubit(i, 0) for i in range(nqubits)]
             circuit = self.cirq.Circuit()
             for gatename, qid, params in gatelist:
                 if params is not None:
@@ -64,3 +64,32 @@ class Cirq(abstract.ParserBackend):
 
     def get_device(self):
         return None
+
+
+class TensorflowQuantum(Cirq):
+
+    def __init__(self):
+        import cirq
+        import tensorflow_quantum as tfq
+        self.name = "tfq"
+        self.cirq = cirq
+        self.__version__ = tfq.__version__
+        self.state_layer = tfq.layers.State()
+
+    def get_precision(self):
+        return "single"
+
+    def from_qasm(self, qasm):
+        circuit = super().from_qasm(qasm)
+        # change `NamedQubit`s to `GridQubit`s as TFQ understands only `GridQubit`
+        qubit_map = {}
+        for q in circuit.all_qubits():
+            if isinstance(q, self.cirq.NamedQubit):
+                i = int(str(q).split("_")[-1])
+                qubit_map[q] = self.cirq.GridQubit(i, 0)
+        if qubit_map:
+            return circuit.transform_qubits(qubit_map)
+        return circuit
+
+    def __call__(self, circuit):
+        return self.state_layer(circuit)[0].numpy()
