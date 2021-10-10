@@ -18,6 +18,9 @@ parser.add_argument("--options", default=None, type=str,
                          "It should have the form 'arg1=value1,arg2=value2,...' ."
                          "See README for the list of arguments that are "
                          "available for each circuit.")
+parser.add_argument("--precision", default=None, type=str,
+                    help="Numerical precision of the simulation."
+                         "Choose between 'double' and 'single'.")
 
 parser.add_argument("--nreps", default=1, type=int,
                     help="Number of repetitions of the circuit execution. "
@@ -26,10 +29,6 @@ parser.add_argument("--nreps", default=1, type=int,
 #                    help="If used the final state array is converted to numpy."
 #                         "If the simulation device is GPU this requires a "
 #                         "transfer from GPU memory to CPU.")
-
-#parser.add_argument("--precision", default="double", type=str,
-#                    help="Numerical precision of the simulation."
-#                         "Choose between 'double' and 'single'.")
 
 parser.add_argument("--filename", default=None, type=str,
                     help="Directory of file to save the logs in json format."

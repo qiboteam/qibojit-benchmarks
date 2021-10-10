@@ -9,6 +9,7 @@ class Cirq(abstract.ParserBackend):
         self.name = "cirq"
         self.__version__ = cirq.__version__
         self.cirq = cirq
+        self.precision = "double"
         self.simulator = cirq.Simulator(dtype=np.complex128)
 
     def RX(self, theta):
@@ -60,7 +61,13 @@ class Cirq(abstract.ParserBackend):
         return x
 
     def get_precision(self):
-        return "double"
+        return self.precision
+
+    def set_precision(self, precision):
+        if precision == "single":
+            import numpy as np
+            self.precision = precision
+            self.simulator = self.cirq.Simulator(dtype=np.complex64)
 
     def get_device(self):
         return None
@@ -73,11 +80,12 @@ class TensorflowQuantum(Cirq):
         import tensorflow_quantum as tfq
         self.name = "tfq"
         self.cirq = cirq
+        self.precision = "single"
         self.__version__ = tfq.__version__
         self.state_layer = tfq.layers.State()
 
-    def get_precision(self):
-        return "single"
+    def set_precision(self, precision):
+        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
 
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)

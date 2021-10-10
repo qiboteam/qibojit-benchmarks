@@ -28,6 +28,9 @@ class AbstractBackend(ABC):
     def get_precision(self):
         raise NotImplementedError
 
+    def set_precision(self, precision):
+        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+
     @abstractmethod
     def get_device(self):
         raise NotImplementedError

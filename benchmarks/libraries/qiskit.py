@@ -9,7 +9,10 @@ class QiskitDefault(abstract.AbstractBackend):
         from qiskit.providers.aer import StatevectorSimulator
         self.name = "qiskit-default"
         self.__version__ = qiskit.__version__
+        self.precision = "double"
+        self.options = backend_options
         self.QuantumCircuit = QuantumCircuit
+        self.StatevectorSimulator = StatevectorSimulator
         self.simulator = StatevectorSimulator(**backend_options)
 
     def from_qasm(self, qasm):
@@ -21,7 +24,12 @@ class QiskitDefault(abstract.AbstractBackend):
         return result.get_statevector(circuit)
 
     def get_precision(self):
-        return "double"
+        return self.precision
+
+    def set_precision(self, precision):
+        self.precision = precision
+        self.options["precision"] = precision
+        self.simulator = self.StatevectorSimulator(**self.options)
 
     def get_device(self):
         return None
