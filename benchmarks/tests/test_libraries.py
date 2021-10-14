@@ -55,8 +55,7 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 
 @pytest.mark.parametrize("nlayers", ["1", "4"])
 @pytest.mark.parametrize("gate,qibo_gate",
-                         [("cx", "CNOT"), ("swap", "SWAP"),
-                          ("cz", "CZ")])
+                         [("cx", "CNOT"), ("swap", "SWAP"), ("cz", "CZ")])
 def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
@@ -71,7 +70,7 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
                           #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}), # not supported by OpenQASM
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
-    skip_libraries = {"qiskit", "qiskit-default", "cirq", "tfq", "qulacs"}
+    skip_libraries = {"qiskit", "qiskit-default", "cirq", "tfq", "qulacs", "qulacs-gpu", "qcgpu"}
     if gate in {"crx", "crz"} and library in skip_libraries:
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))

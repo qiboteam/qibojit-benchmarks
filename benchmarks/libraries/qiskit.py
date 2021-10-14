@@ -42,15 +42,15 @@ class Qiskit(QiskitDefault):
         self.name = "qiskit"
 
 
-class QiskitTwoQubitFusion(Qiskit):
+class QiskitTwoQubitFusion(QiskitDefault):
 
     def __init__(self):
         super().__init__(fusion_max_qubit=2)
         self.name = "qiskit-twoqubitfusion"
 
 
-class QiskitGpu(Qiskit):
+class QiskitGpu(QiskitDefault):
 
     def __init__(self):
-        super().__init__(method="statevector_gpu")
+        super().__init__(fusion_enable=False, device="GPU")
         self.name = "qiskit-gpu"

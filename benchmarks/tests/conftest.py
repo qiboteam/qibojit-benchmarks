@@ -1,10 +1,17 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "tensorflow", "numpy"]
-LIBRARIES = ["qibo", "qiskit", "qiskit-default", "cirq", "tfq", "qulacs"]
-LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
+LIBRARIES = ["qibo", "qiskit", "qiskit-default", "cirq", "qulacs"]
+LIBRARIES_GPU = ["qulacs-gpu", "qcgpu"]
 
-# disable GPU because it is not supported by GitHub CI
-# LIBRARIES.extend(LIBRARIES_GPU)
+
+# Check if GPU is available for tests
+try:
+    from cupy import cuda # pylint: disable=E0401
+    gpu_available = cuda.runtime.getDeviceCount()
+except:
+    gpu_available = 0
+if gpu_available:
+    LIBRARIES.extend(LIBRARIES_GPU)
 
 
 def pytest_generate_tests(metafunc):
