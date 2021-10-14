@@ -1,7 +1,7 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "tensorflow", "numpy"]
 LIBRARIES = ["qibo", "qiskit", "qiskit-default", "cirq", "qulacs"]
-LIBRARIES_GPU = ["qulacs-gpu", "qcgpu"]
+LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
 
 
 # Check if GPU is available for tests
