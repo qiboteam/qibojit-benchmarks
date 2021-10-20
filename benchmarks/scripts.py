@@ -133,7 +133,7 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
     return logs
 
 
-def fusion_benchmark(nqubits, library, max_qubit, circuit_name,
+def fusion_benchmark(nqubits, library, max_qubits, circuit_name,
                      options=None, nreps=1, filename=None):
     """Runs Qiskit benchmark for various fusion configurations.
 
@@ -144,7 +144,7 @@ def fusion_benchmark(nqubits, library, max_qubit, circuit_name,
 
     start_time = time.time()
     from benchmarks import libraries
-    backend = libraries.get(library)
+    backend = libraries.get(library, max_qubits)
     logs.log(import_time=time.time() - start_time)
 
     logs.log(library=backend.name,

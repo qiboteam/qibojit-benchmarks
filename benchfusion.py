@@ -9,7 +9,7 @@ parser.add_argument("--nqubits", default=20, type=int,
 parser.add_argument("--library", default="qibo", type=str,
                     help="Quantum simulation library to use in benchmark. "
                          "See README for the list of available libraries.")
-parser.add_argument("--max-qubit", default=2, type=int,
+parser.add_argument("--max-qubits", default=2, type=int,
                     help="Maximum qubit number to use in fusion algorithm.")
 
 parser.add_argument("--circuit", default="qft", type=str,
