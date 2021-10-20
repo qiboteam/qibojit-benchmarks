@@ -48,10 +48,11 @@ class QiboTF(Qibo):
 
 class QiboFusion(Qibo):
 
-    def __init__(self):
+    def __init__(self, max_qubits=2):
         super().__init__()
         self.name = "qibo-fusion"
+        self.max_qubits = max_qubits
 
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)
-        return circuit.fuse()
+        return circuit.fuse(max_qubits=self.max_qubits)

@@ -133,8 +133,8 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
     return logs
 
 
-def qiskit_fusion_benchmark(nqubits, fusion_max_qubit, no_fusion, circuit_name,
-                            options=None, nreps=1, filename=None):
+def fusion_benchmark(nqubits, library, max_qubit, circuit_name,
+                     options=None, nreps=1, filename=None):
     """Runs Qiskit benchmark for various fusion configurations.
 
     See ``benchmarks/qiskit_fusion.py`` for documentation of each argument.
@@ -143,16 +143,12 @@ def qiskit_fusion_benchmark(nqubits, fusion_max_qubit, no_fusion, circuit_name,
     logs.log(nqubits=nqubits, nreps=nreps)
 
     start_time = time.time()
-    from benchmarks.libraries.qiskit import Qiskit
-    if no_fusion:
-        backend = Qiskit(fusion_enable=False)
-    else:
-        backend = Qiskit(fusion_max_qubit=fusion_max_qubit)
+    from benchmarks import libraries
+    backend = libraries.get(library)
     logs.log(import_time=time.time() - start_time)
 
     logs.log(library=backend.name,
-             using_fusion=not no_fusion,
-             fusion_max_qubit=fusion_max_qubit,
+             max_qubits=max_qubits,
              precision=backend.get_precision(),
              device=backend.get_device(),
              version=backend.__version__)

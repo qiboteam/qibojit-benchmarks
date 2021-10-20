@@ -6,11 +6,11 @@ from benchmarks.scripts import qiskit_fusion_benchmark
 parser = argparse.ArgumentParser()
 parser.add_argument("--nqubits", default=20, type=int,
                     help="Number of qubits in the circuit.")
-
-parser.add_argument("--fusion-max-qubit", default=5, type=int,
+parser.add_argument("--library", default="qibo", type=str,
+                    help="Quantum simulation library to use in benchmark. "
+                         "See README for the list of available libraries.")
+parser.add_argument("--max-qubit", default=2, type=int,
                     help="Maximum qubit number to use in fusion algorithm.")
-parser.add_argument("--no-fusion", action="store_true",
-                    help="Disable fusion.")
 
 parser.add_argument("--circuit", default="qft", type=str,
                     help="Type of circuit to use. See README for the list of "
@@ -24,14 +24,6 @@ parser.add_argument("--options", default=None, type=str,
 parser.add_argument("--nreps", default=1, type=int,
                     help="Number of repetitions of the circuit execution. "
                          "Dry run is not included.")
-#parser.add_argument("--transfer", action="store_true",
-#                    help="If used the final state array is converted to numpy."
-#                         "If the simulation device is GPU this requires a "
-#                         "transfer from GPU memory to CPU.")
-
-#parser.add_argument("--precision", default="double", type=str,
-#                    help="Numerical precision of the simulation."
-#                         "Choose between 'double' and 'single'.")
 
 parser.add_argument("--filename", default=None, type=str,
                     help="Directory of file to save the logs in json format."
@@ -41,4 +33,4 @@ parser.add_argument("--filename", default=None, type=str,
 if __name__ == "__main__":
     args = vars(parser.parse_args())
     args["circuit_name"] = args.pop("circuit")
-    qiskit_fusion_benchmark(**args)
+    fusion_benchmark(**args)
