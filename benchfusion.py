@@ -1,12 +1,12 @@
 """Launches the qiskit fusion benchmark script for user given arguments."""
 import argparse
-from benchmarks.scripts import qiskit_fusion_benchmark
+from benchmarks.scripts import fusion_benchmark
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nqubits", default=20, type=int,
                     help="Number of qubits in the circuit.")
-parser.add_argument("--library", default="qibo", type=str,
+parser.add_argument("--library", default="qibo-fusion", type=str,
                     help="Quantum simulation library to use in benchmark. "
                          "See README for the list of available libraries.")
 parser.add_argument("--max-qubits", default=2, type=int,
