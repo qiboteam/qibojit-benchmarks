@@ -15,9 +15,9 @@ def get(backend_name):
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit
         return Qiskit()
-    elif backend_name == "qiskit-nofusion":
-        from benchmarks.libraries.qiskit import QiskitNoFusion
-        return QiskitNoFusion()
+    elif backend_name == "qiskit-default":
+        from benchmarks.libraries.qiskit import QiskitDefault
+        return QiskitDefault()
     elif backend_name == "qiskit-twoqubitfusion":
         from benchmarks.libraries.qiskit import QiskitTwoQubitFusion
         return QiskitTwoQubitFusion()
@@ -28,6 +28,9 @@ def get(backend_name):
     elif backend_name == "cirq":
         from benchmarks.libraries.cirq import Cirq
         return Cirq()
+    elif backend_name == "tfq":
+        from benchmarks.libraries.cirq import TensorflowQuantum
+        return TensorflowQuantum()
 
     elif backend_name == "qulacs":
         from benchmarks.libraries.qulacs import Qulacs

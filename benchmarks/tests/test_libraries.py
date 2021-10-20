@@ -9,7 +9,7 @@ from benchmarks.circuits import qasm, qibo
 def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=None):
     if atol is None:
         if backend.get_precision() == "single":
-            atol = 1e-6
+            atol = 1e-5
         else:
             atol = 1e-10
     circuit = backend.from_qasm(qasm_circuit.to_qasm())
@@ -42,6 +42,9 @@ def test_one_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
                           ("u2", "U2", {"phi": 0.2, "lam": 0.3}),
                           ("u3", "U3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
+    if gate in {"u1", "u2", "u3"} and library == "tfq":
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
@@ -52,8 +55,7 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 
 @pytest.mark.parametrize("nlayers", ["1", "4"])
 @pytest.mark.parametrize("gate,qibo_gate",
-                         [("cx", "CNOT"), ("swap", "SWAP"),
-                          ("cz", "CZ")])
+                         [("cx", "CNOT"), ("swap", "SWAP"), ("cz", "CZ")])
 def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
@@ -61,15 +63,19 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-# disabled gates that are not supported by Qiskit OpenQASM
 @pytest.mark.parametrize("gate,qibo_gate,params",
                          [("crx", "CRX", {"theta": 0.1}),
                           ("crz", "CRZ", {"theta": 0.2}),
                           ("cu1", "CU1", {"theta": 0.3}),
-                          ("cu2", "CU2", {"phi": 0.1, "lam": 0.3}),
+                          #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}), # not supported by OpenQASM
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
-    if gate in {"crx", "crz", "cu2"}:
+    skip_libraries = {"qiskit", "qiskit-default", "qiskit-gpu", "cirq", "tfq",
+                      "qulacs", "qulacs-gpu", "qcgpu"}
+    if gate in {"crx", "crz"} and library in skip_libraries:
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
+    if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
     order = ["theta", "phi", "lam"]
@@ -112,7 +118,7 @@ def test_hidden_shift(nqubits, library):
 
 
 def test_qaoa_circuit(library):
-    if library in {"qibo", "qibojit", "qibotf", "qcgpu", "cirq"}:
+    if library in {"qibo", "qibojit", "qcgpu", "cirq", "tfq"}:
         pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
@@ -140,6 +146,9 @@ def test_basis_change(nqubits, library, simtime):
 
 @pytest.mark.parametrize("depth", ["2", "5", "8"])
 def test_quantum_volume(nqubits, library, depth):
+    if library == "tfq":
+        pytest.skip("Skipping qv test because it is not supported by {}."
+                    "".format(library))
     qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)
     target_circuit = qibo.QuantumVolume(nqubits, depth=depth)
     backend = libraries.get(library)

@@ -1,15 +1,18 @@
 from benchmarks.libraries import abstract
 
 
-class Qiskit(abstract.AbstractBackend):
+class QiskitDefault(abstract.AbstractBackend):
 
     def __init__(self, **backend_options):
         import qiskit
         from qiskit import QuantumCircuit
         from qiskit.providers.aer import StatevectorSimulator
-        self.name = "qiskit"
+        self.name = "qiskit-default"
         self.__version__ = qiskit.__version__
+        self.precision = "double"
+        self.options = backend_options
         self.QuantumCircuit = QuantumCircuit
+        self.StatevectorSimulator = StatevectorSimulator
         self.simulator = StatevectorSimulator(**backend_options)
 
     def from_qasm(self, qasm):
@@ -21,28 +24,33 @@ class Qiskit(abstract.AbstractBackend):
         return result.get_statevector(circuit)
 
     def get_precision(self):
-        return "double"
+        return self.precision
+
+    def set_precision(self, precision):
+        self.precision = precision
+        self.options["precision"] = precision
+        self.simulator = self.StatevectorSimulator(**self.options)
 
     def get_device(self):
         return None
 
 
-class QiskitNoFusion(Qiskit):
+class Qiskit(QiskitDefault):
 
     def __init__(self):
         super().__init__(fusion_enable=False)
-        self.name = "qiskit-nofusion"
+        self.name = "qiskit"
 
 
-class QiskitTwoQubitFusion(Qiskit):
+class QiskitTwoQubitFusion(QiskitDefault):
 
     def __init__(self):
         super().__init__(fusion_max_qubit=2)
         self.name = "qiskit-twoqubitfusion"
 
 
-class QiskitGpu(Qiskit):
+class QiskitGpu(QiskitDefault):
 
     def __init__(self):
-        super().__init__(method="statevector_gpu")
+        super().__init__(fusion_enable=False, device="GPU")
         self.name = "qiskit-gpu"

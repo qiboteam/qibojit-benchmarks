@@ -23,6 +23,9 @@ class Qibo(abstract.AbstractBackend):
     def get_precision(self):
         return self.qibo.get_precision()
 
+    def set_precision(self, precision):
+        self.qibo.set_precision(precision)
+
     def get_device(self):
         return self.qibo.get_device()
 
