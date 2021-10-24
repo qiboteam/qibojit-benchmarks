@@ -46,7 +46,7 @@ class QiskitFusion(QiskitDefault):
 
     def __init__(self, max_qubits=2):
         super().__init__(fusion_max_qubit=max_qubits)
-        self.name = "qiskit-twoqubitfusion"
+        self.name = "qiskit-fusion"
 
 
 class QiskitGpu(QiskitDefault):
