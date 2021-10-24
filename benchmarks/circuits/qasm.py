@@ -272,7 +272,9 @@ class SupremacyCircuit(AbstractCircuit):
                                   "using Cirq.")
 
     def to_qasm(self):
-        return self.cirq_circuit.to_qasm()
+        qasm = self.cirq_circuit.to_qasm()
+        qasm = qasm.replace("sx", "rx(pi*0.5)")
+        return qasm
 
 
 class BasisChange(AbstractCircuit):
