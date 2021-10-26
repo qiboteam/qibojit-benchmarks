@@ -124,6 +124,5 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
 
     logs.log(dtype=dtype, simulation_times=simulation_times)
     logs.average("simulation_times")
-    logs.average("transfer_times")
     logs.dump()
     return logs
