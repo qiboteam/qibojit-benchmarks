@@ -52,6 +52,8 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     if transfer:
         result = result.numpy()
     logs.log(dry_run_transfer_time=time.time() - start_time)
+    dtype = result.dtype
+    del(result)
 
     simulation_times, transfer_times = [], []
     for _ in range(nreps):
@@ -62,9 +64,9 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
         if transfer:
             result = result.numpy()
         transfer_times.append(time.time() - start_time)
+        del(result)
 
-    logs.log(dtype=str(result.dtype),
-             simulation_times=simulation_times,
+    logs.log(dtype=dtype, simulation_times=simulation_times,
              transfer_times=transfer_times)
     logs.average("simulation_times")
     logs.average("transfer_times")
@@ -109,10 +111,8 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
     start_time = time.time()
     result = backend(circuit)
     logs.log(dry_run_time=time.time() - start_time)
-    start_time = time.time()
-    #if transfer:
-    #    result = result.numpy()
-    logs.log(dry_run_transfer_time=time.time() - start_time)
+    dtype = str(result.dtype)
+    del(result)
 
     simulation_times, transfer_times = [], []
     for _ in range(nreps):
@@ -120,13 +120,9 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
         result = backend(circuit)
         simulation_times.append(time.time() - start_time)
         start_time = time.time()
-        #if transfer:
-        #    result = result.numpy()
-        transfer_times.append(time.time() - start_time)
+        del(result)
 
-    logs.log(dtype=str(result.dtype),
-             simulation_times=simulation_times,
-             transfer_times=transfer_times)
+    logs.log(dtype=dtype, simulation_times=simulation_times)
     logs.average("simulation_times")
     logs.average("transfer_times")
     logs.dump()
