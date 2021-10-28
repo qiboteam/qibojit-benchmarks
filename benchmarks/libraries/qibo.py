@@ -57,3 +57,13 @@ class QiboFusion(Qibo):
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)
         return circuit.fuse()
+
+
+class QiboMultiGpu(Qibo):
+
+    def __init__(self, accelerators):
+        super().__init__()
+        self.accelerators = accelerators
+
+    def from_qasm(self, qasm):
+        return self.models.Circuit.from_qasm(qasm, accelerators=self.accelerators)
