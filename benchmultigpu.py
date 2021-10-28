@@ -81,6 +81,7 @@ def main(nqubits, library, circuit_name, accelerators, options=None,
     logs.log(library=backend.name,
              precision=backend.get_precision(),
              device=backend.get_device(),
+             accelerators=accelerators,
              version=backend.__version__)
 
     from benchmarks import circuits
