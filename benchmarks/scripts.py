@@ -52,7 +52,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     if transfer:
         result = result.numpy()
     logs.log(dry_run_transfer_time=time.time() - start_time)
-    dtype = result.dtype
+    dtype = str(result.dtype)
     del(result)
 
     simulation_times, transfer_times = [], []
