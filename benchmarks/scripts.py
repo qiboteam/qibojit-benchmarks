@@ -71,6 +71,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     logs.average("simulation_times")
     logs.average("transfer_times")
 
+    result = circuit(nshots=nshots)
     start_time = time.time()
     if nshots is not None:
         freqs = result.frequencies()
