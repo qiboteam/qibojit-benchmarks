@@ -101,3 +101,37 @@ class TensorflowQuantum(Cirq):
 
     def __call__(self, circuit):
         return self.state_layer(circuit)[0].numpy()
+
+
+class QSim(Cirq):
+
+    def __init__(self):
+        import cirq
+        import qsimcirq
+        from multiprocessing import cpu_count
+        self.name = "qsim"
+        self.cirq = cirq
+        self.qsimcirq = qsimcirq
+        self.precision = "single"
+        self.__version__ = qsimcirq.__version__
+        self.nthreads = cpu_count()
+        self.simulator = self.get_simulator()
+
+    def get_simulator(self):
+        return self.qsimcirq.QSimSimulator({'t': self.nthreads})
+
+    def set_precision(self, precision):
+        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+
+
+class QSimGpu(QSim):
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0)
+        return self.qsimcirq.QSimSimulator(qsim_options)
+
+class QSimCuQuantum(QSim):
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1)
+        return self.qsimcirq.QSimSimulator(qsim_options)
