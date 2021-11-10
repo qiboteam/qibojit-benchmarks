@@ -46,7 +46,10 @@ class JsonLogger(list):
 
     def average(self, key):
         self[-1][f"{key}_mean"] = np.mean(self[-1][key])
-        self[-1][f"{key}_std"] = np.std(self[-1][key])
+        if len(self[-1][key]) == 1:
+            self[-1][f"{key}_std"] = 0.0
+        else:
+            self[-1][f"{key}_std"] = np.std(self[-1][key], ddof=1)
         log.info("{}_mean: {}".format(key, self[-1][f"{key}_mean"]))
         log.info("{}_std: {}".format(key, self[-1][f"{key}_std"]))
 
