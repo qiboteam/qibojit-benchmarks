@@ -128,11 +128,19 @@ class QSim(Cirq):
 
 class QSimGpu(QSim):
 
+    def __init__(self):
+        super().__init__()
+        self.name = "qsim-gpu"
+
     def get_simulator(self):
         qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0)
         return self.qsimcirq.QSimSimulator(qsim_options)
 
 class QSimCuQuantum(QSim):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "qsim-cuquantum"
 
     def get_simulator(self):
         qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1)
