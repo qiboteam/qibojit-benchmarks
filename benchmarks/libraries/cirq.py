@@ -119,7 +119,7 @@ class QSim(Cirq):
         self.simulator = self.get_simulator()
 
     def get_simulator(self):
-        return self.qsimcirq.QSimSimulator({'t': self.nthreads})
+        return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': 0})
 
     def set_precision(self, precision):
         if precision == "double":
@@ -133,7 +133,7 @@ class QSimGpu(QSim):
         self.name = "qsim-gpu"
 
     def get_simulator(self):
-        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0)
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0, max_fused_gate_size=0)
         return self.qsimcirq.QSimSimulator(qsim_options)
 
 class QSimCuQuantum(QSim):
@@ -143,5 +143,5 @@ class QSimCuQuantum(QSim):
         self.name = "qsim-cuquantum"
 
     def get_simulator(self):
-        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1)
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1, max_fused_gate_size=0)
         return self.qsimcirq.QSimSimulator(qsim_options)
