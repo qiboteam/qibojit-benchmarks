@@ -85,7 +85,8 @@ class TensorflowQuantum(Cirq):
         self.state_layer = tfq.layers.State()
 
     def set_precision(self, precision):
-        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
 
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)
@@ -121,7 +122,8 @@ class QSim(Cirq):
         return self.qsimcirq.QSimSimulator({'t': self.nthreads})
 
     def set_precision(self, precision):
-        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
 
 
 class QSimGpu(QSim):
