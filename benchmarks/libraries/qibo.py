@@ -15,7 +15,9 @@ class Qibo(abstract.AbstractBackend):
         return self.models.Circuit.from_qasm(qasm)
 
     def __call__(self, circuit):
-        return circuit()
+        # transfer final state to numpy array because that's what happens
+        # for all backends
+        return circuit().numpy()
 
     def transpose_state(self, x):
         return x
