@@ -1,3 +1,5 @@
+"""Tests for circuits defined in benchmarks/circuits/qibo.py"""
+
 import pytest
 from qibo.models import Circuit
 from benchmarks.circuits import qibo
