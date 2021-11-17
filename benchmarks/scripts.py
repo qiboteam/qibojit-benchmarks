@@ -119,7 +119,6 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
         start_time = time.time()
         result = backend(circuit)
         simulation_times.append(time.time() - start_time)
-        start_time = time.time()
         del(result)
 
     logs.log(dtype=dtype, simulation_times=simulation_times)
