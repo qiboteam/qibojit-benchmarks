@@ -3,6 +3,28 @@ from qibo.models import Circuit
 from benchmarks.circuits import qibo
 
 
+@pytest.mark.parametrize("nlayers", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("gate", ["H", "X", "Y", "Z"])
+def test_one_qubit_gate_circuit(nlayers, gate):
+    circuit = Circuit(28)
+    gates   = qibo.OneQubitGate(28, nlayers=nlayers, gate=gate)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.depth   == nlayers
+    assert circuit.ngates  == nlayers * 28
+
+
+@pytest.mark.parametrize("nlayers", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("gate", ["CNOT", "CZ", "SWAP"])
+def test_two_qubit_gate_circuit(nlayers, gate):
+    circuit = Circuit(28)
+    gates   = qibo.TwoQubitGate(28, nlayers=nlayers, gate=gate)
+    circuit.add(gates)
+    assert circuit.nqubits == 28
+    assert circuit.depth   == nlayers * 2
+    assert circuit.ngates  == nlayers * 27
+
+
 @pytest.mark.parametrize("swaps", ["True", "False"])
 def test_qft_circuit(swaps):
     circuit = Circuit(28)
