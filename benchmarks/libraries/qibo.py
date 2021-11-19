@@ -14,7 +14,7 @@ class Qibo(abstract.AbstractBackend):
 
     def from_qasm(self, qasm):
         circuit = self.models.Circuit.from_qasm(qasm)
-        if self.max_qubits > 1:
+        if self.max_qubits > 0:
             circuit = circuit.fuse(self.max_qubits)
         return circuit
 
