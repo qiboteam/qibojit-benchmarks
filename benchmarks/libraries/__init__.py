@@ -1,29 +1,20 @@
-def get(backend_name, max_qubits=2):
+def get(backend_name, max_qubits=0):
     if backend_name == "qibo":
         from benchmarks.libraries.qibo import Qibo
-        return Qibo()
+        return Qibo(max_qubits)
     elif backend_name == "qibojit":
         from benchmarks.libraries.qibo import QiboJit
-        return QiboJit()
+        return QiboJit(max_qubits)
     elif backend_name == "qibotf":
         from benchmarks.libraries.qibo import QiboTF
-        return QiboTF()
-    elif backend_name == "qibo-fusion":
-        from benchmarks.libraries.qibo import QiboFusion
-        return QiboFusion(max_qubits)
+        return QiboTF(max_qubits)
 
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit
-        return Qiskit()
-    elif backend_name == "qiskit-default":
-        from benchmarks.libraries.qiskit import QiskitDefault
-        return QiskitDefault()
+        return Qiskit(max_qubits)
     elif backend_name == "qiskit-gpu":
         from benchmarks.libraries.qiskit import QiskitGpu
-        return QiskitGpu()
-    elif backend_name == "qiskit-fusion":
-        from benchmarks.libraries.qiskit import QiskitFusion
-        return QiskitFusion(max_qubits)
+        return QiskitGpu(max_qubits)
 
     elif backend_name == "cirq":
         from benchmarks.libraries.cirq import Cirq

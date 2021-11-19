@@ -1,6 +1,10 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "numpy"]
+<<<<<<< HEAD
 LIBRARIES = ["qibo", "qiskit", "qiskit-default", "cirq", "qulacs"]
+=======
+LIBRARIES = ["qibo", "qiskit", "cirq", "qulacs"]
+>>>>>>> fusion
 LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
 
 
@@ -21,5 +25,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("backend", BACKENDS)
     if "library" in metafunc.fixturenames:
         metafunc.parametrize("library", LIBRARIES)
+    if "max_qubits" in metafunc.fixturenames:
+        metafunc.parametrize("max_qubits", [0, 2, 3])
     if "transfer" in metafunc.fixturenames:
         metafunc.parametrize("transfer", [False, True])
