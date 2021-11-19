@@ -43,4 +43,8 @@ def get(backend_name):
         from benchmarks.libraries.qcgpu import QCGPU
         return QCGPU()
 
+    elif backend_name == "projectq":
+        from benchmarks.libraries.projectq import ProjectQ
+        return ProjectQ()
+
     raise KeyError(f"Unknown simulation library {backend_name}.")

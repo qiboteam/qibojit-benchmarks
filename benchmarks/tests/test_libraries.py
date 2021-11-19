@@ -45,6 +45,9 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     if gate in {"u1", "u2", "u3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
+    if gate in {"u2", "u3"} and library == "projectq":
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
@@ -57,6 +60,9 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 @pytest.mark.parametrize("gate,qibo_gate",
                          [("cx", "CNOT"), ("swap", "SWAP"), ("cz", "CZ")])
 def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
+    if gate in {"swap"} and library == "projectq":
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
     backend = libraries.get(library)
@@ -78,6 +84,9 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
+    if gate in {"cu3"} and library == "projectq":
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
@@ -85,7 +94,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
-
+'''
 @pytest.mark.parametrize("swaps", ["False", "True"])
 def test_qft(nqubits, library, swaps):
     qasm_circuit = qasm.QFT(nqubits, swaps=swaps)
@@ -127,7 +136,7 @@ def test_qaoa_circuit(library):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
-
+'''
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
 def test_supremacy_circuit(nqubits, library, depth):
     qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
@@ -146,7 +155,7 @@ def test_basis_change(nqubits, library, simtime):
 
 @pytest.mark.parametrize("depth", ["2", "5", "8"])
 def test_quantum_volume(nqubits, library, depth):
-    if library == "tfq":
+    if library == "tfq" or "projectq":
         pytest.skip("Skipping qv test because it is not supported by {}."
                     "".format(library))
     qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)
