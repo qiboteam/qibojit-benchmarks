@@ -11,7 +11,10 @@ class Qiskit(abstract.AbstractBackend):
         self.precision = "double"
         self.max_qubits = max_qubits
         self.simulator = StatevectorSimulator(
-            fusion_enable=max_qubits > 1, fusion_max_qubit=max_qubits)
+            fusion_enable=max_qubits > 0,
+            fusion_max_qubit=max_qubits,
+            fusion_threshold=1
+            )
 
     def from_qasm(self, qasm):
         from qiskit import QuantumCircuit
@@ -43,6 +46,7 @@ class QiskitGpu(Qiskit):
         self.name = "qiskit-gpu"
         self.simulator = StatevectorSimulator(
             device="GPU",
-            fusion_enable=max_qubits > 1,
-            fusion_max_qubit=max_qubits
+            fusion_enable=max_qubits > 0,
+            fusion_max_qubit=max_qubits,
+            fusion_threshold=1
             )

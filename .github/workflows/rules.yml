@@ -24,7 +24,7 @@ jobs:
         pip install tensorflow==2.5.1
         pip install tensorflow_quantum
         pip install tfq_nightly
-        pip install qibo
+        pip install qibo --pre
         pip install qibojit
     - name: Test
       run: |
