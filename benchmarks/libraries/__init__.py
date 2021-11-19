@@ -43,4 +43,8 @@ def get(backend_name):
         from benchmarks.libraries.qcgpu import QCGPU
         return QCGPU()
 
+    elif backend_name == "hybridq":
+        from benchmarks.libraries.hybridq import HybridQ
+        return HybridQ()
+
     raise KeyError(f"Unknown simulation library {backend_name}.")
