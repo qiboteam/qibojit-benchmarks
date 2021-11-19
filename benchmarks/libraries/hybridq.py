@@ -4,12 +4,12 @@ from benchmarks.libraries import abstract
 
 class HybridQ(abstract.ParserBackend):
 
-    def __init__(self):
+    def __init__(self, max_qubits=0):
         from hybridq.gate import Gate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
-        self.max_qubits = 0
+        self.max_qubits = max_qubits
 
     def RX(self, theta):
         return self.Gate('RX', params=[theta])
@@ -77,11 +77,3 @@ class HybridQ(abstract.ParserBackend):
 
     def get_device(self):
         return None
-
-
-class HybridQFusion(HybridQ):
-
-    def __init__(self, max_qubits=2):
-        super().__init__()
-        self.name = "hybridq-fusion"
-        self.max_qubits = max_qubits

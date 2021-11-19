@@ -36,9 +36,6 @@ def get(backend_name, max_qubits=0):
 
     elif backend_name == "hybridq":
         from benchmarks.libraries.hybridq import HybridQ
-        return HybridQ()
-    elif backend == "hybridq-fusion":
-        from benchmarks.libraries.hybridq import HybridQFusion
-        return HybridQFusion(max_qubits)
+        return HybridQ(max_qubits)
 
     raise KeyError(f"Unknown simulation library {backend_name}.")
