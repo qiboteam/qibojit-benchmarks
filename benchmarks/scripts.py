@@ -81,7 +81,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
 
 
 def library_benchmark(nqubits, library, circuit_name, options=None,
-                      max_qubits=2, precision=None, nreps=1, filename=None):
+                      max_qubits=0, precision=None, nreps=1, filename=None):
     """Runs benchmark for different quantum simulation libraries.
 
     See ``benchmarks/compare.py`` for documentation of each argument.

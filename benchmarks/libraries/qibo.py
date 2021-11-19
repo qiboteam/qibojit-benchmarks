@@ -3,16 +3,20 @@ from benchmarks.libraries import abstract
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self):
+    def __init__(self, max_qubits=0):
         import qibo
         from qibo import models
         self.name = "qibo"
         self.qibo = qibo
         self.models = models
         self.__version__ = qibo.__version__
+        self.max_qubits = max_qubits
 
     def from_qasm(self, qasm):
-        return self.models.Circuit.from_qasm(qasm)
+        circuit = self.models.Circuit.from_qasm(qasm)
+        if self.max_qubits > 1:
+            circuit = circuit.fuse(self.max_qubits)
+        return circuit
 
     def __call__(self, circuit):
         # transfer final state to numpy array because that's what happens
@@ -34,27 +38,15 @@ class Qibo(abstract.AbstractBackend):
 
 class QiboJit(Qibo):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, max_qubits):
+        super().__init__(max_qubits)
         self.qibo.set_backend("qibojit")
         self.name = "qibojit"
 
 
 class QiboTF(Qibo):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, max_qubits):
+        super().__init__(max_qubits)
         self.qibo.set_backend("qibotf")
         self.name = "qibotf"
-
-
-class QiboFusion(Qibo):
-
-    def __init__(self, max_qubits=2):
-        super().__init__()
-        self.name = "qibo-fusion"
-        self.max_qubits = max_qubits
-
-    def from_qasm(self, qasm):
-        circuit = super().from_qasm(qasm)
-        return circuit.fuse(max_qubits=self.max_qubits)
