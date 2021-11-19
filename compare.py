@@ -21,6 +21,9 @@ parser.add_argument("--options", default=None, type=str,
 parser.add_argument("--precision", default=None, type=str,
                     help="Numerical precision of the simulation."
                          "Choose between 'double' and 'single'.")
+parser.add_argument("--max-qubits", default=2, type=int,
+                    help="Maximum qubit number to use in gate fusion optimization.")
+
 
 parser.add_argument("--nreps", default=1, type=int,
                     help="Number of repetitions of the circuit execution. "
