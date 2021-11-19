@@ -9,6 +9,7 @@ class HybridQ(abstract.ParserBackend):
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
+        self.max_qubits = 0
 
     def RX(self, theta):
         return self.Gate('RX', params=[theta])
@@ -68,10 +69,19 @@ class HybridQ(abstract.ParserBackend):
     def __call__(self, circuit):
         from hybridq.circuit.simulation import simulate
         initial_state = len(circuit.all_qubits()) * '0'
-        return simulate(circuit, optimize='evolution', initial_state=initial_state)
+        return simulate(circuit, optimize='evolution', initial_state=initial_state,
+                        compress=self.max_qubits)
 
     def get_precision(self):
         return "single"
 
     def get_device(self):
         return None
+
+
+class HybridQFusion(HybridQ):
+
+    def __init__(self, max_qubits=2):
+        super().__init__()
+        self.name = "hybridq-fusion"
+        self.max_qubits = max_qubits
