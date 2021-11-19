@@ -81,7 +81,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
 
 
 def library_benchmark(nqubits, library, circuit_name, options=None,
-                      precision=None, nreps=1, filename=None):
+                      max_qubits=2, precision=None, nreps=1, filename=None):
     """Runs benchmark for different quantum simulation libraries.
 
     See ``benchmarks/compare.py`` for documentation of each argument.
@@ -91,13 +91,14 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
 
     start_time = time.time()
     from benchmarks import libraries
-    backend = libraries.get(library)
+    backend = libraries.get(library, max_qubits)
     logs.log(import_time=time.time() - start_time)
     if precision is not None:
         backend.set_precision(precision)
 
     logs.log(library=backend.name,
              precision=backend.get_precision(),
+             max_qubits=max_qubits,
              device=backend.get_device(),
              version=backend.__version__)
 
@@ -119,60 +120,9 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
         start_time = time.time()
         result = backend(circuit)
         simulation_times.append(time.time() - start_time)
-        start_time = time.time()
         del(result)
 
     logs.log(dtype=dtype, simulation_times=simulation_times)
     logs.average("simulation_times")
-    logs.dump()
-    return logs
-
-
-def fusion_benchmark(nqubits, library, max_qubits, circuit_name,
-                     options=None, nreps=1, filename=None):
-    """Runs Qiskit benchmark for various fusion configurations.
-
-    See ``benchmarks/qiskit_fusion.py`` for documentation of each argument.
-    """
-    logs = JsonLogger(filename)
-    logs.log(nqubits=nqubits, nreps=nreps)
-
-    start_time = time.time()
-    from benchmarks import libraries
-    backend = libraries.get(library, max_qubits)
-    logs.log(import_time=time.time() - start_time)
-
-    logs.log(library=backend.name,
-             max_qubits=max_qubits,
-             precision=backend.get_precision(),
-             device=backend.get_device(),
-             version=backend.__version__)
-
-    from benchmarks import circuits
-    gates = circuits.get(circuit_name, nqubits, options)
-    logs.log(circuit=circuit_name, options=str(gates))
-    start_time = time.time()
-    circuit = backend.from_qasm(gates.to_qasm())
-    logs.log(creation_time=time.time() - start_time)
-
-    start_time = time.time()
-    result = backend(circuit)
-    logs.log(dry_run_time=time.time() - start_time)
-    start_time = time.time()
-    logs.log(dry_run_transfer_time=time.time() - start_time)
-
-    simulation_times, transfer_times = [], []
-    for _ in range(nreps):
-        start_time = time.time()
-        result = backend(circuit)
-        simulation_times.append(time.time() - start_time)
-        start_time = time.time()
-        transfer_times.append(time.time() - start_time)
-
-    logs.log(dtype=str(result.dtype),
-             simulation_times=simulation_times,
-             transfer_times=transfer_times)
-    logs.average("simulation_times")
-    logs.average("transfer_times")
     logs.dump()
     return logs
