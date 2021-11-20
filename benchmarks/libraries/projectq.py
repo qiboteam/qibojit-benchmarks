@@ -23,7 +23,7 @@ class ProjectQ(abstract.ParserBackend):
         return  self.projectq.ops.R(theta)
 
     def SWAP(self):
-        return self.projectq.ops.SwapGate()
+        return self.projectq.ops.Swap
     
     def CRX(self, theta):
         return self.projectq.ops.C(self.RX(theta))
@@ -65,7 +65,10 @@ class ProjectQ(abstract.ParserBackend):
                 else:
                     gate(*parameters) | qureg[qubits[0]]
             elif len(qubits) > 1:
-                gate | tuple(qureg[i] for i in qubits)
+                    if gatename == "SWAP": # swap for reason is callable
+                        gate() | tuple(qureg[i] for i in qubits)
+                    else:
+                        gate | tuple(qureg[i] for i in qubits)
             else:
                 gate | qureg[qubits[0]]
 

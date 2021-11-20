@@ -60,9 +60,6 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 @pytest.mark.parametrize("gate,qibo_gate",
                          [("cx", "CNOT"), ("swap", "SWAP"), ("cz", "CZ")])
 def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
-    if gate in {"swap"} and library == "projectq":
-        pytest.skip("Skipping {} test because it is not supported by {}."
-                    "".format(gate, library))
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
     backend = libraries.get(library)
@@ -94,7 +91,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
-'''
+
 @pytest.mark.parametrize("swaps", ["False", "True"])
 def test_qft(nqubits, library, swaps):
     qasm_circuit = qasm.QFT(nqubits, swaps=swaps)
@@ -136,7 +133,7 @@ def test_qaoa_circuit(library):
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
-'''
+
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
 def test_supremacy_circuit(nqubits, library, depth):
     qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
