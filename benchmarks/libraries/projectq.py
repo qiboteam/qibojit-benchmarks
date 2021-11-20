@@ -52,7 +52,6 @@ class ProjectQ(abstract.ParserBackend):
 
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
-        print(nqubits, gatelist)
         eng = self.projectq.MainEngine(projectq.backends.Simulator())
         self.eng = eng
         qureg = eng.allocate_qureg(nqubits)
