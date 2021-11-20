@@ -64,7 +64,7 @@ class ProjectQ(abstract.ParserBackend):
                 else:
                     gate(*parameters) | qureg[qubits[0]]
             elif len(qubits) > 1:
-                    if gatename == "SWAP": # swap for reason is callable
+                    if gatename == "SWAP":
                         gate() | tuple(qureg[i] for i in qubits)
                     else:
                         gate | tuple(qureg[i] for i in qubits)
