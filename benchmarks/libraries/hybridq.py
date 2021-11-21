@@ -10,6 +10,7 @@ class HybridQ(abstract.ParserBackend):
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
         self.max_qubits = max_qubits
+        # TODO: Make sure there are no hidden thresholds that disable fusion
 
     def RX(self, theta):
         return self.Gate('RX', params=[theta])
@@ -69,8 +70,11 @@ class HybridQ(abstract.ParserBackend):
     def __call__(self, circuit):
         from hybridq.circuit.simulation import simulate
         initial_state = len(circuit.all_qubits()) * '0'
-        return simulate(circuit, optimize='evolution', initial_state=initial_state,
-                        compress=self.max_qubits)
+        final_state = simulate(circuit, optimize='evolution',
+                               initial_state=initial_state,
+                               simplify=False,
+                               compress=self.max_qubits)
+        return final_state.ravel()
 
     def get_precision(self):
         return "single"
