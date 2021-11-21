@@ -5,10 +5,11 @@ from benchmarks.libraries import abstract
 class HybridQ(abstract.ParserBackend):
 
     def __init__(self, max_qubits=0):
-        from hybridq.gate import Gate
+        from hybridq.gate import Gate, MatrixGate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
+        self.MatrixGate = MatrixGate
         self.max_qubits = max_qubits
         # TODO: Make sure there are no hidden thresholds that disable fusion
 
@@ -21,13 +22,22 @@ class HybridQ(abstract.ParserBackend):
     def RZ(self, theta):
         return self.Gate('RZ', params=[theta])
 
-    def CU1(self, theta):
-        raise NotImplementedError
+    def U1(self, theta):
+        phase = np.exp(1j * theta)
+        matrix = np.diag([1, phase])
+        return self.MatrixGate(U=matrix)
 
-        matrix = np.diag([1, np.exp(1j * theta)])
-        gate = self.qulacs.gate.DenseMatrix([target], matrix)
-        gate.add_control_qubit(control, 1)
-        return gate
+    def U2(self, phi, lam):
+        plus = np.exp(0.5j * (phi + lam))
+        minus = np.exp(0.5j * (phi - lam))
+        matrix = np.array([[np.conj(plus), np.conj(minus)], [minus, plus]]) / np.sqrt(2)
+        return self.MatrixGate(U=matrix)
+
+    def U3(self, theta, phi, lam):
+        return self.Gate('U3', params=[theta, phi, lam])
+
+    def CU1(self, theta):
+        return self.Gate('CPHASE', params=[theta])
 
     def CU3(self, theta, phi, lam):
         raise NotImplementedError
@@ -60,7 +70,7 @@ class HybridQ(abstract.ParserBackend):
         nqubits, gatelist = self.parse(qasm)
         circuit = Circuit()
         for gatename, qubits, params in gatelist:
-            if params is not None:
+            if params:
                 gate = getattr(self, gatename)(*params)
             else:
                 gate = getattr(self, gatename)
@@ -75,6 +85,9 @@ class HybridQ(abstract.ParserBackend):
                                simplify=False,
                                compress=self.max_qubits)
         return final_state.ravel()
+
+    def transpose_state(self, x):
+        return x
 
     def get_precision(self):
         return "single"
