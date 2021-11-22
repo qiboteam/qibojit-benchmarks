@@ -22,6 +22,6 @@ def pytest_generate_tests(metafunc):
     if "library" in metafunc.fixturenames:
         metafunc.parametrize("library", LIBRARIES)
     if "max_qubits" in metafunc.fixturenames:
-        metafunc.parametrize("max_qubits", [0, 1, 2, 3])
+        metafunc.parametrize("max_qubits", [0, 1, 2, 3, 4])
     if "transfer" in metafunc.fixturenames:
         metafunc.parametrize("transfer", [False, True])
