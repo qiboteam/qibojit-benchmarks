@@ -21,13 +21,13 @@ def get(backend_name, max_qubits=0):
         return Cirq()
     elif backend_name == "qsim":
         from benchmarks.libraries.cirq import QSim
-        return QSim()
+        return QSim(max_qubits)
     elif backend_name == "qsim-gpu":
         from benchmarks.libraries.cirq import QSimGpu
-        return QSimGpu()
+        return QSimGpu(max_qubits)
     elif backend_name == "qsim-cuquantum":
         from benchmarks.libraries.cirq import QSimCuQuantum
-        return QSimCuQuantum()
+        return QSimCuQuantum(max_qubits)
     elif backend_name == "tfq":
         from benchmarks.libraries.cirq import TensorflowQuantum
         return TensorflowQuantum()
