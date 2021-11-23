@@ -10,17 +10,17 @@ class ProjectQ(abstract.ParserBackend):
         self.projectq = projectq
         self.__version__ = None
 
-    def RX(self,theta):
+    def RX(self, theta):
         return self.projectq.ops.Rx(theta)
 
-    def RY(self,theta):
+    def RY(self, theta):
         return self.projectq.ops.Ry(theta)
 
-    def RZ(self,theta):
+    def RZ(self, theta):
         return self.projectq.ops.Rz(theta)
 
     def U1(self, theta):
-        return  self.projectq.ops.R(theta)
+        return self.projectq.ops.R(theta)
 
     def SWAP(self):
         return self.projectq.ops.Swap
@@ -32,16 +32,16 @@ class ProjectQ(abstract.ParserBackend):
         return self.projectq.ops.C(self.RY(theta))
 
     def CRZ(self, theta):
-        return self.projectq.ops.C(self.RZ(theta))
+        return self.projectq.ops.CRz(theta)
     
     def CU1(self, theta):
         U1 = self.projectq.ops.R(theta)
-        return self.projectq.ops.C(U1,n_qubits=1)
+        return self.projectq.ops.C(U1, n_qubits=1)
 
-    def CU3(self,theta):
+    def CU3(self, theta):
         raise NotImplementedError
 
-    def RZZ(self,theta):
+    def RZZ(self, theta):
         return self.projectq.ops.Rzz(theta)
 
     def __getattr__(self, x):
@@ -64,10 +64,10 @@ class ProjectQ(abstract.ParserBackend):
                 else:
                     gate(*parameters) | qureg[qubits[0]]
             elif len(qubits) > 1:
-                    if gatename == "SWAP":
-                        gate() | tuple(qureg[i] for i in qubits)
-                    else:
-                        gate | tuple(qureg[i] for i in qubits)
+                if gatename == "SWAP":
+                    gate() | tuple(qureg[i] for i in qubits)
+                else:
+                    gate | tuple(qureg[i] for i in qubits)
             else:
                 gate | qureg[qubits[0]]
 
@@ -75,25 +75,17 @@ class ProjectQ(abstract.ParserBackend):
 
     def __call__(self, qureg):
         self.eng.flush()
-        _ , wave = self.eng.backend.cheat()
+        self.qubit_id , wave = self.eng.backend.cheat()
         # measure everything to avoid error when running
         self.projectq.ops.All(self.projectq.ops.Measure) | qureg
         return np.array(wave)
-        
+
     def transpose_state(self, x):
         return x
-    
+
     def get_precision(self):
         return "double"
 
     def get_device(self):
         return None
-
-
-
-
-    
-
-    
-
     
