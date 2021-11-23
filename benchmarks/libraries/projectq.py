@@ -81,6 +81,12 @@ class ProjectQ(abstract.ParserBackend):
         return np.array(wave)
 
     def transpose_state(self, x):
+        shape = tuple(x.shape)
+        nqubits = int(np.log2(shape[0]))
+        x = np.reshape(x, nqubits * (2,))
+        x = np.transpose(x, range(nqubits - 1, -1, -1))
+        x = np.transpose(x, tuple(self.qubit_id[key] for key in self.qubit_id))
+        x = np.reshape(x, shape)
         return x
 
     def get_precision(self):
