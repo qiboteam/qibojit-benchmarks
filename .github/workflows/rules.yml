@@ -24,6 +24,7 @@ jobs:
         pip install tensorflow==2.5.1
         pip install tensorflow_quantum
         pip install tfq_nightly
+        pip install qsimcirq
         # pip install qibo --pre
         git clone https://github.com/qiboteam/qibo
         cd qibo
