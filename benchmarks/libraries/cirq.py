@@ -116,8 +116,8 @@ class QSim(Cirq):
         self.precision = "single"
         self.__version__ = qsimcirq.__version__
         self.nthreads = cpu_count()
+        self.max_qubits = max_qubits
         self.simulator = self.get_simulator()
-        self.max_qubits = 0
 
     def get_simulator(self):
         return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': self.max_qubits})
