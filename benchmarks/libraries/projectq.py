@@ -74,7 +74,7 @@ class ProjectQ(abstract.ParserBackend):
 
     def __call__(self, qureg):
         self.eng.flush()
-        self.qubit_id , wave = self.eng.backend.cheat()
+        self.qubit_id, wave = self.eng.backend.cheat()
         # measure everything to avoid error when running
         self.projectq.ops.All(self.projectq.ops.Measure) | qureg
         return np.array(wave)
