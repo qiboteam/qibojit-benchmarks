@@ -94,4 +94,3 @@ class ProjectQ(abstract.ParserBackend):
 
     def get_device(self):
         return None
-    
