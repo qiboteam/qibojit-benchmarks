@@ -1,4 +1,5 @@
 from benchmarks.libraries import abstract
+from benchmarks.logger import log
 
 
 class Qibo(abstract.AbstractBackend):
@@ -14,8 +15,11 @@ class Qibo(abstract.AbstractBackend):
 
     def from_qasm(self, qasm):
         circuit = self.models.Circuit.from_qasm(qasm)
-        if self.max_qubits > 0:
-            circuit = circuit.fuse(self.max_qubits)
+        if self.max_qubits > 1:
+            if self.max_qubits > 2:
+                log.warn("Fusion with {} qubits is not yet supported by Qibo. "
+                         "Using max_qubits=2.".format(self.max_qubits))
+            circuit = circuit.fuse()
         return circuit
 
     def __call__(self, circuit):

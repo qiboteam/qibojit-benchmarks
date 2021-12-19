@@ -85,7 +85,8 @@ class TensorflowQuantum(Cirq):
         self.state_layer = tfq.layers.State()
 
     def set_precision(self, precision):
-        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
 
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)
@@ -101,3 +102,56 @@ class TensorflowQuantum(Cirq):
 
     def __call__(self, circuit):
         return self.state_layer(circuit)[0].numpy()
+
+
+class QSim(Cirq):
+
+    def __init__(self, max_qubits=0):
+        import cirq
+        import qsimcirq
+        from multiprocessing import cpu_count
+        self.name = "qsim"
+        self.cirq = cirq
+        self.qsimcirq = qsimcirq
+        self.precision = "single"
+        self.__version__ = qsimcirq.__version__
+        self.nthreads = cpu_count()
+        self.max_qubits = max_qubits
+        self.simulator = self.get_simulator()
+
+    def get_simulator(self):
+        return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': self.max_qubits})
+
+    def set_precision(self, precision):
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
+
+
+class QSimGpu(QSim):
+
+    def __init__(self, max_qubits=0):
+        super().__init__(max_qubits)
+        self.name = "qsim-gpu"
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(
+                use_gpu=True,
+                gpu_mode=0,
+                max_fused_gate_size=self.max_qubits
+            )
+        return self.qsimcirq.QSimSimulator(qsim_options)
+
+
+class QSimCuQuantum(QSim):
+
+    def __init__(self, max_qubits=0):
+        super().__init__(max_qubits)
+        self.name = "qsim-cuquantum"
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(
+                use_gpu=True,
+                gpu_mode=1,
+                max_fused_gate_size=self.max_qubits
+            )
+        return self.qsimcirq.QSimSimulator(qsim_options)
