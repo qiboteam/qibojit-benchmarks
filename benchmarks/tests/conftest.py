@@ -1,7 +1,7 @@
 NQUBITS = [3, 4, 5]
 BACKENDS = ["qibojit", "numpy"]
 LIBRARIES = ["qibo", "qiskit", "cirq", "qsim", "qulacs", "hybridq"]
-LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
+LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu", "hybridq-gpu"]
 
 
 # Check if GPU is available for tests

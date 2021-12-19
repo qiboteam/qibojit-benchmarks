@@ -80,7 +80,7 @@ class HybridQ(abstract.ParserBackend):
     def __call__(self, circuit):
         from hybridq.circuit.simulation import simulate
         initial_state = len(circuit.all_qubits()) * '0'
-        final_state = simulate(circuit, optimize='evolution',
+        final_state = simulate(circuit, optimize="evolution",
                                initial_state=initial_state,
                                simplify=False,
                                compress=self.max_qubits)
@@ -94,3 +94,16 @@ class HybridQ(abstract.ParserBackend):
 
     def get_device(self):
         return None
+
+
+class HybridQGPU(HybridQ):
+
+    def __call__(self, circuit):
+        from hybridq.circuit.simulation import simulate
+        initial_state = len(circuit.all_qubits()) * '0'
+        final_state = simulate(circuit, optimize="evolution-einsum",
+                               backend="jax",
+                               initial_state=initial_state,
+                               simplify=False,
+                               compress=self.max_qubits)
+        return final_state.ravel()
