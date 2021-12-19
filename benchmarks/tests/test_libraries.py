@@ -71,7 +71,7 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     skip_libraries = {"qiskit", "qiskit-default", "qiskit-twoqubitfusion",
-                      "qiskit-gpu", "cirq", "tfq", "qsim",
+                      "qiskit-gpu", "cirq", "tfq", "qsim", "qsim-gpu", "qsim-cuquantum",
                       "qulacs", "qulacs-gpu", "qcgpu"}
     if gate in {"crx", "crz"} and library in skip_libraries:
         pytest.skip("Skipping {} test because it is not supported by {}."
