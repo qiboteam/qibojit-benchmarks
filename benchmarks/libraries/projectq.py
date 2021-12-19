@@ -52,9 +52,8 @@ class ProjectQ(abstract.ParserBackend):
 
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
-        eng = self.projectq.MainEngine(projectq.backends.Simulator())
-        self.eng = eng
-        qureg = eng.allocate_qureg(nqubits)
+        self.eng = self.projectq.MainEngine(projectq.backends.Simulator())
+        qureg = self.eng.allocate_qureg(nqubits)
         for gatename, qubits, params in gatelist:
             gate = getattr(self, gatename)
             if params is not None:
