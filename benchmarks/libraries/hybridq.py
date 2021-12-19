@@ -13,42 +13,61 @@ class HybridQ(abstract.ParserBackend):
         self.max_qubits = max_qubits
         # TODO: Make sure there are no hidden thresholds that disable fusion
 
-    def RX(self, theta):
-        return self.Gate('RX', params=[theta])
+    def H(self, q):
+        return self.Gate('H', qubits=(q,))
 
-    def RY(self, theta):
-        return self.Gate('RY', params=[theta])
+    def X(self, q):
+        return self.Gate('X', qubits=(q,))
 
-    def RZ(self, theta):
-        return self.Gate('RZ', params=[theta])
+    def Y(self, q):
+        return self.Gate('Y', qubits=(q,))
 
-    def U1(self, theta):
+    def Z(self, q):
+        return self.Gate('Z', qubits=(q,))
+
+    def RX(self, q, theta):
+        return self.Gate('RX', params=[theta], qubits=(q,))
+
+    def RY(self, q, theta):
+        return self.Gate('RY', params=[theta], qubits=(q,))
+
+    def RZ(self, q, theta):
+        return self.Gate('RZ', params=[theta], qubits=(q,))
+
+    def U1(self, q, theta):
         phase = np.exp(1j * theta)
         matrix = np.diag([1, phase])
-        return self.MatrixGate(U=matrix)
+        return self.MatrixGate(U=matrix, qubits=(q,))
 
-    def U2(self, phi, lam):
+    def U2(self, q, phi, lam):
         plus = np.exp(0.5j * (phi + lam))
         minus = np.exp(0.5j * (phi - lam))
         matrix = np.array([[np.conj(plus), np.conj(minus)], [minus, plus]]) / np.sqrt(2)
-        return self.MatrixGate(U=matrix)
+        return self.MatrixGate(U=matrix, qubits=(q,))
 
-    def U3(self, theta, phi, lam):
-        return self.Gate('U3', params=[theta, phi, lam])
+    def U3(self, q, theta, phi, lam):
+        return self.Gate('U3', params=[theta, phi, lam], qubits=(q,))
 
-    def CU1(self, theta):
-        return self.Gate('CPHASE', params=[theta])
+    def CNOT(self, q1, q2):
+        return self.Gate('CNOT', qubits=(q1, q2))
 
-    def CU3(self, theta, phi, lam):
-        raise NotImplementedError
+    def SWAP(self, q1, q2):
+        return self.Gate('SWAP', qubits=(q1, q2))
 
+    def CZ(self, q1, q2):
+        return self.Gate('CZ', qubits=(q1, q2))
+
+    def CU1(self, q1, q2, theta):
+        return self.Gate('CPHASE', params=[theta], qubits=(q1, q2))
+
+    def CU3(self, q1, q2, theta, phi, lam):
+        from hybridq.gate import Control
         cost, sint = np.cos(theta / 2.0), np.sin(theta / 2.0)
         pplus, pminus = np.exp(0.5j * (phi + lam)), np.exp(0.5j * (phi - lam))
         matrix = np.array([[np.conj(pplus) * cost, -np.conj(pminus) * sint],
                            [pminus * sint, pminus * cost]])
-        gate = self.qulacs.gate.DenseMatrix([target], matrix)
-        gate.add_control_qubit(control, 1)
-        return gate
+        gate = self.MatrixGate(U=matrix, qubits=(q2,))
+        return Control((q1,), gate=gate)
 
     def RZZ(self, theta):
         raise NotImplementedError
@@ -59,22 +78,16 @@ class HybridQ(abstract.ParserBackend):
         gate = self.qulacs.gate.DenseMatrix([target1, target2], matrix)
         return gate
 
-    def __getattr__(self, x):
-        return self.Gate(x)
-
-    def __getitem__(self, x):
-        return self.Gate(x)
-
     def from_qasm(self, qasm):
         from hybridq.circuit import Circuit
         nqubits, gatelist = self.parse(qasm)
         circuit = Circuit()
         for gatename, qubits, params in gatelist:
+            args = list(qubits)
             if params:
-                gate = getattr(self, gatename)(*params)
-            else:
-                gate = getattr(self, gatename)
-            circuit.append(gate.on(qubits))
+                args.extend(params)
+            gate = getattr(self, gatename)(*args)
+            circuit.append(gate)
         return circuit
 
     def __call__(self, circuit):
