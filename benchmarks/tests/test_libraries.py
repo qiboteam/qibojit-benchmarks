@@ -152,7 +152,7 @@ def test_basis_change(nqubits, library, simtime):
 
 @pytest.mark.parametrize("depth", ["2", "5", "8"])
 def test_quantum_volume(nqubits, library, depth):
-    if library == "tfq" or "projectq":
+    if library in ("tfq", "projectq"):
         pytest.skip("Skipping qv test because it is not supported by {}."
                     "".format(library))
     qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)
