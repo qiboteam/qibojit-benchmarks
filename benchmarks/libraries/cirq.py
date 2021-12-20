@@ -23,10 +23,12 @@ class Cirq(abstract.ParserBackend):
 
     def CU1(self, theta):
         # TODO: Check if this is the right gate
+        import numpy as np
         return self.cirq.CZPowGate(exponent=theta/np.pi)
 
     def CU3(self, theta, phi, lam):
         # TODO: Check if this is the right gate
+        import numpy as np
         gate = self.cirq.circuits.qasm_output.QasmUGate(theta/np.pi, phi/np.pi, lam/np.pi)
         return gate.controlled(num_controls=1)
 
