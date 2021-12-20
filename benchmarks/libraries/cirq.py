@@ -23,7 +23,7 @@ class Cirq(abstract.ParserBackend):
 
     def CU1(self, theta):
         # TODO: Check if this is the right gate
-        return self.cirq.CZPowGate(exponent=theta)
+        return self.cirq.CZPowGate(exponent=theta/np.pi)
 
     def CU3(self, theta, phi, lam):
         # TODO: Check if this is the right gate
