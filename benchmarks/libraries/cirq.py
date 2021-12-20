@@ -27,7 +27,7 @@ class Cirq(abstract.ParserBackend):
 
     def CU3(self, theta, phi, lam):
         # TODO: Check if this is the right gate
-        gate = self.cirq.circuits.qasm_output.QasmUGate(theta, phi, lam)
+        gate = self.cirq.circuits.qasm_output.QasmUGate(theta / np.pi, phi / np.pi, lam / np.pi)
         return gate.controlled(num_controls=1)
 
     def RZZ(self, theta):
