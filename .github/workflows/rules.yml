@@ -25,7 +25,7 @@ jobs:
         pip install tensorflow_quantum
         pip install qsimcirq
         pip install qibo --pre
-        pip install qibojit
+        pip install qibojit --pre
     - name: Test
       run: |
-        pytest benchmarks/
+        pytest
