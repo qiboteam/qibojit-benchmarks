@@ -12,9 +12,21 @@ class AbstractCircuit:
     def __iter__(self):
         raise NotImplementedError
 
-    def to_qasm(self):
+    def to_qasm(self, theta=None):
+        """Creates the circuit in OpenQASM format.
+
+        Args:
+            theta (np.ndarray): If not ``None`` random ``RX`` gates are added
+                before the actual circuit gates so that the initial state is
+                non-trivial. Useful for testing.
+
+        Returns:
+            A string with the circuit in OpenQASM format.
+        """
         code = ['OPENQASM 2.0;', 'include "qelib1.inc";',
                 f'qreg q[{self.nqubits}];', f'creg m[{self.nqubits}];']
+        if theta is not None:
+            code.extend(f"rx({t}) q[{i}];" for i, t in enumerate(theta))
         code.extend(iter(self))
         return "\n".join(code)
 
@@ -271,7 +283,7 @@ class SupremacyCircuit(AbstractCircuit):
                                   "`SupremacyCircuit` because it is prepared "
                                   "using Cirq.")
 
-    def to_qasm(self):
+    def to_qasm(self, theta=None):
         qasm = self.cirq_circuit.to_qasm()
         qasm = qasm.replace("sx", "rx(pi*0.5)")
         return qasm
@@ -321,7 +333,7 @@ class BasisChange(AbstractCircuit):
                                   "`BasisChange` because it is prepared "
                                   "using OpenFermion.")
 
-    def to_qasm(self):
+    def to_qasm(self, theta=None):
         return self.openfermion_circuit.to_qasm()
 
 
@@ -369,7 +381,7 @@ class QuantumVolume(AbstractCircuit):
         evaluated = sympy.sympify(expr).evalf()
         return self.evaluate_pi(qasm.replace(expr, str(evaluated)))
 
-    def to_qasm(self):
+    def to_qasm(self, theta=None):
         qasm = self.qiskit_circuit.qasm()
         qasm = qasm.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
         return self.evaluate_pi(qasm)

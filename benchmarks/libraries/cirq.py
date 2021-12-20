@@ -1,3 +1,4 @@
+import numpy as np
 from benchmarks.libraries import abstract
 
 
@@ -5,7 +6,6 @@ class Cirq(abstract.ParserBackend):
 
     def __init__(self):
         import cirq
-        import numpy as np
         self.name = "cirq"
         self.__version__ = cirq.__version__
         self.cirq = cirq
@@ -23,7 +23,7 @@ class Cirq(abstract.ParserBackend):
 
     def CU1(self, theta):
         # TODO: Check if this is the right gate
-        return self.cirq.CZPowGate(exponent=theta)
+        return self.cirq.CZPowGate(exponent=theta / np.pi)
 
     def CU3(self, theta, phi, lam):
         # TODO: Check if this is the right gate
