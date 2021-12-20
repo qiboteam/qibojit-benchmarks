@@ -279,14 +279,14 @@ class SupremacyCircuit(AbstractCircuit):
         return spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
 
     def __iter__(self):
-        raise NotImplementedError("Iteration is not available for "
-                                  "`SupremacyCircuit` because it is prepared "
-                                  "using Cirq.")
-
-    def to_qasm(self, theta=None):
         qasm = self.cirq_circuit.to_qasm()
-        qasm = qasm.replace("sx", "rx(pi*0.5)")
-        return qasm
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                if first_word == "sx":
+                    yield line.replace("sx", "rx(pi*0.5)")
+                else:
+                    yield line
 
 
 class BasisChange(AbstractCircuit):
@@ -329,12 +329,11 @@ class BasisChange(AbstractCircuit):
         return circuit
 
     def __iter__(self):
-        raise NotImplementedError("Iteration is not available for "
-                                  "`BasisChange` because it is prepared "
-                                  "using OpenFermion.")
-
-    def to_qasm(self, theta=None):
-        return self.openfermion_circuit.to_qasm()
+        qasm = self.openfermion_circuit.to_qasm()
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                yield line
 
 
 class QuantumVolume(AbstractCircuit):
@@ -381,7 +380,13 @@ class QuantumVolume(AbstractCircuit):
         evaluated = sympy.sympify(expr).evalf()
         return self.evaluate_pi(qasm.replace(expr, str(evaluated)))
 
-    def to_qasm(self, theta=None):
+    def __iter__(self):
         qasm = self.qiskit_circuit.qasm()
-        qasm = qasm.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                yield line.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
+
+    def to_qasm(self, theta=None):
+        qasm = super().to_qasm(theta)
         return self.evaluate_pi(qasm)
