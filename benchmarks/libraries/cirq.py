@@ -1,3 +1,4 @@
+import numpy as np
 from benchmarks.libraries import abstract
 
 
@@ -5,7 +6,6 @@ class Cirq(abstract.ParserBackend):
 
     def __init__(self):
         import cirq
-        import numpy as np
         self.name = "cirq"
         self.__version__ = cirq.__version__
         self.cirq = cirq
@@ -13,23 +13,24 @@ class Cirq(abstract.ParserBackend):
         self.simulator = cirq.Simulator(dtype=np.complex128)
 
     def RX(self, theta):
-        return self.cirq.XPowGate(exponent=theta)
+        return self.cirq.rx(theta)
 
     def RY(self, theta):
-        return self.cirq.YPowGate(exponent=theta)
+        return self.cirq.ry(theta)
 
     def RZ(self, theta):
-        return self.cirq.ZPowGate(exponent=theta)
+        return self.cirq.rz(theta)
 
     def CU1(self, theta):
-        return self.cirq.CZPowGate(exponent=theta)
+        return self.cirq.CZPowGate(exponent=theta / np.pi)
 
     def CU3(self, theta, phi, lam):
-        gate = self.cirq.circuits.qasm_output.QasmUGate(theta, phi, lam)
+        gate = self.cirq.circuits.qasm_output.QasmUGate(theta / np.pi, phi / np.pi, lam / np.pi)
         return gate.controlled(num_controls=1)
 
     def RZZ(self, theta):
-        return self.cirq.ZZPowGate(exponent=theta)
+        import numpy as np
+        return self.cirq.ZZPowGate(exponent=theta/np.pi, global_shift=-0.5)
 
     def __getattr__(self, x):
         return getattr(self.cirq, x)

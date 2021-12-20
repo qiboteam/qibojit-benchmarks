@@ -1,6 +1,6 @@
 NQUBITS = [3, 4, 5]
-BACKENDS = ["qibojit", "numpy"]
-LIBRARIES = ["qibo", "qiskit", "cirq", "qsim", "qulacs"]
+BACKENDS = ["qibojit", "tensorflow", "numpy"]
+LIBRARIES = ["qibo", "qiskit", "cirq", "qsim", "tfq", "qulacs"]
 LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
 
 
