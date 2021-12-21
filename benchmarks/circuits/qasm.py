@@ -16,9 +16,9 @@ class AbstractCircuit:
         """Creates the circuit in OpenQASM format.
 
         Args:
-            theta (np.ndarray): If not ``None`` random ``RX`` gates are added
-                before the actual circuit gates so that the initial state is
-                non-trivial. Useful for testing.
+            theta (np.ndarray): If not ``None`` ``RX`` gates with the given
+                angles are added before the actual circuit gates so that the
+                initial state is non-trivial. Useful for testing.
 
         Returns:
             A string with the circuit in OpenQASM format.
