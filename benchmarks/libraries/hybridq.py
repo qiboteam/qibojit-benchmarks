@@ -4,14 +4,18 @@ from benchmarks.libraries import abstract
 
 class HybridQ(abstract.ParserBackend):
 
-    def __init__(self, max_qubits="0"):
+    def __init__(self, max_qubits="0", simplify="False"):
         from hybridq.gate import Gate, MatrixGate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
         self.MatrixGate = MatrixGate
-        self.max_qubits = int(max_qubits)
         # TODO: Make sure there are no hidden thresholds that disable fusion
+        self.max_qubits = int(max_qubits)
+        if simplify in ("true", "True"):
+            self.simplify = True
+        else:
+            self.simplify = False
 
     def H(self, q):
         return self.Gate('H', qubits=(q,))
@@ -92,7 +96,7 @@ class HybridQ(abstract.ParserBackend):
         initial_state = len(circuit.all_qubits()) * '0'
         final_state = simulate(circuit, optimize="evolution",
                                initial_state=initial_state,
-                               simplify=False,
+                               simplify=self.simplify,
                                compress=self.max_qubits)
         return final_state.ravel()
 
@@ -114,6 +118,6 @@ class HybridQGPU(HybridQ):
         final_state = simulate(circuit, optimize="evolution-einsum",
                                backend="jax",
                                initial_state=initial_state,
-                               simplify=False,
+                               simplify=self.simplify,
                                compress=self.max_qubits)
         return final_state.ravel()
