@@ -9,11 +9,15 @@ parser.add_argument("--nqubits", default=10, type=int,
 parser.add_argument("--library", default="qibo", type=str,
                     help="Quantum simulation library to use in benchmark. "
                          "See README for the list of available libraries.")
+parser.add_argument("--library-options", default=None, type=str,
+                    help="String with options for the library. "
+                         "It should have the form 'arg1=value1,arg2=value2,...'. "
+                         "Each library supports different options.")
 
 parser.add_argument("--circuit", default="qft", type=str,
                     help="Type of circuit to use. See README for the list of "
                          "available circuits.")
-parser.add_argument("--options", default=None, type=str,
+parser.add_argument("--circuit-options", default=None, type=str,
                     help="String with options for circuit creation. "
                          "It should have the form 'arg1=value1,arg2=value2,...'. "
                          "See README for the list of arguments that are "
@@ -21,9 +25,6 @@ parser.add_argument("--options", default=None, type=str,
 parser.add_argument("--precision", default=None, type=str,
                     help="Numerical precision of the simulation. "
                          "Choose between 'double' and 'single'.")
-parser.add_argument("--max-qubits", default=0, type=int,
-                    help="Maximum qubit number to use in gate fusion optimization.")
-
 
 parser.add_argument("--nreps", default=1, type=int,
                     help="Number of repetitions of the circuit execution. "
