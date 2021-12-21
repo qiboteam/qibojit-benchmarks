@@ -4,8 +4,9 @@ from benchmarks.logger import log
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits="0"):
+    def __init__(self, max_qubits="0", backend="qibojit"):
         import qibo
+        qibo.set_backend(backend)
         from qibo import models
         self.name = "qibo"
         self.qibo = qibo
@@ -38,19 +39,3 @@ class Qibo(abstract.AbstractBackend):
 
     def get_device(self):
         return self.qibo.get_device()
-
-
-class QiboJit(Qibo):
-
-    def __init__(self, max_qubits="0"):
-        super().__init__(max_qubits)
-        self.qibo.set_backend("qibojit")
-        self.name = "qibojit"
-
-
-class QiboTF(Qibo):
-
-    def __init__(self, max_qubits="0"):
-        super().__init__(max_qubits)
-        self.qibo.set_backend("qibotf")
-        self.name = "qibotf"

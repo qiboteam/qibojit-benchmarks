@@ -25,12 +25,6 @@ def get(backend_name, options=None):
     if backend_name == "qibo":
         from benchmarks.libraries.qibo import Qibo
         return Qibo(**options)
-    elif backend_name == "qibojit":
-        from benchmarks.libraries.qibo import QiboJit
-        return QiboJit(**options)
-    elif backend_name == "qibotf":
-        from benchmarks.libraries.qibo import QiboTF
-        return QiboTF(**options)
 
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit
