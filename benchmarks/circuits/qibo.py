@@ -175,7 +175,11 @@ class SupremacyCircuit(qasm.SupremacyCircuit):
     def __init__(self, nqubits, depth="2", seed="123"):
         super().__init__(nqubits, depth, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.SupremacyCircuit(nqubits, depth, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
@@ -187,7 +191,11 @@ class BasisChange(qasm.BasisChange):
     def __init__(self, nqubits, simulation_time="1", seed="123"):
         super().__init__(nqubits, simulation_time, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.BasisChange(nqubits, simulation_time, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
@@ -199,7 +207,11 @@ class QuantumVolume(qasm.QuantumVolume):
     def __init__(self, nqubits, depth="1", seed="123"):
         super().__init__(nqubits, depth, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.QuantumVolume(nqubits, depth, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:

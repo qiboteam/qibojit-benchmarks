@@ -12,9 +12,21 @@ class AbstractCircuit:
     def __iter__(self):
         raise NotImplementedError
 
-    def to_qasm(self):
+    def to_qasm(self, theta=None):
+        """Creates the circuit in OpenQASM format.
+
+        Args:
+            theta (np.ndarray): If not ``None`` ``RX`` gates with the given
+                angles are added before the actual circuit gates so that the
+                initial state is non-trivial. Useful for testing.
+
+        Returns:
+            A string with the circuit in OpenQASM format.
+        """
         code = ['OPENQASM 2.0;', 'include "qelib1.inc";',
                 f'qreg q[{self.nqubits}];', f'creg m[{self.nqubits}];']
+        if theta is not None:
+            code.extend(f"rx({t}) q[{i}];" for i, t in enumerate(theta))
         code.extend(iter(self))
         return "\n".join(code)
 
@@ -267,14 +279,14 @@ class SupremacyCircuit(AbstractCircuit):
         return spc.generate_boixo_2018_supremacy_circuits_v2(qubits, self.depth, self.seed)
 
     def __iter__(self):
-        raise NotImplementedError("Iteration is not available for "
-                                  "`SupremacyCircuit` because it is prepared "
-                                  "using Cirq.")
-
-    def to_qasm(self):
         qasm = self.cirq_circuit.to_qasm()
-        qasm = qasm.replace("sx", "rx(pi*0.5)") # see issue #13
-        return qasm
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                if first_word == "sx":
+                    yield line.replace("sx", "rx(pi*0.5)") # see issue #13
+                else:
+                    yield line
 
 
 class BasisChange(AbstractCircuit):
@@ -317,12 +329,11 @@ class BasisChange(AbstractCircuit):
         return circuit
 
     def __iter__(self):
-        raise NotImplementedError("Iteration is not available for "
-                                  "`BasisChange` because it is prepared "
-                                  "using OpenFermion.")
-
-    def to_qasm(self):
-        return self.openfermion_circuit.to_qasm()
+        qasm = self.openfermion_circuit.to_qasm()
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                yield line
 
 
 class QuantumVolume(AbstractCircuit):
@@ -369,7 +380,13 @@ class QuantumVolume(AbstractCircuit):
         evaluated = sympy.sympify(expr).evalf()
         return self.evaluate_pi(qasm.replace(expr, str(evaluated)))
 
-    def to_qasm(self):
+    def __iter__(self):
         qasm = self.qiskit_circuit.qasm()
-        qasm = qasm.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
+        for line in qasm.split("\n"):
+            first_word = line.split(" ")[0]
+            if first_word not in {"//", "OPENQASM", "include", "qreg"}:
+                yield line.replace("1/(15*pi)", str(1.0 / (15.0 * np.pi)))
+
+    def to_qasm(self, theta=None):
+        qasm = super().to_qasm(theta)
         return self.evaluate_pi(qasm)
