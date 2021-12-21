@@ -36,6 +36,12 @@ class QCGPU(abstract.ParserBackend):
         gate = self.qcgpu.Gate(matrix)
         return ("apply_gate", (gate, target))
 
+    def CU1(self, control, target, theta):
+        phase = np.exp(1j * theta)
+        matrix = np.diag([1, phase])
+        gate = self.qcgpu.Gate(matrix)
+        return ("apply_controlled_gate", (gate, control, target))
+
     def RZZ(self, target1, target2, theta):
         raise NotImplementedError
 
@@ -56,7 +62,7 @@ class QCGPU(abstract.ParserBackend):
                 circuit.append(("cx", (target1, target2)))
                 circuit.append(("cx", (target2, target1)))
                 circuit.append(("cx", (target1, target2)))
-            elif gate in {"RX", "RY", "RZ", "U1"}:
+            elif gate in {"RX", "RY", "RZ", "U1", "CU1"}:
                 circuit.append(getattr(self, gate)(*args))
             else:
                 circuit.append((gate.lower(), args))
