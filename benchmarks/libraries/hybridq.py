@@ -4,18 +4,24 @@ from benchmarks.libraries import abstract
 
 class HybridQ(abstract.ParserBackend):
 
-    def __init__(self, max_qubits="0", simplify="False"):
+    def __init__(self, max_qubits="0", simplify="False", nthreads=None):
         from hybridq.gate import Gate, MatrixGate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
         self.MatrixGate = MatrixGate
-        # TODO: Make sure there are no hidden thresholds that disable fusion
         self.max_qubits = int(max_qubits)
         if simplify in ("true", "True"):
             self.simplify = True
         else:
             self.simplify = False
+
+        if nthreads is None:
+            from multiprocessing import cpu_count
+            self.nthreads = cpu_count()
+        else:
+            self.nthreads = int(nthreads)
+        self.max_qubits = int(max_qubits)
 
     def H(self, q):
         return self.Gate('H', qubits=(q,))
@@ -97,7 +103,8 @@ class HybridQ(abstract.ParserBackend):
         final_state = simulate(circuit, optimize="evolution",
                                initial_state=initial_state,
                                simplify=self.simplify,
-                               compress=self.max_qubits)
+                               compress=self.max_qubits,
+                               parallel=self.nthreads)
         return final_state.ravel()
 
     def transpose_state(self, x):
