@@ -70,7 +70,8 @@ def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
                           #("cu2", "CU2", {"phi": 0.1, "lam": 0.3}), # not supported by OpenQASM
                           ("cu3", "CU3", {"theta": 0.1, "phi": 0.2, "lam": 0.3})])
 def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
-    skip_libraries = {"qiskit", "qiskit-default", "qiskit-gpu", "cirq", "tfq",
+    skip_libraries = {"qiskit", "qiskit-default", "qiskit-twoqubitfusion",
+                      "qiskit-gpu", "cirq", "tfq", "qsim", "qsim-gpu", "qsim-cuquantum",
                       "qulacs", "qulacs-gpu", "qcgpu"}
     if gate in {"crx", "crz"} and library in skip_libraries:
         pytest.skip("Skipping {} test because it is not supported by {}."
@@ -118,7 +119,7 @@ def test_hidden_shift(nqubits, library):
 
 
 def test_qaoa_circuit(library):
-    if library in {"qibo", "qibojit", "qcgpu", "cirq", "tfq"}:
+    if library in {"qibo", "qibojit", "qcgpu"}:
         pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")

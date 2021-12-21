@@ -1,6 +1,6 @@
 NQUBITS = "3,4,5"
 BACKENDS = "qibojit,tensorflow,numpy"
-LIBRARIES = "qibo,qiskit,qiskit-default,cirq,qulacs"
+LIBRARIES = "qibo,qiskit,qiskit-default,qiskit-twoqubitfusion,cirq,qsim,tfq,qulacs"
 
 
 def pytest_addoption(parser):

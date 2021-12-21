@@ -23,6 +23,7 @@ jobs:
         pip install qiskit openfermion qulacs
         pip install tensorflow==2.5.1
         pip install tensorflow_quantum
+        pip install qsimcirq
         pip install qibo
         pip install qibojit
     - name: Test

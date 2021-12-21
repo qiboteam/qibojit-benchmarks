@@ -13,23 +13,28 @@ class Cirq(abstract.ParserBackend):
         self.simulator = cirq.Simulator(dtype=np.complex128)
 
     def RX(self, theta):
-        return self.cirq.XPowGate(exponent=theta)
+        return self.cirq.rx(theta)
 
     def RY(self, theta):
-        return self.cirq.YPowGate(exponent=theta)
+        return self.cirq.ry(theta)
 
     def RZ(self, theta):
-        return self.cirq.ZPowGate(exponent=theta)
+        return self.cirq.rz(theta)
 
     def CU1(self, theta):
-        return self.cirq.CZPowGate(exponent=theta)
+        # TODO: Check if this is the right gate
+        import numpy as np
+        return self.cirq.CZPowGate(exponent=theta/np.pi)
 
     def CU3(self, theta, phi, lam):
-        gate = self.cirq.circuits.qasm_output.QasmUGate(theta, phi, lam)
+        # TODO: Check if this is the right gate
+        import numpy as np
+        gate = self.cirq.circuits.qasm_output.QasmUGate(theta/np.pi, phi/np.pi, lam/np.pi)
         return gate.controlled(num_controls=1)
 
     def RZZ(self, theta):
-        return self.cirq.ZZPowGate(exponent=theta)
+        import numpy as np
+        return self.cirq.ZZPowGate(exponent=theta/np.pi, global_shift=-0.5)
 
     def __getattr__(self, x):
         return getattr(self.cirq, x)
@@ -87,7 +92,8 @@ class TensorflowQuantum(Cirq):
         self.state_layer = tfq.layers.State()
 
     def set_precision(self, precision):
-        raise NotImplementedError(f"Cannot set precision for {self.name} backend.")
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
 
     def from_qasm(self, qasm):
         circuit = super().from_qasm(qasm)
@@ -105,3 +111,46 @@ class TensorflowQuantum(Cirq):
         # transfer final state to numpy array because that's what happens
         # for all backends
         return self.state_layer(circuit)[0].numpy()
+
+
+class QSim(Cirq):
+
+    def __init__(self):
+        import cirq
+        import qsimcirq
+        from multiprocessing import cpu_count
+        self.name = "qsim"
+        self.cirq = cirq
+        self.qsimcirq = qsimcirq
+        self.precision = "single"
+        self.__version__ = qsimcirq.__version__
+        self.nthreads = cpu_count()
+        self.simulator = self.get_simulator()
+
+    def get_simulator(self):
+        return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': 0})
+
+    def set_precision(self, precision):
+        if precision == "double":
+            raise NotImplementedError(f"Cannot set precision '{precision}' for {self.name} backend.")
+
+
+class QSimGpu(QSim):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "qsim-gpu"
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0, max_fused_gate_size=0)
+        return self.qsimcirq.QSimSimulator(qsim_options)
+
+class QSimCuQuantum(QSim):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "qsim-cuquantum"
+
+    def get_simulator(self):
+        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1, max_fused_gate_size=0)
+        return self.qsimcirq.QSimSimulator(qsim_options)
