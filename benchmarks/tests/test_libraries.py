@@ -133,7 +133,7 @@ def test_hidden_shift(nqubits, library, max_qubits):
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-def test_qaoa_circuit(library):
+def test_qaoa_circuit(library, max_qubits):
     if library in {"qibo", "qibojit", "qcgpu"}:
         pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib

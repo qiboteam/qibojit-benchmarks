@@ -65,10 +65,12 @@ class Cirq(abstract.ParserBackend):
         return self.precision
 
     def set_precision(self, precision):
+        import numpy as np
+        self.precision = precision
         if precision == "single":
-            import numpy as np
-            self.precision = precision
             self.simulator = self.cirq.Simulator(dtype=np.complex64)
+        else:
+            self.simulator = self.cirq.Simulator(dtype=np.complex128)
 
     def get_device(self):
         return None
@@ -102,6 +104,8 @@ class TensorflowQuantum(Cirq):
         return circuit
 
     def __call__(self, circuit):
+        # transfer final state to numpy array because that's what happens
+        # for all backends
         return self.state_layer(circuit)[0].numpy()
 
 

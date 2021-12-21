@@ -16,9 +16,9 @@ class AbstractCircuit:
         """Creates the circuit in OpenQASM format.
 
         Args:
-            theta (np.ndarray): If not ``None`` random ``RX`` gates are added
-                before the actual circuit gates so that the initial state is
-                non-trivial. Useful for testing.
+            theta (np.ndarray): If not ``None`` ``RX`` gates with the given
+                angles are added before the actual circuit gates so that the
+                initial state is non-trivial. Useful for testing.
 
         Returns:
             A string with the circuit in OpenQASM format.
@@ -284,7 +284,7 @@ class SupremacyCircuit(AbstractCircuit):
             first_word = line.split(" ")[0]
             if first_word not in {"//", "OPENQASM", "include", "qreg"}:
                 if first_word == "sx":
-                    yield line.replace("sx", "rx(pi*0.5)")
+                    yield line.replace("sx", "rx(pi*0.5)") # see issue #13
                 else:
                     yield line
 

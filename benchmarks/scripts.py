@@ -71,12 +71,16 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     logs.average("simulation_times")
     logs.average("transfer_times")
 
-    start_time = time.time()
     if nshots is not None:
+        result = circuit(nshots=nshots)
+        start_time = time.time()
         freqs = result.frequencies()
-    logs.log(measurement_time=time.time() - start_time)
+        logs.log(measurement_time=time.time() - start_time)
+        del result
+    else:
+        logs.log(measurement_time=0)
+        logs.dump()
 
-    logs.dump()
     return logs
 
 
@@ -115,7 +119,7 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
     dtype = str(result.dtype)
     del(result)
 
-    simulation_times, transfer_times = [], []
+    simulation_times = []
     for _ in range(nreps):
         start_time = time.time()
         result = backend(circuit)

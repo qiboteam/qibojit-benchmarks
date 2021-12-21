@@ -1,27 +1,33 @@
-NQUBITS = [3, 4, 5]
-BACKENDS = ["qibojit", "tensorflow", "numpy"]
-LIBRARIES = ["qibo", "qiskit", "cirq", "qsim", "tfq", "qulacs"]
-LIBRARIES_GPU = ["qiskit-gpu", "qulacs-gpu", "qcgpu"]
+NQUBITS = "3,4,5"
+MAX_QUBITS = "0,1,2,3,4"
+BACKENDS = "qibojit,tensorflow,numpy"
+LIBRARIES = "qibo,qiskit,cirq,qsim,tfq,qulacs"
 
 
-# Check if GPU is available for tests
-try:
-    from cupy import cuda # pylint: disable=E0401
-    gpu_available = cuda.runtime.getDeviceCount()
-except:
-    gpu_available = 0
-if gpu_available:
-    LIBRARIES.extend(LIBRARIES_GPU)
+def pytest_addoption(parser):
+    parser.addoption("--nqubits", type=str, default=NQUBITS)
+    parser.addoption("--max-qubits", type=str, default=MAX_QUBITS)
+    parser.addoption("--backends", type=str, default=BACKENDS)
+    parser.addoption("--libraries", type=str, default=LIBRARIES)
+    parser.addoption("--add", type=str, default="")
 
 
 def pytest_generate_tests(metafunc):
+    nqubits = [int(n) for n in metafunc.config.option.nqubits.split(",")]
+    max_qubits = [int(n) for n in metafunc.config.option.max_qubits.split(",")]
+    backends = metafunc.config.option.backends.split(",")
+    libraries = metafunc.config.option.libraries.split(",")
+    additional = metafunc.config.option.add
+    if additional:
+        libraries.extend(additional.split(","))
+
     if "nqubits" in metafunc.fixturenames:
-        metafunc.parametrize("nqubits", NQUBITS)
+        metafunc.parametrize("nqubits", nqubits)
     if "backend" in metafunc.fixturenames:
-        metafunc.parametrize("backend", BACKENDS)
+        metafunc.parametrize("backend", backends)
     if "library" in metafunc.fixturenames:
-        metafunc.parametrize("library", LIBRARIES)
+        metafunc.parametrize("library", libraries)
     if "max_qubits" in metafunc.fixturenames:
-        metafunc.parametrize("max_qubits", [0, 1, 2, 3, 4])
+        metafunc.parametrize("max_qubits", max_qubits)
     if "transfer" in metafunc.fixturenames:
         metafunc.parametrize("transfer", [False, True])
