@@ -92,9 +92,6 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
-    if gate == "cu3" and "qiskit" in library:
-        gate = "cu"
-        params["gamma"] = - (params["phi"] + params["lam"])/2
 
     order = ["theta", "phi", "lam", "gamma"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
