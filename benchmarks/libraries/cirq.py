@@ -1,3 +1,4 @@
+import numpy as np
 from benchmarks.libraries import abstract
 
 
@@ -5,7 +6,6 @@ class Cirq(abstract.ParserBackend):
 
     def __init__(self):
         import cirq
-        import numpy as np
         self.name = "cirq"
         self.__version__ = cirq.__version__
         self.cirq = cirq
@@ -13,23 +13,24 @@ class Cirq(abstract.ParserBackend):
         self.simulator = cirq.Simulator(dtype=np.complex128)
 
     def RX(self, theta):
-        return self.cirq.XPowGate(exponent=theta)
+        return self.cirq.rx(theta)
 
     def RY(self, theta):
-        return self.cirq.YPowGate(exponent=theta)
+        return self.cirq.ry(theta)
 
     def RZ(self, theta):
-        return self.cirq.ZPowGate(exponent=theta)
+        return self.cirq.rz(theta)
 
     def CU1(self, theta):
-        return self.cirq.CZPowGate(exponent=theta)
+        return self.cirq.CZPowGate(exponent=theta / np.pi)
 
     def CU3(self, theta, phi, lam):
-        gate = self.cirq.circuits.qasm_output.QasmUGate(theta, phi, lam)
+        gate = self.cirq.circuits.qasm_output.QasmUGate(theta / np.pi, phi / np.pi, lam / np.pi)
         return gate.controlled(num_controls=1)
 
     def RZZ(self, theta):
-        return self.cirq.ZZPowGate(exponent=theta)
+        import numpy as np
+        return self.cirq.ZZPowGate(exponent=theta / np.pi, global_shift=-0.5)
 
     def __getattr__(self, x):
         return getattr(self.cirq, x)
@@ -64,10 +65,12 @@ class Cirq(abstract.ParserBackend):
         return self.precision
 
     def set_precision(self, precision):
+        import numpy as np
+        self.precision = precision
         if precision == "single":
-            import numpy as np
-            self.precision = precision
             self.simulator = self.cirq.Simulator(dtype=np.complex64)
+        else:
+            self.simulator = self.cirq.Simulator(dtype=np.complex128)
 
     def get_device(self):
         return None
@@ -101,22 +104,29 @@ class TensorflowQuantum(Cirq):
         return circuit
 
     def __call__(self, circuit):
+        # transfer final state to numpy array because that's what happens
+        # for all backends
         return self.state_layer(circuit)[0].numpy()
 
 
 class QSim(Cirq):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0", nthreads=None):
         import cirq
         import qsimcirq
-        from multiprocessing import cpu_count
         self.name = "qsim"
         self.cirq = cirq
         self.qsimcirq = qsimcirq
         self.precision = "single"
         self.__version__ = qsimcirq.__version__
-        self.nthreads = cpu_count()
-        self.max_qubits = max_qubits
+
+        if nthreads is None:
+            from multiprocessing import cpu_count
+            self.nthreads = cpu_count()
+        else:
+            self.nthreads = int(nthreads)
+        self.max_qubits = int(max_qubits)
+
         self.simulator = self.get_simulator()
 
     def get_simulator(self):
@@ -129,7 +139,7 @@ class QSim(Cirq):
 
 class QSimGpu(QSim):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.name = "qsim-gpu"
 
@@ -144,7 +154,7 @@ class QSimGpu(QSim):
 
 class QSimCuQuantum(QSim):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.name = "qsim-cuquantum"
 

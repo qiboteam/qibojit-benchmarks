@@ -4,13 +4,13 @@ from benchmarks.libraries import abstract
 
 class HybridQ(abstract.ParserBackend):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         from hybridq.gate import Gate, MatrixGate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
         self.Gate = Gate
         self.MatrixGate = MatrixGate
-        self.max_qubits = max_qubits
+        self.max_qubits = int(max_qubits)
         # TODO: Make sure there are no hidden thresholds that disable fusion
 
     def H(self, q):

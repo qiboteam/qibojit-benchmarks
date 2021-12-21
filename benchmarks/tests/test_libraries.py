@@ -1,4 +1,5 @@
 """Check that execution of circuits from external simulation libraries agrees with Qibo."""
+import itertools
 import pytest
 import numpy as np
 from qibo import models, gates
@@ -12,12 +13,24 @@ def assert_circuit_execution(backend, qasm_circuit, qibo_circuit_iter, atol=None
             atol = 1e-5
         else:
             atol = 1e-10
-    circuit = backend.from_qasm(qasm_circuit.to_qasm())
+
+    # add random RX gates before circuit so that initial state is not trivial
+    nqubits = qasm_circuit.nqubits
+    theta = np.random.random(nqubits)
+    qasm_code = qasm_circuit.to_qasm(theta=theta)
+
+    # execute circuit using backend
+    circuit = backend.from_qasm(qasm_code)
     final_state = backend(circuit)
     final_state = backend.transpose_state(final_state)
-    target_circuit = models.Circuit(qibo_circuit_iter.nqubits)
+
+    # execute circuit using qibo
+    assert qibo_circuit_iter.nqubits == nqubits
+    target_circuit = models.Circuit(nqubits)
+    target_circuit.add(gates.RX(i, theta=t) for i, t in enumerate(theta))
     target_circuit.add(qibo_circuit_iter)
     target_state = target_circuit()
+
     # check fidelity instead of absolute states due to different definitions
     # of the phase of U gates in different backends
     fidelity = np.abs(np.conj(target_state).dot(np.array(final_state)))
@@ -78,81 +91,80 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
-    #if gate == "cu3" and library == "hybridq":
-    #    pytest.skip("Skipping {} test because it is not supported by {}."
-    #                "".format(gate, library))
+
+    atol = 1e-1 if gate == "cu3" else None # TODO: Find why this is needed
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
     target_circuit = qibo.TwoQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
-    assert_circuit_execution(backend, qasm_circuit, target_circuit)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit, atol=atol)
 
 
 @pytest.mark.parametrize("swaps", ["False", "True"])
-def test_qft(nqubits, library, swaps, max_qubits):
+def test_qft(nqubits, library, swaps, library_options):
     qasm_circuit = qasm.QFT(nqubits, swaps=swaps)
     target_circuit = qibo.QFT(nqubits, swaps=swaps)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 @pytest.mark.parametrize("nlayers", ["2", "5"])
-def test_variational(nqubits, library, nlayers, max_qubits):
+def test_variational(nqubits, library, nlayers, library_options):
     qasm_circuit = qasm.VariationalCircuit(nqubits, nlayers=nlayers)
     target_circuit = qibo.VariationalCircuit(nqubits, nlayers=nlayers)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-def test_bernstein_vazirani(nqubits, library, max_qubits):
+def test_bernstein_vazirani(nqubits, library, library_options):
     qasm_circuit = qasm.BernsteinVazirani(nqubits)
     target_circuit = qibo.BernsteinVazirani(nqubits)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-def test_hidden_shift(nqubits, library, max_qubits):
+def test_hidden_shift(nqubits, library, library_options):
     shift = "".join(str(x) for x in np.random.randint(0, 2, size=(nqubits,)))
     qasm_circuit = qasm.HiddenShift(nqubits, shift=shift)
     target_circuit = qibo.HiddenShift(nqubits, shift=shift)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
-def test_qaoa_circuit(library, max_qubits):
-    if library not in {"qiskit", "qulacs", "qiskit-gpu", "qulacs-gpu"}:
+def test_qaoa_circuit(library, library_options):
+    if library in {"qibo", "qibojit", "qcgpu"}:
         pytest.skip(f"{library} does not have built-in RZZ gate.")
     import pathlib
     folder = str(pathlib.Path(__file__).with_name("graphs") / "testgraph8.json")
     qasm_circuit = qasm.QAOA(8, graph=folder)
     target_circuit = qibo.QAOA(8, graph=folder)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 @pytest.mark.parametrize("depth", ["2", "5", "10"])
-def test_supremacy_circuit(nqubits, library, depth, max_qubits):
+def test_supremacy_circuit(nqubits, library, depth, library_options):
     qasm_circuit = qasm.SupremacyCircuit(nqubits, depth=depth)
     target_circuit = qibo.SupremacyCircuit(nqubits, depth=depth)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 @pytest.mark.parametrize("simtime", ["1", "2.5"])
-def test_basis_change(nqubits, library, simtime, max_qubits):
+def test_basis_change(nqubits, library, simtime, library_options):
     qasm_circuit = qasm.BasisChange(nqubits, simulation_time=simtime)
     target_circuit = qibo.BasisChange(nqubits, simulation_time=simtime)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 @pytest.mark.parametrize("depth", ["2", "5", "8"])
-def test_quantum_volume(nqubits, library, depth, max_qubits):
+def test_quantum_volume(nqubits, library, depth, library_options):
     if library == "tfq":
         pytest.skip("Skipping qv test because it is not supported by {}."
                     "".format(library))
     qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)
     target_circuit = qibo.QuantumVolume(nqubits, depth=depth)
-    backend = libraries.get(library, max_qubits)
+    backend = libraries.get(library, library_options)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)

@@ -24,6 +24,9 @@ class TwoQubitGate(OneQubitGate):
     def __init__(self, nqubits, nlayers="1", gate="CNOT", **params):
         super().__init__(nqubits, nlayers, gate, **params)
 
+    def to_qasm(self):
+        raise NotImplementedError
+
     def base_command(self, i):
         return self.gate(i, i + 1, **self.angles)
 
@@ -79,7 +82,7 @@ class VariationalCircuit(qasm.VariationalCircuit):
             for i in range(self.nqubits):
                 yield gates.RY(i, next(theta))
             for i in range(1, self.nqubits - 2, 2):
-              yield gates.CZ(i, i + 1)
+                yield gates.CZ(i, i + 1)
             yield gates.CZ(0, self.nqubits - 1)
 
     def __iter__(self):
@@ -172,7 +175,11 @@ class SupremacyCircuit(qasm.SupremacyCircuit):
     def __init__(self, nqubits, depth="2", seed="123"):
         super().__init__(nqubits, depth, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.SupremacyCircuit(nqubits, depth, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
@@ -184,7 +191,11 @@ class BasisChange(qasm.BasisChange):
     def __init__(self, nqubits, simulation_time="1", seed="123"):
         super().__init__(nqubits, simulation_time, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.BasisChange(nqubits, simulation_time, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
@@ -196,7 +207,11 @@ class QuantumVolume(qasm.QuantumVolume):
     def __init__(self, nqubits, depth="1", seed="123"):
         super().__init__(nqubits, depth, seed)
         from qibo import models
-        self.qibo_circuit = models.Circuit.from_qasm(self.to_qasm())
+        parent = qasm.QuantumVolume(nqubits, depth, seed)
+        self.qibo_circuit = models.Circuit.from_qasm(parent.to_qasm())
+
+    def to_qasm(self):
+        raise NotImplementedError
 
     def __iter__(self):
         for gate in self.qibo_circuit.queue:
