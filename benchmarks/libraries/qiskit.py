@@ -26,11 +26,11 @@ class Qiskit(abstract.AbstractBackend):
         if "cu3" in qasm:
             import re
             theta, phi, lam = re.findall(r"cu3\((.*)\)", qasm)[0].split(",")
-            gamma = - (float(phi) + float(lam)) /2
+            gamma = - (float(phi) + float(lam)) / 2
             qasm = re.sub(rf"cu3\((.*)\)",
                           f"cu({theta},{phi},{lam},{gamma})",
                           qasm)
-        return self.QuantumCircuit.from_qasm_str(qasm)
+        return QuantumCircuit.from_qasm_str(qasm)
 
     def __call__(self, circuit):
         result = self.simulator.run(circuit).result()
