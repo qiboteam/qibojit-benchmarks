@@ -3,13 +3,14 @@ from benchmarks.libraries import abstract
 
 class Qiskit(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits="0", fusion_threshold="1"):
+    def __init__(self, max_qubits="0", fusion_threshold="1", max_parallel_threads="0"):
         import qiskit
         from qiskit.providers.aer import StatevectorSimulator
         self.name = "qiskit"
         self.__version__ = qiskit.__version__
         self.max_qubits = int(max_qubits)
         self.sim_options = dict(
+                max_parallel_threads=int(max_parallel_threads),
                 fusion_enable=self.max_qubits > 0,
                 fusion_max_qubit=self.max_qubits,
                 fusion_threshold=int(fusion_threshold),
