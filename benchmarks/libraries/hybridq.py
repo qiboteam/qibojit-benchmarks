@@ -42,7 +42,7 @@ class HybridQ(abstract.ParserBackend):
     def U2(self, q, phi, lam):
         plus = np.exp(0.5j * (phi + lam))
         minus = np.exp(0.5j * (phi - lam))
-        matrix = np.array([[np.conj(plus), np.conj(minus)], [minus, plus]]) / np.sqrt(2)
+        matrix = np.array([[np.conj(plus), -np.conj(minus)], [minus, plus]]) / np.sqrt(2)
         return self.MatrixGate(U=matrix, qubits=(q,))
 
     def U3(self, q, theta, phi, lam):
@@ -69,14 +69,11 @@ class HybridQ(abstract.ParserBackend):
         gate = self.MatrixGate(U=matrix, qubits=(q2,))
         return Control((q1,), gate=gate)
 
-    def RZZ(self, theta):
-        raise NotImplementedError
-
+    def RZZ(self, q1, q2, theta):
         phase = np.exp(0.5j * theta)
         phasec = np.conj(phase)
         matrix = np.diag([phasec, phase, phase, phasec])
-        gate = self.qulacs.gate.DenseMatrix([target1, target2], matrix)
-        return gate
+        return self.MatrixGate(U=matrix, qubits=(q1, q2))
 
     def from_qasm(self, qasm):
         from hybridq.circuit import Circuit
