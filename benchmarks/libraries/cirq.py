@@ -30,7 +30,7 @@ class Cirq(abstract.ParserBackend):
 
     def RZZ(self, theta):
         import numpy as np
-        return self.cirq.ZZPowGate(exponent=theta/np.pi, global_shift=-0.5)
+        return self.cirq.ZZPowGate(exponent=theta / np.pi, global_shift=-0.5)
 
     def __getattr__(self, x):
         return getattr(self.cirq, x)
@@ -111,20 +111,26 @@ class TensorflowQuantum(Cirq):
 
 class QSim(Cirq):
 
-    def __init__(self):
+    def __init__(self, max_qubits="0", nthreads=None):
         import cirq
         import qsimcirq
-        from multiprocessing import cpu_count
         self.name = "qsim"
         self.cirq = cirq
         self.qsimcirq = qsimcirq
         self.precision = "single"
         self.__version__ = qsimcirq.__version__
-        self.nthreads = cpu_count()
+
+        if nthreads is None:
+            from multiprocessing import cpu_count
+            self.nthreads = cpu_count()
+        else:
+            self.nthreads = int(nthreads)
+        self.max_qubits = int(max_qubits)
+
         self.simulator = self.get_simulator()
 
     def get_simulator(self):
-        return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': 0})
+        return self.qsimcirq.QSimSimulator({'t': self.nthreads, 'f': self.max_qubits})
 
     def set_precision(self, precision):
         if precision == "double":
@@ -133,20 +139,29 @@ class QSim(Cirq):
 
 class QSimGpu(QSim):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, max_qubits="0"):
+        super().__init__(max_qubits)
         self.name = "qsim-gpu"
 
     def get_simulator(self):
-        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=0, max_fused_gate_size=0)
+        qsim_options = self.qsimcirq.QSimOptions(
+                use_gpu=True,
+                gpu_mode=0,
+                max_fused_gate_size=self.max_qubits
+            )
         return self.qsimcirq.QSimSimulator(qsim_options)
+
 
 class QSimCuQuantum(QSim):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, max_qubits="0"):
+        super().__init__(max_qubits)
         self.name = "qsim-cuquantum"
 
     def get_simulator(self):
-        qsim_options = self.qsimcirq.QSimOptions(use_gpu=True, gpu_mode=1, max_fused_gate_size=0)
+        qsim_options = self.qsimcirq.QSimOptions(
+                use_gpu=True,
+                gpu_mode=1,
+                max_fused_gate_size=self.max_qubits
+            )
         return self.qsimcirq.QSimSimulator(qsim_options)

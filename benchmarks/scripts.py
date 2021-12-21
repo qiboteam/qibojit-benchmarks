@@ -3,7 +3,7 @@ import time
 from benchmarks.logger import JsonLogger
 
 
-def circuit_benchmark(nqubits, backend, circuit_name, options=None,
+def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
                       nreps=1, nshots=None, transfer=False,
                       precision="double", memory=None, threading=None,
                       filename=None):
@@ -35,8 +35,8 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
              version=qibo.__version__)
 
     from benchmarks import circuits
-    gates = circuits.get(circuit_name, nqubits, options, qibo=True)
-    logs.log(circuit=circuit_name, options=str(gates))
+    gates = circuits.get(circuit_name, nqubits, circuit_options, qibo=True)
+    logs.log(circuit=circuit_name, circuit_options=str(gates))
     start_time = time.time()
     circuit = qibo.models.Circuit(nqubits)
     circuit.add(gates)
@@ -84,8 +84,9 @@ def circuit_benchmark(nqubits, backend, circuit_name, options=None,
     return logs
 
 
-def library_benchmark(nqubits, library, circuit_name, options=None,
-                      precision=None, nreps=1, filename=None):
+def library_benchmark(nqubits, library, circuit_name, circuit_options=None,
+                      library_options=None, precision=None, nreps=1,
+                      filename=None):
     """Runs benchmark for different quantum simulation libraries.
 
     See ``benchmarks/compare.py`` for documentation of each argument.
@@ -95,8 +96,9 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
 
     start_time = time.time()
     from benchmarks import libraries
-    backend = libraries.get(library)
+    backend = libraries.get(library, library_options)
     logs.log(import_time=time.time() - start_time)
+    logs.log(library_options=library_options)
     if precision is not None:
         backend.set_precision(precision)
 
@@ -106,8 +108,8 @@ def library_benchmark(nqubits, library, circuit_name, options=None,
              version=backend.__version__)
 
     from benchmarks import circuits
-    gates = circuits.get(circuit_name, nqubits, options)
-    logs.log(circuit=circuit_name, options=str(gates))
+    gates = circuits.get(circuit_name, nqubits, circuit_options)
+    logs.log(circuit=circuit_name, circuit_options=str(gates))
     start_time = time.time()
     circuit = backend.from_qasm(gates.to_qasm())
     logs.log(creation_time=time.time() - start_time)

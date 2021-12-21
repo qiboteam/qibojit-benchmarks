@@ -14,7 +14,7 @@ parser.add_argument("--backend", default="qibojit", type=str,
 parser.add_argument("--circuit", default="qft", type=str,
                     help="Type of circuit to use. See README for the list of "
                          "available circuits.")
-parser.add_argument("--options", default=None, type=str,
+parser.add_argument("--circuit-options", default=None, type=str,
                     help="String with options for circuit creation. "
                          "It should have the form 'arg1=value1,arg2=value2,...'. "
                          "See README for the list of arguments that are "
