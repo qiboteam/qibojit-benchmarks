@@ -4,14 +4,14 @@ from benchmarks.logger import log
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         import qibo
         from qibo import models
         self.name = "qibo"
         self.qibo = qibo
         self.models = models
         self.__version__ = qibo.__version__
-        self.max_qubits = max_qubits
+        self.max_qubits = int(max_qubits)
 
     def from_qasm(self, qasm):
         circuit = self.models.Circuit.from_qasm(qasm)
@@ -42,7 +42,7 @@ class Qibo(abstract.AbstractBackend):
 
 class QiboJit(Qibo):
 
-    def __init__(self, max_qubits):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.qibo.set_backend("qibojit")
         self.name = "qibojit"
@@ -50,7 +50,7 @@ class QiboJit(Qibo):
 
 class QiboTF(Qibo):
 
-    def __init__(self, max_qubits):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.qibo.set_backend("qibotf")
         self.name = "qibotf"

@@ -1,33 +1,56 @@
-def get(backend_name, max_qubits=0):
+def parse(options):
+    """Parse options from string.
+
+    Args:
+        options (str): String with options.
+                       It should have the form 'arg1=value1,arg2=value2,...'.
+
+    Returns:
+        dict: {'arg1': value1, 'arg2': value2, ...}
+
+    """
+    kwargs = {}
+    if options is not None:
+        for parameter in options.split(","):
+            if "=" in parameter:
+                k, v = parameter.split("=")
+                kwargs[k] = v
+            else:
+                raise ValueError(f"Cannot parse parameter {parameter}.")
+    return kwargs
+
+
+def get(backend_name, options=None):
+    options = parse(options)
     if backend_name == "qibo":
         from benchmarks.libraries.qibo import Qibo
-        return Qibo(max_qubits)
+        return Qibo(**options)
     elif backend_name == "qibojit":
         from benchmarks.libraries.qibo import QiboJit
-        return QiboJit(max_qubits)
+        return QiboJit(**options)
     elif backend_name == "qibotf":
         from benchmarks.libraries.qibo import QiboTF
-        return QiboTF(max_qubits)
+        return QiboTF(**options)
 
     elif backend_name == "qiskit":
         from benchmarks.libraries.qiskit import Qiskit
-        return Qiskit(max_qubits)
+        return Qiskit(**options)
     elif backend_name == "qiskit-gpu":
         from benchmarks.libraries.qiskit import QiskitGpu
-        return QiskitGpu(max_qubits)
+        return QiskitGpu(**options)
 
     elif backend_name == "cirq":
         from benchmarks.libraries.cirq import Cirq
         return Cirq()
     elif backend_name == "qsim":
         from benchmarks.libraries.cirq import QSim
-        return QSim(max_qubits)
+        return QSim(**options)
     elif backend_name == "qsim-gpu":
         from benchmarks.libraries.cirq import QSimGpu
-        return QSimGpu(max_qubits)
+        return QSimGpu(**options)
     elif backend_name == "qsim-cuquantum":
         from benchmarks.libraries.cirq import QSimCuQuantum
-        return QSimCuQuantum(max_qubits)
+        return QSimCuQuantum(**options)
     elif backend_name == "tfq":
         from benchmarks.libraries.cirq import TensorflowQuantum
         return TensorflowQuantum()

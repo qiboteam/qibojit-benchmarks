@@ -30,7 +30,7 @@ class Cirq(abstract.ParserBackend):
 
     def RZZ(self, theta):
         import numpy as np
-        return self.cirq.ZZPowGate(exponent=theta/np.pi, global_shift=-0.5)
+        return self.cirq.ZZPowGate(exponent=theta / np.pi, global_shift=-0.5)
 
     def __getattr__(self, x):
         return getattr(self.cirq, x)
@@ -111,17 +111,22 @@ class TensorflowQuantum(Cirq):
 
 class QSim(Cirq):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0", nthreads=None):
         import cirq
         import qsimcirq
-        from multiprocessing import cpu_count
         self.name = "qsim"
         self.cirq = cirq
         self.qsimcirq = qsimcirq
         self.precision = "single"
         self.__version__ = qsimcirq.__version__
-        self.nthreads = cpu_count()
-        self.max_qubits = max_qubits
+
+        if nthreads is None:
+            from multiprocessing import cpu_count
+            self.nthreads = cpu_count()
+        else:
+            self.nthreads = int(nthreads)
+        self.max_qubits = int(max_qubits)
+
         self.simulator = self.get_simulator()
 
     def get_simulator(self):
@@ -134,7 +139,7 @@ class QSim(Cirq):
 
 class QSimGpu(QSim):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.name = "qsim-gpu"
 
@@ -149,7 +154,7 @@ class QSimGpu(QSim):
 
 class QSimCuQuantum(QSim):
 
-    def __init__(self, max_qubits=0):
+    def __init__(self, max_qubits="0"):
         super().__init__(max_qubits)
         self.name = "qsim-cuquantum"
 

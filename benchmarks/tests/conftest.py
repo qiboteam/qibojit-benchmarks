@@ -14,7 +14,7 @@ def pytest_addoption(parser):
 
 def pytest_generate_tests(metafunc):
     nqubits = [int(n) for n in metafunc.config.option.nqubits.split(",")]
-    max_qubits = [int(n) for n in metafunc.config.option.max_qubits.split(",")]
+    library_options = [f"max_qubits={n}" for n in metafunc.config.option.max_qubits.split(",")]
     backends = metafunc.config.option.backends.split(",")
     libraries = metafunc.config.option.libraries.split(",")
     additional = metafunc.config.option.add
@@ -27,7 +27,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("backend", backends)
     if "library" in metafunc.fixturenames:
         metafunc.parametrize("library", libraries)
-    if "max_qubits" in metafunc.fixturenames:
-        metafunc.parametrize("max_qubits", max_qubits)
+    if "library_options" in metafunc.fixturenames:
+        metafunc.parametrize("library_options", library_options)
     if "transfer" in metafunc.fixturenames:
         metafunc.parametrize("transfer", [False, True])
