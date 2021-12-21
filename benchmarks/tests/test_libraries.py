@@ -100,7 +100,7 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
     if "gamma" in params:
-        params.remove("gamma")
+        del params["gamma"]
     target_circuit = qibo.TwoQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
     assert_circuit_execution(backend, qasm_circuit, target_circuit)
