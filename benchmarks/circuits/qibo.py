@@ -24,6 +24,9 @@ class TwoQubitGate(OneQubitGate):
     def __init__(self, nqubits, nlayers="1", gate="CNOT", **params):
         super().__init__(nqubits, nlayers, gate, **params)
 
+    def to_qasm(self):
+        raise NotImplementedError
+
     def base_command(self, i):
         return self.gate(i, i + 1, **self.angles)
 
@@ -79,7 +82,7 @@ class VariationalCircuit(qasm.VariationalCircuit):
             for i in range(self.nqubits):
                 yield gates.RY(i, next(theta))
             for i in range(1, self.nqubits - 2, 2):
-              yield gates.CZ(i, i + 1)
+                yield gates.CZ(i, i + 1)
             yield gates.CZ(0, self.nqubits - 1)
 
     def __iter__(self):
