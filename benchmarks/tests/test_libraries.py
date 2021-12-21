@@ -58,9 +58,6 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
     if gate in {"u1", "u2", "u3"} and library == "tfq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
-    if gate in {"u2", "u3"} and library == "projectq":
-        pytest.skip("Skipping {} test because it is not supported by {}."
-                    "".format(gate, library))
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.OneQubitGate(nqubits, gate=gate, angles=angles)
@@ -168,7 +165,7 @@ def test_basis_change(nqubits, library, simtime):
 
 @pytest.mark.parametrize("depth", ["2", "5", "8"])
 def test_quantum_volume(nqubits, library, depth):
-    if library in ("tfq", "projectq"):
+    if library == "tfq":
         pytest.skip("Skipping qv test because it is not supported by {}."
                     "".format(library))
     qasm_circuit = qasm.QuantumVolume(nqubits, depth=depth)

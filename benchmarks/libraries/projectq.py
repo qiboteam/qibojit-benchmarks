@@ -22,6 +22,21 @@ class ProjectQ(abstract.ParserBackend):
     def U1(self, theta):
         return self.projectq.ops.R(theta)
 
+    def U2(self, phi, lam):
+        pplus, pminus = np.exp(0.5j * (phi + lam)), np.exp(0.5j * (phi - lam))
+        matrix = np.array([[np.conj(pplus), -np.conj(pminus)],
+                           [pminus, pplus]])
+        matrix /= np.sqrt(2)
+        return self.projectq.ops.MatrixGate(matrix)
+
+    def U3(self, theta, phi, lam):
+        cost, sint = np.cos(theta / 2.0), np.sin(theta / 2.0)
+        pplus, pminus = np.exp(0.5j * (phi + lam)), np.exp(0.5j * (phi - lam))
+        matrix = np.array([[np.conj(pplus) * cost, -np.conj(pminus) * sint],
+                           [pminus * sint, pplus * cost]])
+        return self.projectq.ops.MatrixGate(matrix)
+
+
     def SWAP(self):
         return self.projectq.ops.Swap
     
