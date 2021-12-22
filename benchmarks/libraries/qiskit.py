@@ -1,56 +1,57 @@
 from benchmarks.libraries import abstract
 
 
-class QiskitDefault(abstract.AbstractBackend):
+class Qiskit(abstract.AbstractBackend):
 
-    def __init__(self, **backend_options):
+    def __init__(self, max_qubits="0", fusion_threshold="1",
+                 max_parallel_threads="0", statevector_parallel_threshold="14"):
         import qiskit
-        from qiskit import QuantumCircuit
         from qiskit.providers.aer import StatevectorSimulator
-        self.name = "qiskit-default"
+        self.name = "qiskit"
         self.__version__ = qiskit.__version__
-        self.precision = "double"
-        self.options = backend_options
-        self.QuantumCircuit = QuantumCircuit
-        self.StatevectorSimulator = StatevectorSimulator
-        self.simulator = StatevectorSimulator(**backend_options)
+        self.max_qubits = int(max_qubits)
+        self.sim_options = dict(
+                max_parallel_threads=int(max_parallel_threads),
+                statevector_parallel_threshold=int(statevector_parallel_threshold),
+                fusion_enable=self.max_qubits > 0,
+                fusion_max_qubit=self.max_qubits,
+                fusion_threshold=int(fusion_threshold),
+                precision="double"
+            )
+        self.simulator = StatevectorSimulator(**self.sim_options)
 
     def from_qasm(self, qasm):
+        from qiskit import QuantumCircuit
         # TODO: Consider using `circ = transpile(circ, simulator)`
-        return self.QuantumCircuit.from_qasm_str(qasm)
+        return QuantumCircuit.from_qasm_str(qasm)
 
     def __call__(self, circuit):
         result = self.simulator.run(circuit).result()
         return result.get_statevector(circuit)
 
     def get_precision(self):
-        return self.precision
+        return self.sim_options.get("precision")
 
     def set_precision(self, precision):
-        self.precision = precision
-        self.options["precision"] = precision
-        self.simulator = self.StatevectorSimulator(**self.options)
+        from qiskit.providers.aer import StatevectorSimulator
+        self.sim_options["precision"] = precision
+        self.simulator = StatevectorSimulator(**self.sim_options)
 
     def get_device(self):
         return None
 
 
-class Qiskit(QiskitDefault):
+class QiskitGpu(Qiskit):
 
-    def __init__(self):
-        super().__init__(fusion_enable=False)
-        self.name = "qiskit"
-
-
-class QiskitTwoQubitFusion(QiskitDefault):
-
-    def __init__(self):
-        super().__init__(fusion_max_qubit=2)
-        self.name = "qiskit-twoqubitfusion"
-
-
-class QiskitGpu(QiskitDefault):
-
-    def __init__(self):
-        super().__init__(fusion_enable=False, device="GPU")
+    def __init__(self, max_qubits="0", fusion_threshold="1"):
+        from qiskit.providers.aer import StatevectorSimulator
+        super().__init__(max_qubits)
         self.name = "qiskit-gpu"
+        self.options = dict(
+                device="GPU",
+                fusion_enable=self.max_qubits > 0,
+                fusion_max_qubit=self.max_qubits,
+                fusion_threshold=int(fusion_threshold),
+                precision="double"
+            )
+        self.simulator = StatevectorSimulator(**self.options)
