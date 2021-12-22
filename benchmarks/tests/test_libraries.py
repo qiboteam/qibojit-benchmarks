@@ -93,13 +93,12 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
 
-    atol = 1e-1 if gate == "cu3" else None # TODO: Find why this is needed
     order = ["theta", "phi", "lam"]
     angles = ",".join(str(params.get(n)) for n in order if n in params)
     qasm_circuit = qasm.TwoQubitGate(nqubits, gate=gate, angles=angles)
     target_circuit = qibo.TwoQubitGate(nqubits, gate=qibo_gate, **params)
     backend = libraries.get(library)
-    assert_circuit_execution(backend, qasm_circuit, target_circuit, atol=atol)
+    assert_circuit_execution(backend, qasm_circuit, target_circuit)
 
 
 @pytest.mark.parametrize("swaps", ["False", "True"])

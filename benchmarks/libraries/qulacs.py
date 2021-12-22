@@ -31,7 +31,7 @@ class Qulacs(abstract.ParserBackend):
         cost, sint = np.cos(theta / 2.0), np.sin(theta / 2.0)
         pplus, pminus = np.exp(0.5j * (phi + lam)), np.exp(0.5j * (phi - lam))
         matrix = np.array([[np.conj(pplus) * cost, -np.conj(pminus) * sint],
-                           [pminus * sint, pminus * cost]])
+                           [pminus * sint, pplus * cost]])
         gate = self.qulacs.gate.DenseMatrix([target], matrix)
         gate.add_control_qubit(control, 1)
         return gate
