@@ -23,6 +23,13 @@ class Qiskit(abstract.AbstractBackend):
     def from_qasm(self, qasm):
         from qiskit import QuantumCircuit
         # TODO: Consider using `circ = transpile(circ, simulator)`
+        if "cu3" in qasm:
+            import re
+            theta, phi, lam = re.findall(r"cu3\((.*)\)", qasm)[0].split(",")
+            gamma = - (float(phi) + float(lam)) / 2
+            qasm = re.sub(rf"cu3\((.*)\)",
+                          f"cu({theta},{phi},{lam},{gamma})",
+                          qasm)
         return QuantumCircuit.from_qasm_str(qasm)
 
     def __call__(self, circuit):

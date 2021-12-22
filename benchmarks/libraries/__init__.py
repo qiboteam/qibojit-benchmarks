@@ -60,6 +60,10 @@ def get(backend_name, options=None):
         from benchmarks.libraries.qcgpu import QCGPU
         return QCGPU()
 
+    elif backend_name == "projectq":
+        from benchmarks.libraries.projectq import ProjectQ
+        return ProjectQ(**options)
+
     elif backend_name == "hybridq":
         from benchmarks.libraries.hybridq import HybridQ
         return HybridQ(**options)
