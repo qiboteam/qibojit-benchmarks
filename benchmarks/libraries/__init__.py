@@ -62,6 +62,6 @@ def get(backend_name, options=None):
 
     elif backend_name == "projectq":
         from benchmarks.libraries.projectq import ProjectQ
-        return ProjectQ()
+        return ProjectQ(**options)
 
     raise KeyError(f"Unknown simulation library {backend_name}.")

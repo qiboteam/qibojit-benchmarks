@@ -1,14 +1,23 @@
-import projectq
 import numpy as np
 from benchmarks.libraries import abstract
 
 class ProjectQ(abstract.ParserBackend):
 
-    def __init__(self):
+    def __init__(self, max_qubits="0", local_optimizer="0"):
+        """Initialize data members.
+
+        Args:
+            max_qubits (str): if "0", gate fusion is disabled, otherwise it's enabled.
+                              Note that it's not possible to set the maximum fused gate size.
+            local_optimizer (str): if "0", local optimization of circuits is disabled,
+                              otherwise it's enabled.
+        """
         import projectq
         self.name = "projectq"
         self.projectq = projectq
         self.__version__ = None
+        self.gate_fusion = int(max_qubits) > 0
+        self.local_optimizer = bool(int(local_optimizer))
 
     def RX(self, theta):
         return self.projectq.ops.Rx(theta)
@@ -67,8 +76,13 @@ class ProjectQ(abstract.ParserBackend):
 
     def from_qasm(self, qasm):
         nqubits, gatelist = self.parse(qasm)
-        self.eng = self.projectq.MainEngine(backend=projectq.backends.Simulator(gate_fusion=False),
-                                            engine_list=[self.projectq.cengines.LocalOptimizer()])
+        backend = self.projectq.backends.Simulator(gate_fusion=self.gate_fusion)
+        if self.local_optimizer:
+            self.eng = self.projectq.MainEngine(
+                backend=backend, engine_list=[self.projectq.cengines.LocalOptimizer()]
+            )
+        else:
+            self.eng = self.projectq.MainEngine(backend=backend)
         qureg = self.eng.allocate_qureg(nqubits)
         for gatename, qubits, params in gatelist:
             gate = getattr(self, gatename)
