@@ -69,7 +69,7 @@ def test_one_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
 @pytest.mark.parametrize("nlayers", ["1", "4"])
 @pytest.mark.parametrize("gate,qibo_gate",
                          [("cx", "CNOT"), ("swap", "SWAP"), ("cz", "CZ")])
-def test_two_qubit_gate_benchmark(nqubits, library, nlayers, gate, qibo_gate):
+def test_two_qubit_gate(nqubits, library, nlayers, gate, qibo_gate):
     qasm_circuit = qasm.TwoQubitGate(nqubits, nlayers=nlayers, gate=gate)
     target_circuit = qibo.TwoQubitGate(nqubits, nlayers=nlayers, gate=qibo_gate)
     backend = libraries.get(library)
@@ -90,6 +90,9 @@ def test_two_qubit_gate_parametrized(nqubits, library, gate, qibo_gate, params):
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
     if gate in {"cu1", "cu2", "cu3"} and library == "tfq":
+        pytest.skip("Skipping {} test because it is not supported by {}."
+                    "".format(gate, library))
+    if gate in {"cu3"} and library == "projectq":
         pytest.skip("Skipping {} test because it is not supported by {}."
                     "".format(gate, library))
 
