@@ -1,10 +1,11 @@
+import os
 import numpy as np
 from benchmarks.libraries import abstract
 
 
 class HybridQ(abstract.ParserBackend):
 
-    def __init__(self, max_qubits="0", simplify="False", nthreads=None):
+    def __init__(self, max_qubits="0", simplify="False"):
         from hybridq.gate import Gate, MatrixGate
         self.name = "hybridq"
         self.__version__ = "0.7.7.post2"
@@ -15,12 +16,6 @@ class HybridQ(abstract.ParserBackend):
             self.simplify = True
         else:
             self.simplify = False
-
-        if nthreads is None:
-            from multiprocessing import cpu_count
-            self.nthreads = cpu_count()
-        else:
-            self.nthreads = int(nthreads)
         self.max_qubits = int(max_qubits)
 
     def H(self, q):
@@ -103,8 +98,7 @@ class HybridQ(abstract.ParserBackend):
         final_state = simulate(circuit, optimize="evolution",
                                initial_state=initial_state,
                                simplify=self.simplify,
-                               compress=self.max_qubits,
-                               parallel=self.nthreads)
+                               compress=self.max_qubits)
         return final_state.ravel()
 
     def transpose_state(self, x):
