@@ -1,3 +1,5 @@
+#! /usr/bin/bash
+
 FILENAME=qibo_scaling_gpu.dat
 CIRCUIT=qft
 export CUDA_VISIBLE_DEVICES=0
