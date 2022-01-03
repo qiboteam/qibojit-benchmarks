@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-GPUNAME=quadro_t2000
+GPUNAME=gpuname
 FILENAME=qibojit_gpu_$GPUNAME.dat
 CIRCUIT=qft
 PRECISION=double
