@@ -1,14 +1,19 @@
 #! /usr/bin/bash
 
-FILENAME=qibo_scaling_gpu.dat
-CIRCUIT=qft
+: "${filename:=qibo_scaling_gpu.dat}"
+: "${circuit:=qft}"
+: "${precision:=double}"
+: "${nreps:=20}"
+: "${min_qubits:=3}"
+: "${max_qubits:=30}"
+
 export CUDA_VISIBLE_DEVICES=0
-NREPS=20
-for NQUBITS in {3..30}
+
+for ((nqubits=min_qubits; nqubits<=max_qubits; nqubits++));
 do
-  for BACKEND in tensorflow qibotf qibojit
+  for backend in tensorflow qibotf qibojit
   do
-    python compare.py --circuit $CIRCUIT --nqubits $NQUBITS --filename $FILENAME --library-options backend=$BACKEND --nreps $NREPS
+    python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library-options backend=$backend --nreps $nreps --precision $precision
     echo
   done
 done

@@ -1,13 +1,16 @@
 #! /usr/bin/bash
 
-GPUNAME=gpuname
-FILENAME=qibojit_gpu_$GPUNAME.dat
-CIRCUIT=qft
-PRECISION=double
+: "${filename:=qibojit_gpu.dat}"
+: "${circuit:=qft}"
+: "${precision:=double}"
+: "${nreps:=20}"
+: "${min_qubits:=3}"
+: "${max_qubits:=30}"
+
 export CUDA_VISIBLE_DEVICES=0
-NREPS=20
-for NQUBITS in {3..30}
+
+for ((nqubits=min_qubits; nqubits<=max_qubits; nqubits++));
 do
-    python compare.py --circuit $CIRCUIT --nqubits $NQUBITS --filename $FILENAME --library-options backend=qibojit --nreps $NREPS  --precision $PRECISION
+    python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library-options backend=qibojit --nreps $nreps  --precision $precision
     echo
 done
