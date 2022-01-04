@@ -16,6 +16,7 @@ class HybridQ(abstract.ParserBackend):
             self.simplify = True
         else:
             self.simplify = False
+        self.complex_type = "complex128"
         self.max_qubits = int(max_qubits)
 
     def H(self, q):
@@ -97,6 +98,7 @@ class HybridQ(abstract.ParserBackend):
         initial_state = len(circuit.all_qubits()) * '0'
         final_state = simulate(circuit, optimize="evolution",
                                initial_state=initial_state,
+                               complex_type=self.complex_type,
                                simplify=self.simplify,
                                compress=self.max_qubits)
         return final_state.ravel()
@@ -104,8 +106,17 @@ class HybridQ(abstract.ParserBackend):
     def transpose_state(self, x):
         return x
 
+    def set_precision(self, precision):
+        if precision == "single":
+            self.complex_type = "complex64"
+        else:
+            self.complex_type = "complex128"
+
     def get_precision(self):
-        return "single"
+        if self.complex_type == "complex64":
+            return "single"
+        else:
+            return "double"
 
     def get_device(self):
         return None
@@ -119,6 +130,7 @@ class HybridQGPU(HybridQ):
         final_state = simulate(circuit, optimize="evolution-einsum",
                                backend="jax",
                                initial_state=initial_state,
+                               complex_type=self.complex_type,
                                simplify=self.simplify,
                                compress=self.max_qubits)
         return final_state.ravel()
