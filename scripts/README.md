@@ -1,19 +1,37 @@
 # Example scripts
 
-This folder contains example bash scripts that execute the `main.py` benchmark for different circuit configurations and qubit numbers. The provided scripts are the following:
+This folder contains example bash scripts that execute the `compare.py` benchmark for different circuit configurations and different libraries.
+The provided scripts are the following:
 
-### `qftcpu.sh`
+### `circuit_cpu.sh`
 
-Executes Quantum Fourier Transform benchmarks on CPU from 3 to 30 qubits with and without the `--transfer` flag using the qibojit and qibotf backends. Twenty repetitions are used for up to 25 qubits and a single repetition for more qubits.
+Executes benchmarks for some of the circuits presented in Table 1 of the [HyQuas paper](https://dl.acm.org/doi/pdf/10.1145/3447818.3460357).
+All circuits are executed with default options using the CPU libraries implemented in this repository i.e. Qibo, Qiskit, Qsim, Qulacs, ProjectQ and HybridQ.
+Options:
+ - ``filename``: where to store the logs (default: ``circuits_cpu.dat``)
+ - ``precision``: ``single`` or ``double`` (default: ``double``)
+ - ``nreps``: number of repetitions for each circuit (default: 20)
+ - ``nqubits``: number of qubits for each circuit (default: 30)
 
-### `qftgpu.sh`
+### `circuit_gpu.sh`
 
-Executes Quantum Fourier Transform benchmarks on GPU from 3 to 30 qubits with and without the `--transfer` flag using the qibojit and qibotf backends. Twenty repetitions are used for up to 25 qubits and five repetitions for more qubits.
+Same as ``circuit_cpu.sh``, but using the GPU libraries implemented in this repository i.e. Qiskit, Qsim(+cuQuantum), Qulacs and QCGPU.
 
-### `circuits.sh`
+### `qibo_scaling_cpu.sh`
 
-Executes benchmarks for the circuits presented in Table 1 of the [HyQuas paper](https://dl.acm.org/doi/pdf/10.1145/3447818.3460357).
+Executes a specific circuit with different size and different qibo CPU backends.
+Options:
+ - ``filename``: where to store the logs (default: ``qibo_scaling_cpu.dat``)
+ - ``circuit``: the circuit to execute (default: ``qft``)
+ - ``precision``: ``single`` or ``double`` (default: ``double``)
+ - ``nreps``: number of repetitions for each circuit (default: 20)
+ - ``min_qubits``: size of the smallest circuit to run (default: 3)
+ - ``max_qubits``: size of the largest circuit to run (default: 30)
 
-The qft, bernstein-vazirani, supremacy, basis-change and quantum-volume circuits are executed with default options. The hidden-shift circuit is executed for the random bitstrings written in the `graphs/random_bitstrings.dat` file. The MaxCut QAOA circuit is executed for the random graphs written in the json files under `graphs/`.
+### `qibo_scaling_gpu.sh`
 
-All circuits are executed using the qibojit and qibotf backends with the `--transfer` flag for 3 to 30 qubits on GPU and 3 to 25 qubits on CPU. Note that the QAOA circuit is only executed for even qubit numbers.
+Same as ``qibo_scaling_cpu.sh``, but uses the GPU backends i.e. TensorFlow, Qibotf and Qibojit.
+
+### ``qibojit_gpu.sh``
+Similar to ``qibo_scaling_gpu.sh``, but uses only qibojit on GPU. Useful to compare the performance across different GPUs.
+
