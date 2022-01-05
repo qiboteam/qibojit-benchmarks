@@ -66,6 +66,10 @@ class Qulacs(abstract.ParserBackend):
         circuit.update_quantum_state(state)
         return state.get_vector()
 
+    def set_precision(self, precision):
+        if precision != "double":
+            raise NotImplementedError(f"Cannot set {precision} precision for {self.name} backend.")
+
     def get_precision(self):
         return "double"
 

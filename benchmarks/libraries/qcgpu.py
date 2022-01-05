@@ -74,6 +74,10 @@ class QCGPU(abstract.ParserBackend):
             getattr(state, gate)(*args)
         return state.amplitudes()
 
+    def set_precision(self, precision):
+        if precision != "single":
+            raise NotImplementedError(f"Cannot set {precision} precision for {self.name} backend.")
+
     def get_precision(self):
         return "single"
 

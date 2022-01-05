@@ -118,6 +118,10 @@ class ProjectQ(abstract.ParserBackend):
         x = np.reshape(x, shape)
         return x
 
+    def set_precision(self, precision):
+        if precision != "double":
+            raise NotImplementedError(f"Cannot set {precision} precision for {self.name} backend.")
+
     def get_precision(self):
         return "double"
 
