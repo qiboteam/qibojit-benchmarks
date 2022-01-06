@@ -9,12 +9,15 @@ def parse(options):
         dict: {'arg1': value1, 'arg2': value2, ...}
 
     """
-    if options is None:
-        return {}
-    params = options.split("=")
-    if len(params) % 2:
-        raise ValueError(f"Cannot parse options {options}.")
-    return {params[i]: params[i + 1] for i in range(0, len(params), 2)}
+    kwargs = {}
+    if options is not None:
+        for parameter in options.split(","):
+            if "=" in parameter:
+                k, v = parameter.split("=")
+                kwargs[k] = v
+            else:
+                raise ValueError(f"Cannot parse parameter {parameter}.")
+    return kwargs
 
 
 def get(backend_name, options=None):
