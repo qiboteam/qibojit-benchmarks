@@ -1,16 +1,14 @@
 #! /usr/bin/bash
 
-: "${filename:=qibo_scaling_gpu.dat}"
+: "${filename:=qibo_gpu.dat}"
 : "${backend=qibojit}"
-: "${circuit:=qft}"
 : "${precision:=double}"
 : "${nreps:=20}"
-: "${min_qubits:=3}"
-: "${max_qubits:=30}"
+: "${nqubits:=30}"
 
 export CUDA_VISIBLE_DEVICES=0
 
-for ((nqubits=min_qubits; nqubits<=max_qubits; nqubits++));
+for circuit in qft variational bv supremacy qv
 do
   python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library-options backend=$backend --nreps $nreps --precision $precision
   echo

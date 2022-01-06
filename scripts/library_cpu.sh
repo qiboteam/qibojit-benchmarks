@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-: "${filename:=circuits_cpu.dat}"
+: "${filename:=library_cpu.dat}"
 : "${library:=qibo}"
 : "${precision:=double}"
 : "${nreps:=20}"

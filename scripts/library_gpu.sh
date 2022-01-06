@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-: "${filename:=circuits_gpu.dat}"
+: "${filename:=library_gpu.dat}"
 : "${library:=qibo}"
 : "${precision:=double}"
 : "${nreps:=20}"
