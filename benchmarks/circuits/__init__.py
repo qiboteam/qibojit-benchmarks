@@ -1,4 +1,14 @@
 def parse(options):
+    """Parse options from string.
+
+    Args:
+        options (str): String with options.
+                       It should have the form 'arg1=value1,arg2=value2,...'.
+
+    Returns:
+        dict: {'arg1': value1, 'arg2': value2, ...}
+
+    """
     kwargs = {}
     if options is not None:
         for parameter in options.split(","):
@@ -16,25 +26,25 @@ def get(circuit_name, nqubits, options=None, qibo=False):
     else:
         from benchmarks.circuits import qasm as module
 
-    if circuit_name == "qft" or circuit_name == "QFT":
+    if circuit_name in ("qft", "QFT"):
         circuit = module.QFT
     elif circuit_name == "one-qubit-gate":
         circuit = module.OneQubitGate
     elif circuit_name == "two-qubit-gate":
         circuit = module.TwoQubitGate
-    elif circuit_name == "variational" or circuit_name == "variational-circuit":
+    elif circuit_name in ("variational", "variational-circuit"):
         circuit = module.VariationalCircuit
-    elif circuit_name == "bernstein-vazirani" or circuit_name == "bv":
+    elif circuit_name in ("bernstein-vazirani", "bv"):
         circuit = module.BernsteinVazirani
-    elif circuit_name == "hidden-shift" or circuit_name == "hs":
+    elif circuit_name in ("hidden-shift", "hs"):
         circuit = module.HiddenShift
     elif circuit_name == "qaoa":
         circuit = module.QAOA
     elif circuit_name == "supremacy":
         circuit = module.SupremacyCircuit
-    elif circuit_name == "basis-change" or circuit_name == "bc":
+    elif circuit_name in ("basis-change", "bc"):
         circuit = module.BasisChange
-    elif circuit_name == "quantum-volume" or circuit_name == "qv":
+    elif circuit_name in ("quantum-volume", "qv"):
         circuit = module.QuantumVolume
     else:
         raise NotImplementedError(f"Cannot find circuit {circuit_name}.")
