@@ -46,12 +46,12 @@ class Qibo(abstract.AbstractBackend):
         """Transforms string that specifies accelerators to dictionary.
 
         The string that is parsed has the following format:
-            n1device1,n2device2,n3device3,...
+            n1device1+n2device2+n3device3,...
         and is transformed to the dictionary:
             {'device1': n1, 'device2': n2, 'device3': n3, ...}
 
         Example:
-            2/GPU:0,2/GPU:1 --> {'/GPU:0': 2, '/GPU:1': 2}
+            2/GPU:0+2/GPU:1 --> {'/GPU:0': 2, '/GPU:1': 2}
         """
         if not accelerators or accelerators is None:
             return None
@@ -63,7 +63,7 @@ class Qibo(abstract.AbstractBackend):
             return x[i:], int(x[:i])
 
         accelerator_dict = {}
-        for entry in accelerators.split(","):
+        for entry in accelerators.split("+"):
             device, n = read_digit(entry)
             if device in accelerator_dict:
                 accelerator_dict[device] += n
