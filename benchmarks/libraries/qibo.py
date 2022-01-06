@@ -41,6 +41,7 @@ class Qibo(abstract.AbstractBackend):
     def get_device(self):
         return self.qibo.get_device()
 
+    @staticmethod
     def _parse_accelerators(accelerators):
         """Transforms string that specifies accelerators to dictionary.
 
@@ -64,7 +65,7 @@ class Qibo(abstract.AbstractBackend):
         accelerator_dict = {}
         for entry in accelerators.split(","):
             device, n = read_digit(entry)
-            if device in acc_dict:
+            if device in accelerator_dict:
                 accelerator_dict[device] += n
             else:
                 accelerator_dict[device] = n
