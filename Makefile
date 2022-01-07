@@ -46,7 +46,7 @@ libraries_single:
 		done \
 	done
 	for nqubits in {3..26} ; do \
-		for backend in qibo qiskit-gpu qsim-gpu qsim-cuquantum qulacs-gpu qcgpu ; do \
+		for backend in qibo qiskit-gpu qsim-gpu qsim-cuquantum qulacs-gpu qcgpu hybridq-gpu ; do \
 			filename=library_gpu.dat library=$$backend precision=single nqubits=$$nqubits bash scripts/library_gpu.sh ; \
 		done \
 	done
