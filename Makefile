@@ -41,12 +41,12 @@ qibojit_gpu:
 
 libraries_single:
 	for nqubits in {3..24} ; do \
-		for backend in qibo qiskit qsim qulacs projectq hybridq ; do \
+		for backend in qibo qiskit qsim hybridq ; do \
 			filename=library_cpu.dat library=$$backend precision=single nqubits=$$nqubits bash scripts/library_cpu.sh ; \
 		done \
 	done
 	for nqubits in {3..26} ; do \
-		for backend in qibo qiskit-gpu qsim-gpu qsim-cuquantum qulacs-gpu qcgpu hybridq-gpu ; do \
+		for backend in qibo qiskit-gpu qsim-gpu qsim-cuquantum qcgpu hybridq-gpu ; do \
 			filename=library_gpu.dat library=$$backend precision=single nqubits=$$nqubits bash scripts/library_gpu.sh ; \
 		done \
 	done
