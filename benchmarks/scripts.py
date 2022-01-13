@@ -4,7 +4,7 @@ from benchmarks.logger import JsonLogger
 
 
 def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
-                      nreps=1, nshots=None, transfer=False,
+                      nreps=1, nshots=None, transfer=False, engine=None,
                       precision="double", memory=None, threading=None,
                       filename=None):
     """Runs benchmark for different circuit types.
@@ -33,6 +33,9 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
              precision=qibo.get_precision(),
              device=qibo.get_device(),
              version=qibo.__version__)
+    if engine is not None and qibo.get_backend() == "qibojit":
+        qibo.K.set_engine(engine)
+        logs.log(engine=qibo.K.engine.name)
 
     from benchmarks import circuits
     gates = circuits.get(circuit_name, nqubits, circuit_options, qibo=True)

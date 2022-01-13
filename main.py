@@ -32,6 +32,9 @@ parser.add_argument("--transfer", action="store_true",
                     help="If used the final state array is converted to numpy. "
                          "If the simulation device is GPU this requires a "
                          "transfer from GPU memory to CPU.")
+parser.add_argument("--engine", default=None, type=str,
+                    help="Switch between cupy and cuquantum engine for "
+                         "qibojit backend.")
 
 parser.add_argument("--precision", default="double", type=str,
                     help="Numerical precision of the simulation. "
