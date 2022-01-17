@@ -1,15 +1,23 @@
 #! /usr/bin/bash
 
-: "${filename:=library_cpu.dat}"
-: "${library:=qibo}"
-: "${precision:=double}"
-: "${nreps:=20}"
-: "${nqubits:=30}"
+: "${nreps:=10}"
 
-export CUDA_VISIBLE_DEVICES=""
 
-for circuit in qft variational bv supremacy qv
+for nqubits in 20 30
 do
-  python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library $library --nreps $nreps --precision $precision
-  echo
+	for circuit in qft variational bv supremacy qv
+  do
+    for library in qibo qiskit qulacs projectq hybridq
+    do
+      CUDA_VISIBLE_DEVICES="" python compare.py --circuit $circuit --nqubits $nqubits --filename library_cpu.dat \
+                                                --library $library --nreps $nreps --precision double
+      echo
+    done
+    for library in qibo qiskit-gpu qulacs-gpu hybridq-gpu
+    do
+      CUDA_VISIBLE_DEVICES=0  python compare.py --circuit $circuit --nqubits $nqubits --filename library_gpu.dat \
+                                                --library $library --nreps $nreps --precision double
+      echo
+	  done
+	done
 done
