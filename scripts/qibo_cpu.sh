@@ -8,8 +8,14 @@
 
 export CUDA_VISIBLE_DEVICES=""
 
-for circuit in qft variational bv supremacy qv
-do
+if [[ -n "$circuit" ]];
+then
   python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library-options backend=$backend --nreps $nreps --precision $precision
   echo
-done
+else
+  for circuit in qft variational bv supremacy qv
+  do
+    python compare.py --circuit $circuit --nqubits $nqubits --filename $filename --library-options backend=$backend --nreps $nreps --precision $precision
+    echo
+  done
+fi
