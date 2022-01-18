@@ -124,6 +124,10 @@ class HybridQ(abstract.ParserBackend):
 
 class HybridQGPU(HybridQ):
 
+    def __init__(self, max_qubits="0", simplify="False"):
+        super().__init__(max_qubits=max_qubits, simplify=simplify)
+        self.name = "hybridq-gpu"
+
     def __call__(self, circuit):
         from hybridq.circuit.simulation import simulate
         initial_state = len(circuit.all_qubits()) * '0'
