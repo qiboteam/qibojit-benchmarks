@@ -4,9 +4,12 @@ from benchmarks.logger import log
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits="0", backend="qibojit"):
+    def __init__(self, max_qubits="0", backend="qibojit", platform=""):
         import qibo
-        qibo.set_backend(backend)
+        if platform:
+            qibo.set_backend(backend=backend, platform=platform)
+        else:
+            qibo.set_backend(backend=backend)
         from qibo import models
         self.name = "qibo"
         self.qibo = qibo
