@@ -6,7 +6,7 @@ from benchmarks.logger import JsonLogger
 def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
                       nreps=1, nshots=None, transfer=False,
                       precision="double", memory=None, threading=None,
-                      filename=None, platform=""):
+                      filename=None, platform=None):
     """Runs benchmark for different circuit types.
 
     See ``benchmarks/main.py`` for documentation of each argument.

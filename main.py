@@ -10,7 +10,7 @@ parser.add_argument("--nqubits", default=20, type=int,
                     help="Number of qubits in the circuit.")
 parser.add_argument("--backend", default="qibojit", type=str,
                     help="Qibo backend to use for simulation.")
-parser.add_argument("--platform", default="", type=str,
+parser.add_argument("--platform", default=None, type=str,
                     help="Qibo platform to use for simulation.")
 
 parser.add_argument("--circuit", default="qft", type=str,
