@@ -6,7 +6,7 @@ from benchmarks.logger import JsonLogger
 def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
                       nreps=1, nshots=None, transfer=False,
                       precision="double", memory=None, threading=None,
-                      filename=None):
+                      filename=None, platform=""):
     """Runs benchmark for different circuit types.
 
     See ``benchmarks/main.py`` for documentation of each argument.
@@ -27,7 +27,10 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     import qibo
     logs.log(import_time=time.time() - start_time)
 
-    qibo.set_backend(backend)
+    if platform:
+        qibo.set_backend(backend=backend, platform=platform)
+    else:
+        qibo.set_backend(backend=backend)
     qibo.set_precision(precision)
     logs.log(backend=qibo.get_backend(),
              precision=qibo.get_precision(),
