@@ -100,7 +100,8 @@ class HybridQ(abstract.ParserBackend):
                                initial_state=initial_state,
                                complex_type=self.complex_type,
                                simplify=self.simplify,
-                               compress=self.max_qubits)
+                               compress=self.max_qubits,
+                               max_largest_intermediate=2**40)
         return final_state.ravel()
 
     def transpose_state(self, x):
@@ -136,5 +137,6 @@ class HybridQGPU(HybridQ):
                                initial_state=initial_state,
                                complex_type=self.complex_type,
                                simplify=self.simplify,
-                               compress=self.max_qubits)
+                               compress=self.max_qubits,
+                               max_largest_intermediate=2**40)
         return final_state.ravel()
