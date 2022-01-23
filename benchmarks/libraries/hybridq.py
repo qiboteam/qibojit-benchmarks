@@ -100,7 +100,8 @@ class HybridQ(abstract.ParserBackend):
                                initial_state=initial_state,
                                complex_type=self.complex_type,
                                simplify=self.simplify,
-                               compress=self.max_qubits)
+                               compress=self.max_qubits,
+                               max_largest_intermediate=2**40)
         return final_state.ravel()
 
     def transpose_state(self, x):
@@ -124,6 +125,10 @@ class HybridQ(abstract.ParserBackend):
 
 class HybridQGPU(HybridQ):
 
+    def __init__(self, max_qubits="0", simplify="False"):
+        super().__init__(max_qubits=max_qubits, simplify=simplify)
+        self.name = "hybridq-gpu"
+
     def __call__(self, circuit):
         from hybridq.circuit.simulation import simulate
         initial_state = len(circuit.all_qubits()) * '0'
@@ -132,5 +137,6 @@ class HybridQGPU(HybridQ):
                                initial_state=initial_state,
                                complex_type=self.complex_type,
                                simplify=self.simplify,
-                               compress=self.max_qubits)
+                               compress=self.max_qubits,
+                               max_largest_intermediate=2**40)
         return final_state.ravel()
