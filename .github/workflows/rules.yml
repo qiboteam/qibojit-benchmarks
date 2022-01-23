@@ -25,7 +25,8 @@ jobs:
         pip install tensorflow_quantum
         pip install projectq
         pip install qsimcirq
-        pip install qibo qibojit
+        pip install git+https://github.com/qiboteam/qibo
+        pip install git+https://github.com/qiboteam/qibojit
     - name: Test
       run: |
         pytest
