@@ -176,6 +176,6 @@ def evolution_benchmark(nqubits, dt, solver, backend, platform=None,
         result = evolution(final_time=1.0)
         simulation_times.append(time.time() - start_time)
     logs.log(dtype=dtype, simulation_times=simulation_times)
-
+    logs.average("simulation_times")
     logs.dump()
     return logs
