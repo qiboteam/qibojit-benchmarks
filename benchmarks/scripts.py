@@ -31,7 +31,6 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     qibo.set_precision(precision)
     logs.log(backend=qibo.get_backend(),
              platform=qibo.K.get_platform(),
-
              precision=qibo.get_precision(),
              device=qibo.get_device(),
              version=qibo.__version__)
@@ -131,5 +130,52 @@ def library_benchmark(nqubits, library, circuit_name, circuit_options=None,
 
     logs.log(dtype=dtype, simulation_times=simulation_times)
     logs.average("simulation_times")
+    logs.dump()
+    return logs
+
+
+def evolution_benchmark(nqubits, dt, solver, backend, platform=None,
+                        nreps=1, precision="double", dense=False,
+                        filename=None):
+    """Performs adiabatic evolution with critical TFIM as the hard Hamiltonian."""
+    logs = JsonLogger(filename)
+    logs.log(nqubits=nqubits, nreps=nreps, dt=dt, solver=solver, dense=dense)
+
+    start_time = time.time()
+    import qibo
+    logs.log(import_time=time.time() - start_time)
+
+    qibo.set_backend(backend=backend, platform=platform)
+    qibo.set_precision(precision)
+    logs.log(backend=qibo.get_backend(),
+             platform=qibo.K.get_platform(),
+             precision=qibo.get_precision(),
+             device=qibo.get_device(),
+             threads=qibo.get_threads(),
+             version=qibo.__version__)
+
+    from qibo import hamiltonians, models
+    start_time = time.time()
+    h0 = hamiltonians.X(nqubits, dense=dense)
+    h1 = hamiltonians.TFIM(nqubits, h=1.0, dense=dense)
+    logs.log(hamiltonian_creation_time=time.time() - start_time)
+
+    start_time = time.time()
+    evolution = models.AdiabaticEvolution(h0, h1, lambda t: t, dt=dt, solver=solver)
+    logs.log(evolution_creation_time=time.time() - start_time)
+
+    start_time = time.time()
+    result = evolution(final_time=1.0)
+    logs.log(dry_run_time=time.time() - start_time)
+    dtype = str(result.dtype)
+    del(result)
+
+    simulation_times = []
+    for _ in range(nreps):
+        start_time = time.time()
+        result = evolution(final_time=1.0)
+        simulation_times.append(time.time() - start_time)
+    logs.log(dtype=dtype, simulation_times=simulation_times)
+
     logs.dump()
     return logs
