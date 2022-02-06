@@ -11,6 +11,10 @@ parser.add_argument("--dt", default=1e-2, type=float,
 
 parser.add_argument("--nreps", default=1, type=int,
                     help="Number of repetitions to run the evolution.")
+parser.add_argument("--precision", default=None, type=str,
+                    help="Numerical precision of the simulation. "
+                         "Choose between 'double' and 'single'.")
+
 parser.add_argument("--solver", default="exp", type=str,
                     help="Which solver to use for integration (exponential or RK methods)")
 parser.add_argument("--dense", action="store_true",
