@@ -1,4 +1,4 @@
-"""Generates dry run vs simulation barplot for qibojit backend."""
+"""Generates barplot breakdowns for the qibojit backend."""
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -8,7 +8,8 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def breakdown_barplot_nqubits(data, circuit, precision="double", width=0.1, fontsize=30, save=False):
+def plot_breakdown_nqubits(data, circuit, precision="double", width=0.1, fontsize=30, save=False):
+    """Creates dry run vs simulation barplot with import time breakdown for given circuit varying the number of qubits."""
     matplotlib.rcParams["font.size"] = fontsize
 
     # Set plot params
@@ -96,12 +97,13 @@ def breakdown_barplot_nqubits(data, circuit, precision="double", width=0.1, font
     ]
     plt.legend(handles=legend_elements)
     if save:
-        plt.savefig(f"qibojit_dry_vs_simulation_{precision}_{circuit}.pdf", bbox_inches="tight")
+        plt.savefig(f"qibojit_dry_vs_simulation_{circuit}_{precision}.pdf", bbox_inches="tight")
     else:
         plt.show()
 
 
-def breakdown_barplot_circuits(data, nqubits, precision="double", width=0.1, fontsize=30, save=False):
+def plot_breakdown_circuits(data, nqubits, precision="double", width=0.1, fontsize=30, save=False):
+    """Creates dry run vs simulation barplot with import time breakdown for given number of qubits varying the circuit."""
     matplotlib.rcParams["font.size"] = fontsize
     # Set plot params
     hatches = ['/', '\\', 'o', '-', 'x', '.', '*']
@@ -169,6 +171,6 @@ def breakdown_barplot_circuits(data, nqubits, precision="double", width=0.1, fon
     plt.legend(handles=legend_elements, bbox_to_anchor=(1,1))
     
     if save:
-        plt.savefig(f"qibojit_dry_vs_simulation_{precision}_{nqubits}qubits.pdf", bbox_inches="tight")
+        plt.savefig(f"qibojit_dry_vs_simulation_{nqubits}qubits_{precision}.pdf", bbox_inches="tight")
     else:
         plt.show()
