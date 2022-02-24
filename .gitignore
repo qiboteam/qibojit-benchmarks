@@ -130,3 +130,6 @@ dmypy.json
 
 # pdf plots
 *.pdf
+
+# benchmark logs
+*.dat
