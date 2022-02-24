@@ -1,5 +1,5 @@
 import pytest
-from benchmarks.scripts import circuit_benchmark
+from benchmarks.scripts import circuit_benchmark, evolution_benchmark
 
 
 def assert_logs(logs, nqubits, backend, nreps=1):
@@ -154,3 +154,13 @@ def test_quantum_volume_benchmark(nqubits, backend, depth):
     target_options = f"nqubits={nqubits}, depth={depth}, seed=123"
     assert logs[-1]["circuit"] == "qv"
     assert logs[-1]["circuit_options"] == target_options
+
+
+@pytest.mark.parametrize("dt", [0.01, 0.05, 0.1])
+@pytest.mark.parametrize("dense", [False, True])
+def test_adiabatic_evolution_benchmark(nqubits, dt, backend, dense, solver="exp"):
+    logs = evolution_benchmark(nqubits, dt, solver, backend, dense=dense)
+    assert logs[-1]["nqubits"] == nqubits
+    assert logs[-1]["dt"] == dt
+    assert logs[-1]["backend"] == backend
+    assert logs[-1]["dense"] == dense
