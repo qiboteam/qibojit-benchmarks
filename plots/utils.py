@@ -14,3 +14,11 @@ def load_data(filename, qibojit_only=False):
     data["total_dry_time"]        = data["dry_run_time"]          + data["creation_time"] + data["import_time"]
     data["total_simulation_time"] = data["simulation_times_mean"] + data["creation_time"] + data["import_time"]
     return data
+
+
+def load_data_multigpu(filename, qibojit_only=False):
+    data = load_data(filename, qibojit_only)
+    data["backend"] = data["library_options"].apply(lambda x: x.split(",")[0].split("=")[-1])
+    data["accelerators"] = data["library_options"].apply(lambda x: x.split(",")[1].split("=")[-1])
+    data["nqubits (accelerators)"] = data.apply(lambda x: f"{x.nqubits} ({x.accelerators})", axis=1)
+    return data
