@@ -6,28 +6,11 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def plot_hardware(data, circuit, quantity, precision="double", fontsize=30, legend=False, save=False):
+def plot_hardware(data, circuit, quantity, colors, markers, precision="double", fontsize=30, legend=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Filter data
     data = {k: d[(d["circuit"] == circuit) & (d["precision"] == precision)]
             for k, d in data.items()}
-        
-    # Plot data
-    oranges = sns.color_palette("Oranges", 2)
-    blues = sns.color_palette("Blues", 3)
-
-    colors = {
-        "NVIDIA RTX A6000": blues[2],
-        "NVIDIA DGX V100": blues[1],
-        "NVIDIA GTX 1650": blues[0],
-        "AMD EPYC 7742": oranges[1]
-    }
-    markers = {
-        "NVIDIA RTX A6000": "^",
-        "NVIDIA DGX V100": "s",
-        "NVIDIA GTX 1650": "v",
-        "AMD EPYC 7742": "o"
-    }
 
     plt.figure(figsize=(14, 8))
     for k, d in data.items():
