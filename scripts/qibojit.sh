@@ -5,7 +5,7 @@
 : "${filename:=qibojit_breakdown.dat}"
 : "${precision:=double}"
 : "${circuit:=supremacy}"
-: "${nreps_cpu:=3}"
+: "${nreps_cpu:=5}"
 : "${nreps_gpu:=10}"
 
 
@@ -15,7 +15,7 @@ do
                                              --library-options backend=qibojit,platform=cupy --nreps $nreps_gpu --precision $precision
     echo
     CUDA_VISIBLE_DEVICES=0 python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
-                                             --library-options backend=qibojit,platform=cupy --nreps $nreps_gpu --precision $precision
+                                             --library-options backend=qibojit,platform=cuquantum --nreps $nreps_gpu --precision $precision
     echo
     CUDA_VISIBLE_DEVICES="" python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
                                               --library-options backend=qibojit,platform=numba --nreps $nreps_cpu --precision $precision
