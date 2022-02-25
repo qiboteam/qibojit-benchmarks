@@ -183,7 +183,7 @@ def plot_multigpu(data, nqubits, quantity, precision="double", fontsize=45, lege
     width = 0.1
     quantities = ["import_time", "creation_time", "dry_run_time", "simulation_times_mean",
                   "total_simulation_time", "total_dry_time"]
-    circuits = ["qft", "variational", "supremacy"]
+    circuits = ["qft", "variational", "supremacy", "qv", "bv"]
 
     widths = [-5 * width / 2, - 3 * width / 2, -width / 2, width / 2, 3 * width / 2, 5 * width / 2]
     oranges = sns.color_palette("Oranges", 3)
