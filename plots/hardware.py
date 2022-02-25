@@ -15,7 +15,7 @@ def plot_hardware(data, circuit, quantity, colors, markers, precision="double", 
     plt.figure(figsize=(14, 8))
     for k, d in data.items():
         plt.semilogy(d["nqubits"], d[quantity], color=colors[k], linewidth=3.0, 
-                    marker=markers[k], markersize=10, label=k)
+                     marker=markers[k], markersize=10, label=k)
 
     plt.title(f"qibojit, {circuit}, {precision} precision")
     plt.xlabel("Number of qubits")
