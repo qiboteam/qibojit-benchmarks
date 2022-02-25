@@ -54,11 +54,11 @@ class QiskitGpu(Qiskit):
         from qiskit.providers.aer import StatevectorSimulator
         super().__init__(max_qubits)
         self.name = "qiskit-gpu"
-        self.options = dict(
+        self.sim_options = dict(
                 device="GPU",
                 fusion_enable=self.max_qubits > 0,
                 fusion_max_qubit=self.max_qubits,
                 fusion_threshold=int(fusion_threshold),
                 precision="double"
             )
-        self.simulator = StatevectorSimulator(**self.options)
+        self.simulator = StatevectorSimulator(**self.sim_options)
