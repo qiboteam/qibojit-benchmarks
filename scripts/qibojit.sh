@@ -9,7 +9,7 @@
 : "${nreps_gpu:=10}"
 
 
-for nqubits in 16 18 20 22 24 28
+for nqubits in 16 18 20 22 24 26 28
 do
     CUDA_VISIBLE_DEVICES=0 python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
                                              --library-options backend=qibojit,platform=cupy --nreps $nreps_gpu --precision $precision
