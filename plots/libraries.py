@@ -8,7 +8,7 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, fontsize=45, legend=False, save=False):
+def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.07, fontsize=45, legend=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Process data
     gpu_data = gpu_data.copy()
@@ -18,7 +18,7 @@ def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, font
     # Set plot params
     circuits = ["qft", "variational", "supremacy", "qv", "bv"]
     palette     = sns.color_palette("bright", 7)
-    ws = [-3*width, -2*width, -width, 0, width, 2 * width, 3*width, 4*width]
+    ws = [-4*width, -3*width, -2*width, -width, 0, width, 2 * width, 3*width, 4*width, 5*width]
 
     # Set up plot
     libraries = [
@@ -27,7 +27,9 @@ def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, font
             "qiskit", 
             "qiskit-gpu GPU", 
             "qulacs", 
-            "qulacs-gpu GPU", 
+            "qulacs-gpu GPU",
+            "hybridq",
+            "hybridq-gpu GPU",
             "projectq"
         ]
     colors = {
@@ -37,6 +39,8 @@ def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, font
         "qiskit-gpu GPU": palette[1],
         "qulacs": palette[2],
         "qulacs-gpu GPU": palette[2],
+        "hybridq": palette[4],
+        "hybridq-gpu GPU": palette[4],
         "projectq": palette[3]
     }
     labels = {
@@ -46,6 +50,8 @@ def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, font
         "qiskit-gpu GPU": "Qiskit GPU",
         "qulacs": "Qulacs",
         "qulacs-gpu GPU": "Qulacs GPU",
+        "hybridq": "HybridQ",
+        "hybridq-gpu GPU": "HybridQ GPU",
         "projectq": "ProjectQ"
     }
     hatches = {
@@ -55,7 +61,9 @@ def plot_libraries_double(cpu_data, gpu_data, quantity, nqubits, width=0.1, font
         "qiskit-gpu GPU": "-",
         "qulacs": "\\",
         "qulacs-gpu GPU": "\\",
-        "projectq": "x"
+        "hybridq": "x",
+        "hybridq-gpu GPU": "x",
+        "projectq": "o",
     }
 
     # Plot the results
