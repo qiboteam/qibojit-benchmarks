@@ -6,16 +6,27 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def plot_hardware(data, circuit, quantity, colors, markers, precision="double", fontsize=30, legend=False, save=False):
+class Line:
+
+    def __init__(self, label, data, color, marker):
+        self.label = label
+        self.data = data
+        self.color = color
+        self.marker = marker
+
+
+def plot_devices(lines, circuit, quantity, precision="double", 
+                 fontsize=30, legend=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Filter data
-    data = {k: d[(d["circuit"] == circuit) & (d["precision"] == precision)]
-            for k, d in data.items()}
+    for line in lines:
+        condition = (line.data["circuit"] == circuit) & (line.data["precision"] == precision)
+        line.data = line.data[condition]
 
     plt.figure(figsize=(14, 8))
-    for k, d in data.items():
-        plt.semilogy(d["nqubits"], d[quantity], color=colors[k], linewidth=3.0, 
-                     marker=markers[k], markersize=10, label=k)
+    for line in lines:
+        plt.semilogy(line.data["nqubits"], line.data[quantity], color=line.color, 
+                     linewidth=3.0, marker=line.marker, markersize=10, label=line.label)
 
     plt.title(f"qibojit, {circuit}, {precision} precision")
     plt.xlabel("Number of qubits")
