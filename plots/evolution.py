@@ -42,7 +42,7 @@ def plot_dense(data, quantity, nqubits, fontsize=30, legend=True, save=False):
         plt.legend()
 
     if save:
-        plt.savefig(filename, bbox_inches="tight")
+        plt.savefig(f"evolution_dense_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
 
@@ -94,6 +94,6 @@ def plot_trotter(data, quantity, nqubits, fontsize=30, legend=False, save=False)
         plt.legend(fontsize="small")
     
     if save:
-        plt.savefig(filename, bbox_inches="tight")
+        plt.savefig(f"evolution_dense_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
