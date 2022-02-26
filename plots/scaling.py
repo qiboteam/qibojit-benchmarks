@@ -7,7 +7,7 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def plot_scaling(cpu_data, gpu_data, circuit, quantity, precision="double", fontsize=30, save=False):
+def plot_scaling(cpu_data, gpu_data, circuit, quantity, precision="double", fontsize=30, legend=True, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Prepare GPU data
     condition = (gpu_data["circuit"] == circuit) & (gpu_data["precision"] == precision)
@@ -48,7 +48,8 @@ def plot_scaling(cpu_data, gpu_data, circuit, quantity, precision="double", font
         plt.ylabel("Total dry run time (sec)")
     elif quantity == "total_simulation_time":
         plt.ylabel("Total simulation time (sec)")
-    plt.legend(fontsize="small")
+    if legend:
+        plt.legend(fontsize="small")
     if save:
         plt.savefig(f"qibo_scaling_{circuit}_{quantity}_{precision}.pdf", bbox_inches="tight")
     else:

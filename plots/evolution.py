@@ -94,6 +94,6 @@ def plot_trotter(data, quantity, nqubits, fontsize=30, legend=False, save=False)
         plt.legend(fontsize="small")
     
     if save:
-        plt.savefig(f"evolution_dense_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
+        plt.savefig(f"evolution_trotter_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
