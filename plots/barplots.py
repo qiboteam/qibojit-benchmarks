@@ -22,7 +22,7 @@ def plot_breakdown_nqubits(data, circuit, precision="double", width=0.1, fontsiz
     oranges = sns.color_palette("Oranges", 2)
     purples = sns.color_palette("Purples", 2)
     greens = sns.color_palette("Greens", 2)
-    blues = sns.color_palette("Blues", 2)
+    greys = sns.color_palette("Greys", 2)
     
     # Plot the results
     plt.figure(figsize=(25, 9))
@@ -43,31 +43,31 @@ def plot_breakdown_nqubits(data, circuit, precision="double", width=0.1, fontsiz
                          for q in quantities}
     
     plt.bar(xvalues + widths[0], heights_numba["import_time"],
-            color=oranges[0], align="center", width=width, alpha=1, hatch=hatches[0],
+            color=greys[0], align="center", width=width, alpha=1, hatch=hatches[0],
             edgecolor='w')
     plt.bar(xvalues + widths[1], heights_numba["import_time"],
-            color=oranges[1], align="center", width=width, alpha=1, hatch=hatches[1],
+            color=greys[1], align="center", width=width, alpha=1, hatch=hatches[1],
             edgecolor='w')
     
     plt.bar(xvalues + widths[2], heights_cupy["import_time"],
-            color=oranges[0], align="center", width=width, alpha=1, hatch=hatches[0],
+            color=greys[0], align="center", width=width, alpha=1, hatch=hatches[0],
             edgecolor='w')
     plt.bar(xvalues + widths[3], heights_cupy["import_time"],
-            color=oranges[1], align="center", width=width, alpha=1, hatch=hatches[1],
+            color=greys[1], align="center", width=width, alpha=1, hatch=hatches[1],
             edgecolor='w')
     
     plt.bar(xvalues + widths[4], heights_cuquantum["import_time"],
-            color=oranges[0], align="center", width=width, alpha=1, hatch=hatches[0],
+            color=greys[0], align="center", width=width, alpha=1, hatch=hatches[0],
             edgecolor='w')
     plt.bar(xvalues + widths[5], heights_cuquantum["import_time"],
-            color=oranges[1], align="center", width=width, alpha=1, hatch=hatches[1],
+            color=greys[1], align="center", width=width, alpha=1, hatch=hatches[1],
             edgecolor='w')
     
     plt.bar(xvalues + widths[0], heights_numba["total_dry_time"],
-            color=blues[0], align="center", width=width, alpha=1, hatch=hatches[0],
+            color=oranges[0], align="center", width=width, alpha=1, hatch=hatches[0],
             edgecolor='w', bottom=heights_numba["import_time"] + heights_numba["creation_time"])
     plt.bar(xvalues + widths[1], heights_numba["total_simulation_time"],
-            color=blues[1], align="center", width=width, alpha=1, hatch=hatches[1],
+            color=oranges[1], align="center", width=width, alpha=1, hatch=hatches[1],
             edgecolor='w', bottom=heights_numba["import_time"] + heights_numba["creation_time"])
     
     plt.bar(xvalues + widths[2], heights_cupy["total_dry_time"],
@@ -90,8 +90,8 @@ def plot_breakdown_nqubits(data, circuit, precision="double", width=0.1, fontsiz
     legend_elements = [
         Patch(facecolor="w", edgecolor="k", hatch=hatches[0], label="Dry run time"),
         Patch(facecolor="w", edgecolor="k", hatch=hatches[1], label="Simulation time"),
-        Patch(color=oranges[1], label="Import time"),
-        Patch(color=blues[1], label="numba"),
+        Patch(color=greys[1], label="Import time"),
+        Patch(color=oranges[1], label="numba"),
         Patch(color=purples[1], label="cupy"),
         Patch(color=greens[1], label="cuquantum"),
     ]
