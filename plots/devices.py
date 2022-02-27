@@ -16,7 +16,7 @@ class Line:
 
 
 def plot_devices(lines, circuit, quantity, precision="double", 
-                 fontsize=30, legend=False, save=False):
+                 fontsize=30, legendfont=None, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Filter data
     for line in lines:
@@ -35,8 +35,8 @@ def plot_devices(lines, circuit, quantity, precision="double",
     elif quantity == "total_simulation_time":
         plt.ylabel("Total simulation time (sec)")
 
-    if legend:
-        plt.legend(loc="upper left")
+    if legendfont is not None:
+        plt.legend(loc="upper left", fontsize=legendfont)
     if save:
         plt.savefig(f"devices_{circuit}_{quantity}_{precision}.pdf", bbox_inches="tight")
     else:
