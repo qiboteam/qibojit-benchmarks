@@ -8,11 +8,12 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 class Line:
 
-    def __init__(self, label, data, color, marker):
+    def __init__(self, label, data, color, marker, linestyle="-"):
         self.label = label
         self.data = data
         self.color = color
         self.marker = marker
+        self.linestyle = linestyle
 
 
 def plot_devices(lines, circuit, quantity, precision="double", 
@@ -25,7 +26,7 @@ def plot_devices(lines, circuit, quantity, precision="double",
 
     plt.figure(figsize=(14, 8))
     for line in lines:
-        plt.semilogy(line.data["nqubits"], line.data[quantity], color=line.color, 
+        plt.semilogy(line.data["nqubits"], line.data[quantity], color=line.color, linestyle=line.linestyle,
                      linewidth=3.0, marker=line.marker, markersize=10, label=line.label)
 
     plt.title(f"qibojit, {circuit}, {precision} precision")
