@@ -29,7 +29,7 @@ class Library:
 
 def plot_libraries(libraries, cpu_data, gpu_data, quantity, nqubits, 
                    precision="double", width=0.07, fontsize=45, 
-                   legend=False, save=False):
+                   legend=False, logscale=True, fusion=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     # Process data
     gpu_data = gpu_data.copy()
@@ -52,9 +52,12 @@ def plot_libraries(libraries, cpu_data, gpu_data, quantity, nqubits,
             height = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
             plt.bar(xvalues + next(ws), height, color=library.color, align="center", 
                     width=width, alpha=library.alpha, label=library.label, 
-                    log=True, edgecolor='w', hatch=library.hatch)
+                    log=logscale, edgecolor='w', hatch=library.hatch)
 
-    plt.title(f"{nqubits} qubits - {precision} precision")
+    if fusion:
+        plt.title(f"{nqubits} qubits - Two-qubit fusion - {precision} precision")
+    else:
+        plt.title(f"{nqubits} qubits - {precision} precision")
     if quantity == "total_dry_time":
         plt.ylabel("Total dry time (sec)")
     elif quantity == "total_simulation_time":
@@ -64,6 +67,7 @@ def plot_libraries(libraries, cpu_data, gpu_data, quantity, nqubits,
     if legend:
         plt.legend(fontsize="small", bbox_to_anchor=(1,1))
     if save:
-        plt.savefig(f"libraries_{precision}_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
+        savename = "libraries_fusion" if fusion else "libraries"
+        plt.savefig(f"{savename}_{precision}_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
