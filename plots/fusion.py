@@ -72,7 +72,7 @@ def plot_fusion_nqubits(data, circuit, quantity, precision="double", width=0.1, 
         ]
         plt.legend(handles=legend_elements)
     if save:
-        plt.savefig(f"qibojit_fusion_{circuit}_{precision}.pdf", bbox_inches="tight")
+        plt.savefig(f"qibojit_fusion_{precision}_{circuit}_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
 
@@ -140,6 +140,6 @@ def plot_fusion_circuits(data, nqubits, quantity, precision="double", width=0.1,
         ]
         plt.legend(handles=legend_elements)
     if save:
-        plt.savefig(f"qibojit_fusion_{circuit}_{precision}.pdf", bbox_inches="tight")
+        plt.savefig(f"qibojit_fusion_{precision}_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
         plt.show()
