@@ -8,7 +8,7 @@ matplotlib.rcParams['mathtext.fontset'] = 'cm'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 
-def plot_fusion_nqubits(data, circuit, quantity, precision="double", width=0.1, fontsize=30, legend=False, save=False):
+def plot_fusion_nqubits(data, circuit, quantity, precision="double", width=0.1, fontsize=30, legend=False, logscale=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
 
     # Set plot params
@@ -32,29 +32,29 @@ def plot_fusion_nqubits(data, circuit, quantity, precision="double", width=0.1, 
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=numba")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[0], heights, color=oranges[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=numba,max_qubits=2")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[1], heights, color=oranges[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cupy")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[2], heights, color=purples[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cupy,max_qubits=2")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[3], heights, color=purples[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cuquantum")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[4], heights, color=greens[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cuquantum,max_qubits=2")
     heights = np.array([float(data[condition & (data["nqubits"] == n)][quantity]) for n in nqubits])
     plt.bar(xvalues + widths[5], heights, color=greens[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     plt.xlabel("Number of qubits")
     if quantity == "total_dry_time":
@@ -77,13 +77,13 @@ def plot_fusion_nqubits(data, circuit, quantity, precision="double", width=0.1, 
         plt.show()
 
 
-def plot_fusion_circuits(data, nqubits, quantity, precision="double", width=0.1, fontsize=30, legend=False, save=False):
+def plot_fusion_circuits(data, nqubits, quantity, precision="double", width=0.1, fontsize=30, legend=False, logscale=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
 
     # Set plot params
     hatches = ['/', '\\', 'o', '-', 'x', '.', '*']
     
-    circuits = ["qft", "variational", "supremacy", "bv", "qv"]
+    circuits = ["qft", "variational", "supremacy", "qv", "bv"]
     widths = [-5 * width / 2, - 3 * width / 2, -width / 2, width / 2, 3 * width / 2, 5 * width / 2]
     oranges = sns.color_palette("Oranges", 2)
     purples = sns.color_palette("Purples", 2)
@@ -101,29 +101,29 @@ def plot_fusion_circuits(data, nqubits, quantity, precision="double", width=0.1,
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=numba")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[0], heights, color=oranges[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=numba,max_qubits=2")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[1], heights, color=oranges[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cupy")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[2], heights, color=purples[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cupy,max_qubits=2")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[3], heights, color=purples[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cuquantum")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[4], heights, color=greens[0], align="center", width=width, 
-            alpha=1, hatch=hatches[0], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[0], edgecolor='w')
     condition = base_condition & (data["library_options"] == "backend=qibojit,platform=cuquantum,max_qubits=2")
     heights = np.array([float(data[condition & (data["circuit"] == c)][quantity]) for c in circuits])
     plt.bar(xvalues + widths[5], heights, color=greens[1], align="center", width=width, 
-            alpha=1, hatch=hatches[1], edgecolor='w')
+            log=logscale, alpha=1, hatch=hatches[1], edgecolor='w')
 
     if quantity == "total_dry_time":
         plt.ylabel("Total dry run time (sec)")
