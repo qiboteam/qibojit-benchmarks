@@ -1,0 +1,19 @@
+name: benchmarks
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - numpy=1.21
+  - pip:
+    - qibo==0.1.7rc1
+    - qibotf==0.0.4rc1
+    - qibojit==0.0.4rc0
+    - qiskit==0.34.1
+    - qiskit-aer-gpu==0.10.2
+    - qulacs==0.3.0
+    - cirq==0.13.1
+    - qsimcirq==0.11.1
+    - qcgpu==0.1.1
+    - projectq==0.7.1
+
