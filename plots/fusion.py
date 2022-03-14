@@ -138,7 +138,7 @@ def plot_fusion_circuits(data, nqubits, quantity, precision="double", width=0.1,
             Patch(color=purples[1], label="cupy"),
             Patch(color=greens[1], label="cuquantum")
         ]
-        plt.legend(handles=legend_elements)
+        plt.legend(handles=legend_elements, bbox_to_anchor=(1,1))
     if save:
         plt.savefig(f"qibojit_fusion_{precision}_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
