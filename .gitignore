@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Saved plots
+# pdf plots
 *.pdf
+
+# benchmark logs
+*.dat
