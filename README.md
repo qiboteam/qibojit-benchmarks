@@ -5,28 +5,18 @@ This repository contains benchmark scripts for quantum circuit simulation using
 
 ## Installing prerequisites
 
-Before executing the simulation please:
+In order to run the benchmarks, you need to install the required libraries.
 
-1. Install `Qibo >= 0.1.6rc1` from source or using:
+In order to set up an environment with most of the libraries available in this repository,
+you can set up a **conda** environment:
     ```
-    pip install qibo --pre
+    conda env create -f environment.yml
     ```
-
-2. Install `qibojit >= 0.0.2` simulation backend with:
-    ```
-    pip install qibojit
-    ```
-    Visit the [CuPy website](https://cupy.dev/) and install the binary/source code version that matches your CUDA version.
-
-3. (optional) Install qibotf simulation backend with:
-    ```
-    pip install qibotf
-    ```
-    This will install TensorFlow 2.5.0 automatically, please make sure you have the supported CUDA version.
+This recipe doesn't include the installation of CUDA Toolkit, CuPy, cuQuantum nor HybridQ, Qulacs-GPU, qsim GPU and TensorFlow Quantum.
 
 ## Supported simulation backends
 
-- [qibojit](https://github.com/qiboteam/qibojit): uses numba on CPU and cupy on GPU for custom operations.
+- [qibojit](https://github.com/qiboteam/qibojit): uses numba on CPU and cupy/cuquantum on GPU for custom operations.
 - [qibotf](https://github.com/qiboteam/qibotf): uses tf primitives with custom operators on CPU and GPU.
 - [tensorflow](https://www.tensorflow.org/): uses tf default primitives.
 - [numpy](https://numpy.org/): single-threaded CPU implementation.
@@ -40,39 +30,49 @@ The script in `benchmarks/main.py` executes the benchmark code following the sup
 ```
 $ python main.py -h
 
-usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND] [--circuit CIRCUIT]
-               [--options OPTIONS] [--nreps NREPS] [--nshots NSHOTS] [--transfer]
-               [--precision PRECISION] [--memory MEMORY] [--threading THREADING]
-               [--filename FILENAME]
+usage: main.py [-h] [--nqubits NQUBITS] [--backend BACKEND]
+               [--platform PLATFORM] [--circuit CIRCUIT]
+               [--circuit-options CIRCUIT_OPTIONS] [--nreps NREPS]
+               [--nshots NSHOTS] [--transfer] [--precision PRECISION]
+               [--memory MEMORY] [--threading THREADING] [--filename FILENAME]
 
 optional arguments:
   -h, --help            show this help message and exit
   --nqubits NQUBITS     Number of qubits in the circuit.
   --backend BACKEND     Qibo backend to use for simulation.
-  --circuit CIRCUIT     Type of circuit to use. See README for the list of available circuits.
-  --options OPTIONS     String with options for circuit creation. It should have the form
-                        'arg1=value1,arg2=value2,...' .See README for the list of arguments
-                        that are available for each circuit.
-  --nreps NREPS         Number of repetitions of the circuit execution. Dry run is not
-                        included.
-  --nshots NSHOTS       Number of measurement shots. If used the time required to measure
-                        frequencies (no samples) is measured and logged. If it is ``None`` no
-                        measurements are performed.
-  --transfer            If used the final state array is converted to numpy.If the simulation
-                        device is GPU this requires a transfer from GPU memory to CPU.
+  --platform PLATFORM   Qibo platform to use for simulation.
+  --circuit CIRCUIT     Type of circuit to use. See README for the list of
+                        available circuits.
+  --circuit-options CIRCUIT_OPTIONS
+                        String with options for circuit creation. It should
+                        have the form 'arg1=value1,arg2=value2,...'. See
+                        README for the list of arguments that are available
+                        for each circuit.
+  --nreps NREPS         Number of repetitions of the circuit execution. Dry
+                        run is not included.
+  --nshots NSHOTS       Number of measurement shots. If used the time required
+                        to measure frequencies (no samples) is measured and
+                        logged. If it is ``None`` no measurements are
+                        performed.
+  --transfer            If used the final state array is converted to numpy.
+                        If the simulation device is GPU this requires a
+                        transfer from GPU memory to CPU.
   --precision PRECISION
-                        Numerical precision of the simulation.Choose between 'double' and
-                        'single'.
-  --memory MEMORY       Limit the GPU memory usage when using Tensorflow based backends. The
-                        memory limit should be given in MB. Tensorflow reserves the full
-                        available memory by default.
+                        Numerical precision of the simulation. Choose between
+                        'double' and 'single'.
+  --memory MEMORY       Limit the GPU memory usage when using Tensorflow based
+                        backends. The memory limit should be given in MB.
+                        Tensorflow reserves the full available memory by
+                        default.
   --threading THREADING
-                        Switches the numba threading layer when using the qibojit backend on
-                        CPU. See https://numba.pydata.org/numba-doc/latest/user/threading-
-                        layer.html#selecting-a-named-threading-layer for a list of available
+                        Switches the numba threading layer when using the
+                        qibojit backend on CPU. See
+                        https://numba.pydata.org/numba-
+                        doc/latest/user/threading-layer.html#selecting-a-
+                        named-threading-layer for a list of available
                         threading layers.
-  --filename FILENAME   Directory of file to save the logs in json format.If not given the
-                        logs only be printed and not saved.
+  --filename FILENAME   Directory of file to save the logs in json format. If
+                        not given the logs will only be printed and not saved.
 ```
 
 Before executing the code keep in mind the following:
@@ -81,6 +81,47 @@ Before executing the code keep in mind the following:
 - The benchmark script provides several options, including the possibility to modify the default numba threading pooling technology, (see [docs](https://numba.pydata.org/numba-doc/latest/developer/threading_implementation.html#notes-on-numba-s-threading-implementation)) or limiting the GPU memory used be Tensorflow. See `python main.py -h` for more details.
 
 The `scripts/` folder contains example bash scripts that execute circuit benchmarks for different numbers of qubits. We refer to the README inside this folder for more details.
+
+#### Comparing simulation libraries
+
+In addition to the above `main.py` benchmark, we provide the `compare.py` benchmark for comparing the performance of different simulation libraries.
+The usage is similar to `main.py` with the `--backend` flag replaced by the `--library` flag which can be used to select one of the available quantum simulation libraries
+(check `python compare.py -h`).
+
+```
+$ python compare.py -h
+
+usage: compare.py [-h] [--nqubits NQUBITS] [--library LIBRARY] [--library-options LIBRARY_OPTIONS] [--circuit CIRCUIT] [--circuit-options CIRCUIT_OPTIONS] [--precision PRECISION] [--nreps NREPS]
+                  [--filename FILENAME]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --nqubits NQUBITS     Number of qubits in the circuit.
+  --library LIBRARY     Quantum simulation library to use in benchmark. See README for the list of available libraries.
+  --library-options LIBRARY_OPTIONS
+                        String with options for the library. It should have the form 'arg1=value1,arg2=value2,...'. Each library supports different options.
+  --circuit CIRCUIT     Type of circuit to use. See README for the list of available circuits.
+  --circuit-options CIRCUIT_OPTIONS
+                        String with options for circuit creation. It should have the form 'arg1=value1,arg2=value2,...'. See README for the list of arguments that are available for each circuit.
+  --precision PRECISION
+                        Numerical precision of the simulation. Choose between 'double' and 'single'.
+  --nreps NREPS         Number of repetitions of the circuit execution. Dry run is not included.
+  --filename FILENAME   Directory of file to save the logs in json format. If not given the logs will only be printed and not saved.
+
+```
+
+Currently the available libraries (defined under `benchmarks/libraries`) are:
+ - [Qiskit](https://qiskit.org/), defined as ``qiskit`` and ``qiskit-gpu`` in the ``library`` option of ``compare.py``.
+ - [Qulacs](https://github.com/qulacs/qulacs), defined as ``qulacs`` and ``qulacs-gpu``.
+ - [Cirq](https://quantumai.google/cirq), defined as ``cirq``.
+ - [TensorFlow Quantum](https://www.tensorflow.org/quantum), defined as ``tfq``.
+ - [Qsim](https://quantumai.google/qsim), defined as ``qsim``, ``qsim-gpu`` and ``qsim-cuquantum``.
+ - [HybridQ](https://github.com/nasa/hybridq), defined as ``hybridq`` and ``hybridq-gpu``.
+ - [ProjectQ](https://projectq.ch/), defined as ``projectq``.
+ - [QCGPU](https://qcgpu.github.io/), defined as ``qcgpu``.
+ - [Qibo](https://qibo.science/), defined as ``qibo``.
+
+All the circuits described below are available for both `main.py` and `compare.py`.
 
 ## Benchmark output
 
@@ -100,9 +141,6 @@ The benchmark script prints a summary of the circuit and user selected flags tog
 Note that if a GPU is used for simulation then transfer times measure the time required to copy the final state from the GPU memory to CPU.
 
 If `--filename` is given the above logs are saved in json format in the given directory.
-
-The `data/` folder contains example logs. We refer to the README inside this folder for more details. The results are transformed in markdown tables for presentation using pandas DataFrame's in the `data.ipynb` notebook.
-
 
 ## Implemented circuits
 
