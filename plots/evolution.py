@@ -47,7 +47,7 @@ def plot_dense(data, quantity, nqubits, fontsize=30, legend=True, save=False):
         plt.show()
 
 
-def plot_trotter(data, quantity, nqubits, fontsize=30, legend=False, save=False):
+def plot_trotter(data, quantity, nqubits, fontsize=30, yticks=None, legend=False, save=False):
     matplotlib.rcParams["font.size"] = fontsize
     
     cpu_cp = sns.color_palette("Oranges", 4)
@@ -92,7 +92,9 @@ def plot_trotter(data, quantity, nqubits, fontsize=30, legend=False, save=False)
 
     if legend:
         plt.legend(fontsize="small")
-    
+    if yticks is not None:
+        plt.minorticks_off()
+        plt.yticks(yticks)
     if save:
         plt.savefig(f"evolution_trotter_{nqubits}qubits_{quantity}.pdf", bbox_inches="tight")
     else:
