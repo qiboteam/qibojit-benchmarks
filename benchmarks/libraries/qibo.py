@@ -27,7 +27,7 @@ class Qibo(abstract.AbstractBackend):
     def __call__(self, circuit):
         # transfer final state to numpy array because that's what happens
         # for all backends
-        return circuit().numpy()
+        return circuit().state(numpy=True)
 
     def transpose_state(self, x):
         return x
