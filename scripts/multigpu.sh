@@ -5,30 +5,29 @@
 : "${precision:=double}"
 : "${nreps:=1}"
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-for circuit in qft variational supremacy qv bv
-do
-  for backend in qibojit qibotf
-  do
-    python compare.py --circuit $circuit --nqubits 32 --filename $filename \
-                      --library-options backend=$backend,accelerators=1/GPU:0+1/GPU:1+1/GPU:2+1/GPU:3 \
-                      --nreps $nreps --precision $precision
-    echo
-  done
+# TODO: temporarily reduce expectations to a single GPU
+# export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0
 
-  for backend in qibojit qibotf
-  do
-    python compare.py --circuit $circuit --nqubits 32 --filename $filename \
-                      --library-options backend=$backend,accelerators=2/GPU:2+2/GPU:3 \
-                      --nreps $nreps --precision $precision
-    echo
-  done
+for circuit in qft; do # variational supremacy qv bv
+  # for backend in qibojit qibotf; do
+  #   python compare.py --circuit $circuit --nqubits 10 --filename $filename \
+  #     --library-options backend=$backend,accelerators=1/GPU:0+1/GPU:1+1/GPU:2+1/GPU:3 \
+  #     --nreps $nreps --precision $precision
+  #   echo
+  # done
 
-  for backend in qibojit qibotf
-  do
-    python compare.py --circuit $circuit --nqubits 32 --filename $filename \
-                      --library-options backend=$backend,accelerators=4/GPU:3 \
-                      --nreps $nreps --precision $precision
+  # for backend in qibojit qibotf; do
+  #   python compare.py --circuit $circuit --nqubits 10 --filename $filename \
+  #     --library-options backend=$backend,accelerators=2/GPU:2+2/GPU:3 \
+  #     --nreps $nreps --precision $precision
+  #   echo
+  # done
+
+  for backend in qibojit qibotf; do
+    python compare.py --circuit $circuit --nqubits 10 --filename $filename \
+      --library-options backend=$backend,accelerators=4/GPU:0 \
+      --nreps $nreps --precision $precision
     echo
   done
 done
