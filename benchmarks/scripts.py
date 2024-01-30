@@ -2,6 +2,7 @@
 import time
 from benchmarks.logger import JsonLogger
 
+from qibo.backends import GlobalBackend
 
 def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
                       nreps=1, nshots=None, transfer=False,
@@ -30,7 +31,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     qibo.set_backend(backend=backend, platform=platform)
     qibo.set_precision(precision)
     logs.log(backend=qibo.get_backend(),
-             platform=qibo.K.get_platform(),
+             platform=GlobalBackend().platform,
              precision=qibo.get_precision(),
              device=qibo.get_device(),
              version=qibo.__version__)
@@ -53,7 +54,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     if transfer:
         result = result.numpy()
     logs.log(dry_run_transfer_time=time.time() - start_time)
-    dtype = str(result.dtype)
+    dtype = str(result.state().dtype)
     del(result)
 
     simulation_times, transfer_times = [], []
@@ -148,7 +149,7 @@ def evolution_benchmark(nqubits, dt, solver, backend, platform=None,
     qibo.set_backend(backend=backend, platform=platform)
     qibo.set_precision(precision)
     logs.log(backend=qibo.get_backend(),
-             platform=qibo.K.get_platform(),
+             platform=GlobalBackend().platform,
              precision=qibo.get_precision(),
              device=qibo.get_device(),
              threads=qibo.get_threads(),
