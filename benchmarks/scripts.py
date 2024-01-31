@@ -56,9 +56,17 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     logs.log(dry_run_transfer_time=time.time() - start_time)
     dtype = str(result.state().dtype)
     del(result)
+    del(circuit)
 
-    simulation_times, transfer_times = [], []
+    creation_times, simulation_times, transfer_times = [], [], []
     for _ in range(nreps):
+        start_time = time.time()
+        circuit = qibo.models.Circuit(nqubits)
+        circuit.add(gates)
+        if nshots is not None:
+            # add measurement gates
+            circuit.add(qibo.gates.M(*range(nqubits)))
+        creation_times.append(time.time() - start_time)
         start_time = time.time()
         result = circuit(nshots=nshots)
         simulation_times.append(time.time() - start_time)
@@ -67,9 +75,12 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
             result = result.numpy()
         transfer_times.append(time.time() - start_time)
         del(result)
+        del(circuit)
 
-    logs.log(dtype=dtype, simulation_times=simulation_times,
+    logs.log(dtype=dtype, creation_times=creation_times,
+             simulation_times=simulation_times,
              transfer_times=transfer_times)
+    logs.average("creation_times")
     logs.average("simulation_times")
     logs.average("transfer_times")
 
