@@ -6,9 +6,9 @@ dependencies:
   - pip
   - numpy=1.21
   - pip:
-    - qibo==0.1.7rc1
-    - qibotf==0.0.4rc1
-    - qibojit==0.0.4rc0
+    - qibo==0.1.11
+    - qibotf==0.0.6
+    - qibojit==0.0.7
     - qiskit==0.34.1
     - qiskit-aer-gpu==0.10.2
     - qulacs==0.3.0
