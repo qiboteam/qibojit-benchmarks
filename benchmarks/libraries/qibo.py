@@ -3,7 +3,7 @@ from qibo.config import raise_error
 from benchmarks.libraries import abstract
 from benchmarks.logger import log
 
-
+#test
 class Qibo(abstract.AbstractBackend):
 
     def __init__(self, max_qubits="0", backend="qibojit", platform=None, accelerators=""):
