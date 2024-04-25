@@ -1,6 +1,7 @@
 """Launches the circuit benchmark script for user given arguments."""
 import argparse
-from benchmarks.scripts import library_benchmark
+from benchmarks.scripts import library_benchmark, qibotn_benchmark
+
 
 
 parser = argparse.ArgumentParser()
@@ -38,8 +39,7 @@ parser.add_argument("--filename", default=None, type=str,
                     help="Directory of file to save the logs in json format. "
                          "If not given the logs will only be printed and not saved.")
 
-
 if __name__ == "__main__":
     args = vars(parser.parse_args())
     args["circuit_name"] = args.pop("circuit")
-    library_benchmark(**args)
+    qibotn_benchmark(**args)
