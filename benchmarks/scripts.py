@@ -132,7 +132,7 @@ def library_benchmark(nqubits, library, circuit_name, circuit_options=None,
     logs.dump()
     return logs
 
-def library_benchmark_mpi(nqubits, library, circuit_name, circuit_options=None,
+def qibotn_benchmark(nqubits, library, circuit_name, circuit_options=None,
                       library_options=None, precision=None, nreps=1,
                       filename=None):
     """Runs benchmark for different quantum simulation libraries.
@@ -194,7 +194,7 @@ def library_benchmark_mpi(nqubits, library, circuit_name, circuit_options=None,
 
     if rank == 0:   
         simulation_times = []
-        if backend.expectation_flag is not None or library_options == "backend=qibotn,platform=cu_tensornet_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_mpi_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_nccl_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_mpi_expectation_auto":
+        if backend.expectation_flag is not None:
                 expectation_result = [] 
     for _ in range(nreps):
         if rank == 0:
@@ -213,7 +213,7 @@ def library_benchmark_mpi(nqubits, library, circuit_name, circuit_options=None,
                 #filename = modified_string+str(circuit.nqubits)+".dat"
                 #np.savetxt(filename,result)
             #print(result)
-            if backend.expectation_flag is not None or library_options == "backend=qibotn,platform=cu_tensornet_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_mpi_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_nccl_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_mpi_expectation_auto":
+            if backend.expectation_flag is not None:
                 magnitude = np.abs(result[0])
                 magnitude_list = magnitude.tolist()
 
@@ -237,7 +237,7 @@ def library_benchmark_mpi(nqubits, library, circuit_name, circuit_options=None,
     if rank == 0:
         logs.log(dtype=dtype, simulation_times=simulation_times)
         logs.average("simulation_times")
-        if backend.expectation_flag is not None or library_options == "backend=qibotn,platform=cu_tensornet_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_mpi_expectation" or library_options == "backend=qibotn,platform=cu_tensornet_nccl_expectation":
+        if backend.expectation_flag is not None:
                 logs.log(dtype=dtype, expectation_result=expectation_result)
                 logs.average("expectation_result")
         logs.dump()
