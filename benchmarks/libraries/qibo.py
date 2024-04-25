@@ -4,79 +4,21 @@ from benchmarks.logger import log
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits="0", backend="qibojit", platform=None, accelerators="",expectation=None):
+    def __init__(self, max_qubits="0", backend="qibojit", platform=None, accelerators="",expectation=None,computation_settings=None):
         import qibo
         
-        # Create runcard dictionary based on platform
-        if platform == "cu_tensornet":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": False,
-                "NCCL_enabled": False,
-                "expectation_enabled": False,
-            }
-            tn_platform = "cutensornet"
-        elif platform == "cu_mps":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": True,
-                "NCCL_enabled": False,
-                "expectation_enabled": False,
-            }
-            tn_platform = "cutensornet"
-        elif platform == "cu_tensornet_mpi":
-            computation_settings = {
-                "MPI_enabled": True,
-                "MPS_enabled": False,
-                "NCCL_enabled": False,
-                "expectation_enabled": False,
-            }
-            tn_platform = "cutensornet"
-        elif platform == "cu_tensornet_mpi_expectation":
-            computation_settings = {
-                "MPI_enabled": True,
-                "MPS_enabled": False,
-                "NCCL_enabled": False,
-                "expectation_enabled": True,
-            }
-            tn_platform = "cutensornet"
-        elif platform == "cu_tensornet_expectation":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": False,
-                "NCCL_enabled": False,
-                "expectation_enabled": True,
-            }
-            tn_platform = "cutensornet"
+        runcard=None
 
-        elif platform == "cu_tensornet_nccl":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": False,
-                "NCCL_enabled": True,
-                "expectation_enabled": False,
-            }
-            tn_platform = "cutensornet"
+        if computation_settings is not None:
+            import json
 
-        elif platform == "cu_tensornet_nccl_expectation":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": False,
-                "NCCL_enabled": True,
-                "expectation_enabled": True,
-            }
-            tn_platform = "cutensornet"
-        elif platform == "qu_tensornet":
-            computation_settings = {
-                "MPI_enabled": False,
-                "MPS_enabled": False,
-                "NCCL_enabled": False,
-                "expectation_enabled": False,
-            }
-            tn_platform = "QuimbBackend"    
-
-            
-        qibo.set_backend(backend=backend, platform=tn_platform, runcard=computation_settings)    
+            with open(computation_settings, 'r') as f:
+                runcard = json.load(f)
+                
+            if runcard["expectation_enabled"]==True:
+                expectation = True
+       
+        qibo.set_backend(backend=backend, platform=platform, runcard=runcard)    
         # qibo.set_backend(backend=backend, platform=platform)
         from qibo import models
         self.name = "qibo"
@@ -112,17 +54,13 @@ class Qibo(abstract.AbstractBackend):
             import numpy as np
             from qibo.backends import GlobalBackend
             backend = GlobalBackend()
-
+            # self.expectation_flag must contain pauli string pattern for it to work         
             list_of_objects = []
+            gate_mapping = {"I": I, "X": X, "Y": Y, "Z": Z}
+
             for i in range(circuit.nqubits):
-                if i % 4 == 0:
-                    list_of_objects.append(X(i))
-                elif i % 4 == 1:
-                    list_of_objects.append(X(i))
-                elif i % 4 == 2:
-                    list_of_objects.append(X(i))
-                else:
-                    list_of_objects.append(Z(i))
+                gate = gate_mapping[self.expectation_flag[i % len(self.expectation_flag)]]
+                list_of_objects.append(gate(i))
             obs = np.prod(list_of_objects)
             obs = SymbolicHamiltonian(obs, backend=backend)
 
