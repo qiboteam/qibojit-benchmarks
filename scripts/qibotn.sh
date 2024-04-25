@@ -1,24 +1,36 @@
 #! /usr/bin/bash
-# Generates data for qibotn breakdown bar plot with dry run vs simulation
-
+# Script for 2-nodes-4-GPUs (2x4) configuration
 # Command-line parameters
-: "${filename:=qibotn.dat}"
+: "${circuit:=variational}"
 : "${precision:=double}"
-: "${circuit:=qft}"
-: "${nreps_cpu:=5}"
-: "${nreps_gpu:=10}"
+: "${nreps:=3}"
+: "${filename:=qibotn_expectation_double_2x4.dat}"
 
+node_list=/nodelist_2x4 #file containing the IP address of the resources
 
-for nqubits in 16 18 20 22 24 26 28
+for (nqubits = 10; nqubits <= 8000; nqubits += 100)
 do
-    echo "nqubits = $nqubits"
-    # CUDA_VISIBLE_DEVICES=0 python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
-    #                                          --library-options backend=qibotn,platform=cupy --nreps $nreps_gpu --precision $precision
-    echo "qibotn with quimb done."
-    # CUDA_VISIBLE_DEVICES=0 python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
-    #                                          --library-options backend=qibotn,platform=cuquantum --nreps $nreps_gpu --precision $precision
-    echo "qibotn with cuquantum done."
-    #  CUDA_VISIBLE_DEVICES="" python compare.py --circuit $circuit --nqubits $nqubits --filename $filename \
-    #                                            --library-options backend=qibotn,platform=numba --nreps $nreps_cpu --precision $precision
-    echo "qibotn with cpu done."
+    echo '{"MPI_enabled": true, "MPS_enabled": false, "NCCL_enabled": false, "expectation_enabled": true}' > cu_tensornet_mpi_expectation.json
+    mpirun -np 8 -hostfile $node_list python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4$nqubits --filename $filename \
+                                            --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_mpi_expectation.json \
+                                            --nreps $nreps --precision $precision
+echo
+    echo '{"MPI_enabled": false, "MPS_enabled": false, "NCCL_enabled": true, "expectation_enabled": true}' > cu_tensornet_nccl_expectation.json
+    mpirun -np 8 -hostfile $node_list python compare.py --circuit variational --circuit-options nlayers=3 --nqubits $nqubits --filename $filename \
+                                            --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_nccl_expectation.json \
+                                            --nreps $nreps --precision $precision
+echo
+    echo '{"MPI_enabled": false, "MPS_enabled": false, "NCCL_enabled": false, "expectation_enabled": true}' > cu_tensornet_expectation.json
+    python compare.py --circuit variational --circuit-options nlayers=3 --nqubits $nqubits --filename $filename \
+                                            --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_expectation.json \
+                                            --nreps $nreps --precision $precision
+echo
+    python compare.py --circuit variational --circuit-options nlayers=3 --nqubits $nqubits --filename $filename \
+                                            --library-options backend=qibojit,platform=numba,expectation="XXXZ" \
+                                            --nreps $nreps --precision $precision
+echo
 done
+
+: <<'END_COMMENT'
+
+END_COMMENT
