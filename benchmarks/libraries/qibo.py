@@ -18,8 +18,10 @@ class Qibo(abstract.AbstractBackend):
             if runcard["expectation_enabled"]==True:
                 expectation = True
        
-        qibo.set_backend(backend=backend, platform=platform, runcard=runcard)    
-        # qibo.set_backend(backend=backend, platform=platform)
+            qibo.set_backend(backend=backend, platform=platform, runcard=runcard)    
+        else:
+            qibo.set_backend(backend=backend, platform=platform)
+            
         from qibo import models
         self.name = "qibo"
         self.qibo = qibo
