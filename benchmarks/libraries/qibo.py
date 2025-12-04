@@ -31,7 +31,7 @@ class Qibo(abstract.AbstractBackend):
         self.accelerators = self._parse_accelerators(accelerators)
         self.expectation_flag = expectation
         self.backend_name_str = backend
-
+        
     def from_qasm(self, qasm):
         circuit = self.models.Circuit.from_qasm(qasm, accelerators=self.accelerators)
         if self.max_qubits > 1:
@@ -69,16 +69,16 @@ class Qibo(abstract.AbstractBackend):
             # Noise-free expected value
             return obs.expectation(backend.execute_circuit(circuit).state())
         else:
-            return circuit().state(numpy=True)   
+            return circuit().statevector.flatten()  
 
     def transpose_state(self, x):
         return x
 
     def get_precision(self):
-        return self.qibo.get_precision()
+        return self.qibo.get_dtype()
 
     def set_precision(self, precision):
-        self.qibo.set_precision(precision)
+        self.qibo.set_dtype(precision)
 
     def get_device(self):
         return self.qibo.get_device()
