@@ -54,8 +54,10 @@ class Qibo(abstract.AbstractBackend):
             from qibo.symbols import X,Y,Z,I
             from qibo.hamiltonians import SymbolicHamiltonian
             import numpy as np
-            from qibo.backends import GlobalBackend
-            backend = GlobalBackend()
+            # from qibo.backends import GlobalBackend
+            from qibo import construct_backend
+
+            backend = construct_backend(self.backend_name_str)
             # self.expectation_flag must contain pauli string pattern for it to work         
             list_of_objects = []
             gate_mapping = {"I": I, "X": X, "Y": Y, "Z": Z}
@@ -67,12 +69,15 @@ class Qibo(abstract.AbstractBackend):
             obs = SymbolicHamiltonian(obs, backend=backend)
 
             # Noise-free expected value
-            return obs.expectation(backend.execute_circuit(circuit).state())
+            return obs.expectation(circuit)
         else:
             if self.expectation_flag:
                 return circuit().real.get()
             else:
-                return circuit().statevector.flatten()  
+                if self.backend_name_str == "qibotn":
+                    return circuit().statevector.flatten()  
+                else:
+                    return circuit().state(numpy=True)
 
     def transpose_state(self, x):
         return x

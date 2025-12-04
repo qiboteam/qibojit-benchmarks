@@ -214,10 +214,8 @@ def qibotn_benchmark(nqubits, library, circuit_name, circuit_options=None,
                 #np.savetxt(filename,result)
             #print(result)
             if backend.expectation_flag is not None:
-                magnitude = np.abs(result[0])
-                magnitude_list = magnitude.tolist()
-
-                expectation_result.append(magnitude_list)
+                magnitude = float(abs(result))
+                expectation_result.append(magnitude)
             '''
             else:
                 components = library_options.split(',')

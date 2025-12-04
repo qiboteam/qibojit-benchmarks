@@ -188,3 +188,13 @@ Another example for the case with runcard input and output expectation. Note tha
 ```bash
 python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_expectation.json --nreps 5 --precision complex128
 ```
+
+Instructions for Qibojit expectation
+```bash                                         
+python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibojit,platform=numba,expectation="XXXZ"  --nreps 5 --precision complex128
+```
+
+Instructions for Qibojit no expectation
+```bash                                         
+python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibojit,platform=numba  --nreps 5 --precision complex128
+```
