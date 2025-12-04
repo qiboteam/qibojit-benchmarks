@@ -179,6 +179,8 @@ Here is a list of the available circuits for benchmarks. As described above the 
 
 ## QiboTN
 
+Command to call QiboTN calculation.
+
 ```bash
 python compare.py --circuit qft --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet --nreps 5 --precision complex128
 ```
