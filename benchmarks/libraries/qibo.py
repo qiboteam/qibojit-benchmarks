@@ -69,7 +69,10 @@ class Qibo(abstract.AbstractBackend):
             # Noise-free expected value
             return obs.expectation(backend.execute_circuit(circuit).state())
         else:
-            return circuit().statevector.flatten()  
+            if self.expectation_flag:
+                return circuit().real.get()
+            else:
+                return circuit().statevector.flatten()  
 
     def transpose_state(self, x):
         return x
