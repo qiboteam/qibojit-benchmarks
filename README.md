@@ -176,3 +176,11 @@ Here is a list of the available circuits for benchmarks. As described above the 
 - `quantum-volume` (`qv`): [Quantum volume](https://qiskit.org/documentation/stubs/qiskit.circuit.library.QuantumVolume.html) circuit model from Qiskit. *Requirements: [Qiskit](https://qiskit.org/).*
   - `depth`: Layers of SU(4) operations in circuit.
   - `seed`: Seed for random gate generator.
+
+## QiboTN
+
+```bash
+python compare.py --circuit qft --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet --nreps 5 --precision complex128
+```
+
+where precision is 'complex128', 'complex64','float64', 'float32'
