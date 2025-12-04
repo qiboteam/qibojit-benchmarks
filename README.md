@@ -182,5 +182,9 @@ Here is a list of the available circuits for benchmarks. As described above the 
 ```bash
 python compare.py --circuit qft --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet --nreps 5 --precision complex128
 ```
-
 where precision is 'complex128', 'complex64','float64', 'float32'
+
+Another example for the case with runcard input and output expectation. Note that user will need to store the runcard settings as json file.
+```bash
+python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_expectation.json --nreps 5 --precision complex128
+```
