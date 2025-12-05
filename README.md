@@ -181,6 +181,7 @@ Here is a list of the available circuits for benchmarks. As described above the 
 
 Command to call QiboTN calculation.
 
+### Single Node
 ```bash
 python compare.py --circuit qft --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet --nreps 5 --precision complex128
 ```
@@ -199,4 +200,11 @@ python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 
 Instructions for Qibojit no expectation
 ```bash                                         
 python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibojit,platform=numba  --nreps 5 --precision complex128
+```
+
+### Multi Node
+
+In Docker environment, need to add `--allow-run-as-root`
+```bash
+mpirun --allow-run-as-root -np 2 python compare.py --circuit variational --circuit-options nlayers=3 --nqubits 4 --filename test.dat --library-options backend=qibotn,platform=cutensornet,computation_settings=cu_tensornet_expectation.json --nreps 1 --precision complex128 
 ```
