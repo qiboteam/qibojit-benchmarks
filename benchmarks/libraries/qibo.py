@@ -4,14 +4,22 @@ from benchmarks.logger import log
 
 class Qibo(abstract.AbstractBackend):
 
-    def __init__(self, max_qubits="0", backend="qibojit", platform=None, accelerators="",expectation=None,computation_settings=None):
+    def __init__(
+        self,
+        max_qubits="0",
+        backend="qibojit",
+        platform=None,
+        accelerators="",
+        expectation=None,
+        computation_settings=None,
+    ):
         import qibo
-        
-        runcard=None
+
+        runcard = None
 
         if computation_settings is not None:
             import json
- 
+
             try:
                 with open(computation_settings, "r") as f:
                     runcard = json.load(f)
@@ -21,15 +29,16 @@ class Qibo(abstract.AbstractBackend):
 
             except FileNotFoundError:
                 raise FileNotFoundError(f"File not found: {computation_settings}")
-                
-            if runcard["expectation_enabled"]==True:
+
+            if runcard["expectation_enabled"] == True:
                 expectation = True
-       
-            qibo.set_backend(backend=backend, platform=platform, runcard=runcard)    
+
+            qibo.set_backend(backend=backend, platform=platform, runcard=runcard)
         else:
             qibo.set_backend(backend=backend, platform=platform)
-            
+
         from qibo import models
+
         self.name = "qibo"
         self.qibo = qibo
         self.models = models
@@ -38,39 +47,45 @@ class Qibo(abstract.AbstractBackend):
         self.accelerators = self._parse_accelerators(accelerators)
         self.expectation_flag = expectation
         self.backend_name_str = backend
-        
+
     def from_qasm(self, qasm):
         circuit = self.models.Circuit.from_qasm(qasm, accelerators=self.accelerators)
         if self.max_qubits > 1:
             if self.max_qubits > 2:
-                log.warn("Fusion with {} qubits is not yet supported by Qibo. "
-                         "Using max_qubits=2.".format(self.max_qubits))
+                log.warn(
+                    "Fusion with {} qubits is not yet supported by Qibo. "
+                    "Using max_qubits=2.".format(self.max_qubits)
+                )
             circuit = circuit.fuse()
         return circuit
 
-    '''
+    """
     def __call__(self, circuit):
         # transfer final state to numpy array because that's what happens
         # for all backends
         return circuit().state(numpy=True)
-    '''
+    """
+
     def __call__(self, circuit):
         # transfer final state to numpy array because that's what happens
         # for all backends
-        if self.backend_name_str == "qibojit" and self.expectation_flag is not  None:
-            from qibo.symbols import X,Y,Z,I
+        if self.backend_name_str == "qibojit" and self.expectation_flag is not None:
+            from qibo.symbols import X, Y, Z, I
             from qibo.hamiltonians import SymbolicHamiltonian
             import numpy as np
+
             # from qibo.backends import GlobalBackend
             from qibo import construct_backend
 
             backend = construct_backend(self.backend_name_str)
-            # self.expectation_flag must contain pauli string pattern for it to work         
+            # self.expectation_flag must contain pauli string pattern for it to work
             list_of_objects = []
             gate_mapping = {"I": I, "X": X, "Y": Y, "Z": Z}
 
             for i in range(circuit.nqubits):
-                gate = gate_mapping[self.expectation_flag[i % len(self.expectation_flag)]]
+                gate = gate_mapping[
+                    self.expectation_flag[i % len(self.expectation_flag)]
+                ]
                 list_of_objects.append(gate(i))
             obs = np.prod(list_of_objects)
             obs = SymbolicHamiltonian(obs, backend=backend)
@@ -82,7 +97,7 @@ class Qibo(abstract.AbstractBackend):
                 return circuit().real.get()
             else:
                 if self.backend_name_str == "qibotn":
-                    return circuit().statevector.flatten()  
+                    return circuit().statevector.flatten()
                 else:
                     return circuit().state(numpy=True)
 
