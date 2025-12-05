@@ -11,9 +11,16 @@ class Qibo(abstract.AbstractBackend):
 
         if computation_settings is not None:
             import json
+ 
+            try:
+                with open(computation_settings, "r") as f:
+                    runcard = json.load(f)
 
-            with open(computation_settings, 'r') as f:
-                runcard = json.load(f)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON in file '{computation_settings}': {e}")
+
+            except FileNotFoundError:
+                raise FileNotFoundError(f"File not found: {computation_settings}")
                 
             if runcard["expectation_enabled"]==True:
                 expectation = True
