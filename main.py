@@ -35,9 +35,9 @@ parser.add_argument("--transfer", action="store_true",
                          "If the simulation device is GPU this requires a "
                          "transfer from GPU memory to CPU.")
 
-parser.add_argument("--precision", default="double", type=str,
+parser.add_argument("--precision", default="complex128", type=str,
                     help="Numerical precision of the simulation. "
-                         "Choose between 'double' and 'single'.")
+                         "Choose between 'complex128' and 'complex64'.")
 parser.add_argument("--memory", default=None, type=int,
                     help="Limit the GPU memory usage when using Tensorflow "
                          "based backends. The memory limit should be given "

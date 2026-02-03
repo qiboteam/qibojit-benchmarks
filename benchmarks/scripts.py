@@ -2,11 +2,11 @@
 import time
 from benchmarks.logger import JsonLogger
 
-from qibo.backends import GlobalBackend
+from qibo.backends import _Global
 
 def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
                       nreps=1, nshots=None, transfer=False,
-                      precision="double", memory=None, threading=None,
+                      precision="complex128", memory=None, threading=None,
                       filename=None, platform=None):
     """Runs benchmark for different circuit types.
 
@@ -29,10 +29,10 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
     logs.log(import_time=time.time() - start_time)
 
     qibo.set_backend(backend=backend, platform=platform)
-    qibo.set_precision(precision)
+    qibo.set_dtype(precision)
     logs.log(backend=qibo.get_backend(),
-             platform=GlobalBackend().platform,
-             precision=qibo.get_precision(),
+             platform=_Global()._backend.platform,
+             precision=qibo.get_dtype(),
              device=qibo.get_device(),
              version=qibo.__version__)
 
