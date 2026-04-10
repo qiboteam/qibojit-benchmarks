@@ -1,0 +1,1 @@
+{"MPI_enabled": true, "expectation_enabled": false, "use_mps": true, "max_bond_dimension": 20, "svd_cutoff": 1e-10}

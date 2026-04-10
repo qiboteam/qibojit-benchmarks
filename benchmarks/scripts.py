@@ -237,7 +237,13 @@ def qibotn_benchmark(
     result = backend(circuit)
     if rank == 0:
         logs.log(dry_run_time=time.time() - start_time)
-    dtype = str(result.dtype)
+    # Handle both array results (state) and scalar results (expectation)
+    if hasattr(result, 'dtype'):
+        dtype = str(result.dtype)
+    else:
+        # Expectation result is a scalar; convert to numpy array to get dtype
+        result_array = np.array([result])
+        dtype = str(result_array.dtype)
     del result
 
     if rank == 0:
