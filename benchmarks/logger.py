@@ -59,4 +59,4 @@ class JsonLogger(list):
     def dump(self):
         if self.filename is not None:
             with open(self.filename, "w") as file:
-                json.dump(self, file)
+                json.dump(self, file, default=lambda x: None)
