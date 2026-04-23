@@ -30,7 +30,7 @@ def circuit_benchmark(nqubits, backend, circuit_name, circuit_options=None,
 
     qibo.set_backend(backend=backend, platform=platform)
     qibo.set_dtype(precision)
-    logs.log(backend=qibo.get_backend(),
+    logs.log(backend=qibo.get_backend().name,
              platform=_Global()._backend.platform,
              precision=qibo.get_dtype(),
              device=qibo.get_device(),
