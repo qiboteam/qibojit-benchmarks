@@ -45,6 +45,7 @@ circuits="variational bv" nqubits_list="6 8 10" nreps=3 ./quimb_local.sh
 | Circuit | Alias | Parameters | Status | Notes |
 |---------|-------|------------|--------|-------|
 | **qft** | — | none | ✓ Works | Quantum Fourier Transform; aligned with qibojit |
+| **supremacy** | — | depth, seed | ✓ Works | Verified locally after environment repair; requires Cirq import path to be healthy |
 | **variational** | — | nlayers | ✓ Works | Parameterized circuit; aligned with qibojit |
 | **bv** | bernstein-vazirani | none | ✓ Works | Bernstein-Vazirani algorithm; aligned with qibojit |
 | **hs** | hidden-shift | none | ✓ Works | Hidden-shift problem; aligned with qibojit |
@@ -66,7 +67,7 @@ circuits="variational bv" nqubits_list="6 8 10" nreps=3 ./quimb_local.sh
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `nqubits_list` | `6 8 10` | Space-separated qubit counts to benchmark |
-| `circuits` | `qft variational bv` | Space-separated circuit names |
+| `circuits` | `supremacy qft variational bv qaoa` | Space-separated circuit names |
 | `modes` | `dense_vector expectation` | Benchmark modes (dense_vector, expectation) |
 | `nlayers` | `2` | Layers for layered circuits (variational, qaoa) |
 | `nreps` | `1` | Repetitions per benchmark |
@@ -122,6 +123,84 @@ exp_cfg=expectation_dense.json nqubits_list="12" ./quimb_local.sh
 ```
 
 MPS is typically faster and uses bounded memory, while dense provides full accuracy without truncation.
+
+## Installation
+
+Preferred path: create a fresh environment from the benchmark spec.
+
+```bash
+cd /ssd_data/tankya2/code/ASC_2026_prism/ASC-2026/qibojit-benchmarks
+conda env create -f environment.yml
+conda activate benchmarks
+```
+
+If you are using an existing environment instead of recreating it, check that it is aligned with the benchmark stack:
+
+```bash
+python -c "import numpy, qibo, qibojit; print('numpy', numpy.__version__); print('qibo', qibo.__version__); print('qibojit', qibojit.__version__)"
+```
+
+## Dependency Recovery
+
+```bash
+pip install cirq==0.8.2
+```
+This is the recovery path that eventually made `./quimb_local.sh` work for `supremacy` in the existing `qibotn-py311-test` environment.
+
+### Symptom 1: `cirq` failed with `ModuleNotFoundError: No module named 'pkg_resources'`
+
+Cause:
+- the existing environment had `setuptools 82.0.1`
+- that install did not expose `pkg_resources`
+- the installed `cirq` package still imported `pkg_resources` during startup
+
+Fix:
+
+```bash
+/home/tankya2/miniforge3/envs/qibotn-py311-test/bin/python -m pip install "setuptools<81"
+```
+
+Working result:
+- `setuptools` was changed to `80.10.2`
+- `import pkg_resources` worked again
+- the Quimb `supremacy` path could construct the Cirq-generated circuit
+
+### Symptom 2: `qibojit` reference crashed with `TypeError: asarray() got an unexpected keyword argument 'copy'`
+
+Cause:
+- the same environment had `numpy 1.26.4`
+- but `qibo 0.3.1` requires `numpy >= 2.0.0`
+- the `qibojit` reference backend was therefore running against an incompatible NumPy version
+
+Fix:
+
+```bash
+/home/tankya2/miniforge3/envs/qibotn-py311-test/bin/python -m pip install numpy==2.2.6
+```
+
+Working result:
+- `numpy` was changed to `2.2.6`
+- the `qibojit` reference backend started working again
+- both the Quimb and qibojit sides of the `supremacy` benchmark completed successfully
+
+### Final verified state
+
+The existing repaired environment was verified with:
+
+```bash
+cd /ssd_data/tankya2/code/ASC_2026_prism/ASC-2026/qibojit-benchmarks/scripts/quimb
+nqubits_list="6" circuits="supremacy" nreps=1 modes="dense_vector expectation" ./quimb_local.sh
+```
+
+That smoke test completed all three stages:
+- Quimb `dense_vector`
+- Quimb `expectation`
+- qibojit reference
+
+Notes:
+- `environment.yml` remains the preferred source of truth for a clean install
+- the repaired environment may still emit a `pkg_resources` deprecation warning from the older Cirq stack, but the benchmark run succeeds
+- if an environment has drifted far from `environment.yml`, recreating it is usually safer than incremental repair
 
 ## Notes
 

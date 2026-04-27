@@ -14,7 +14,7 @@ set -euo pipefail
 : "${filename:=quimb_benchmark_local.dat}"
 : "${nlayers:=2}"
 : "${nqubits_list:=6 8 10}"
-: "${circuits:=qft variational bv qaoa}"
+: "${circuits:=supremacy qft variational bv qaoa}"
 : "${modes:=dense_vector expectation}"
 : "${exp_cfg:=expectation_mps.json}"
 : "${state_cfg:=dense_vector_mps.json}"
@@ -47,6 +47,7 @@ for nqubits in ${nqubits_list}; do
         circuit_opts="nlayers=${nlayers}"
         # These circuits do not use nlayers — omit it to avoid unknown-option errors.
         if [[ "${circuit}" == "qft" || "${circuit}" == "QFT" || \
+              "${circuit}" == "supremacy" || "${circuit}" == "Supremacy" || \
               "${circuit}" == "bv" || "${circuit}" == "bernstein-vazirani" || \
               "${circuit}" == "hs" || "${circuit}" == "hidden-shift" || \
               "${circuit}" == "qaoa" || "${circuit}" == "qv" || \

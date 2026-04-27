@@ -185,7 +185,10 @@ def qibotn_benchmark(
     """
     from mpi4py import MPI  # this line initializes MPI
     import numpy as np
-    import cupy as cp
+    try:
+        import cupy as cp
+    except ImportError:
+        cp = np  # fallback to numpy for CPU-only users
 
     try:
         # Try to create MPI.COMM_WORLD
@@ -254,7 +257,8 @@ def qibotn_benchmark(
         if rank == 0:
             start_time = time.time()
         result = backend(circuit)
-        if isinstance(result, cp.ndarray):
+        # Use cp.asnumpy if available (cupy), otherwise fallback for numpy
+        if hasattr(cp, "asnumpy") and isinstance(result, cp.ndarray):
             result = cp.asnumpy(result)
         else:
             result = np.array([result])
