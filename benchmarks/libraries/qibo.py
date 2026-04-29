@@ -163,9 +163,16 @@ class Qibo(abstract.AbstractBackend):
                 if self.backend_name_str == "qibotn":
                     if self.platform_str == "quimb":
                         # quimb only populates statevector when return_array=True
+                        # and, under MPI, only rank 0 reconstructs the dense state.
+                        # Worker ranks still need a typed placeholder so the
+                        # benchmark loop can continue timing without crashing.
+                        import numpy as np
+
                         result = self.qibo.get_backend().execute_circuit(
                             circuit, return_array=True
                         )
+                        if result.statevector is None:
+                            return np.empty(0, dtype=self.qibo.get_dtype())
                         return result.statevector.flatten()
                     else:
                         return circuit().statevector.flatten()
