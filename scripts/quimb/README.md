@@ -25,14 +25,17 @@ Local (single-process) tensor network simulation benchmarking using quimb backen
 ```bash
 cd /ssd_data/tankya2/code/ASC_2026_prism/ASC-2026/qibojit-benchmarks/scripts/quimb
 
-# Run with defaults (MPS modes, both dense_vector and expectation)
+# Run with defaults (all matching dense_vector*.json and expectation*.json configs)
 ./quimb_local.sh
 
 # Test only expectation mode, custom qubit sizes
 modes="expectation" nqubits_list="8 10 12" ./quimb_local.sh
 
-# Test dense vector only with dense TN ansatz (no MPS)
+# Test dense vector only with one explicit config
 state_cfg=dense_vector_dense.json modes="dense_vector" ./quimb_local.sh
+
+# Restrict the sweep to a chosen subset of configs
+EXPECTATION_CONFIGS="expectation_mps.json expectation_dense.json" ./quimb_local.sh
 
 # Test variational and BV circuits
 circuits="variational bv" nqubits_list="6 8 10" nreps=3 ./quimb_local.sh
@@ -73,8 +76,10 @@ circuits="variational bv" nqubits_list="6 8 10" nreps=3 ./quimb_local.sh
 | `nreps` | `1` | Repetitions per benchmark |
 | `filename` | `quimb_benchmark_local.dat` | Output log file |
 | `precision` | `complex128` | NumPy dtype (complex128 or complex64) |
-| `exp_cfg` | `expectation_mps.json` | Expectation mode config file |
-| `state_cfg` | `dense_vector_mps.json` | State mode config file |
+| `exp_cfg` | unset | Optional single expectation config; when unset, all `expectation*.json` files are swept |
+| `state_cfg` | unset | Optional single dense-vector config; when unset, all `dense_vector*.json` files are swept |
+| `EXPECTATION_CONFIGS` | unset | Optional space-separated subset of expectation configs to run |
+| `STATE_CONFIGS` | unset | Optional space-separated subset of dense-vector configs to run |
 
 ## Results
 
@@ -114,7 +119,7 @@ cd /ssd_data/tankya2/code/ASC_2026_prism/ASC-2026/qibojit-benchmarks/scripts/qui
 
 ## Tensor Network Options
 
-Quimb supports both MPS (Matrix Product State) and dense tensor network contractions. These can be mixed:
+Quimb supports both MPS (Matrix Product State) and dense tensor network contractions. By default the script sweeps every matching JSON file in this folder, or you can target individual configs:
 
 ```bash
 # Compare MPS vs dense at same nqubits

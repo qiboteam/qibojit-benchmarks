@@ -32,14 +32,17 @@ Demonstrates MPI-enabled tensor network simulation using quimb with 2 MPI proces
 ```bash
 cd /ssd_data/tankya2/code/ASC_2026_prism/ASC-2026/qibojit-benchmarks/scripts/quimb_mpi
 
-# Run with defaults (MPS modes, both dense_vector and expectation, 2 processes)
+# Run with defaults (all matching dense_vector*.json and expectation*.json configs)
 ./quimb_mpi.sh
 
 # Test only expectation mode, custom qubit sizes
 modes="expectation" nqubits_list="8 10 12" ./quimb_mpi.sh
 
-# Test dense vector only with dense TN ansatz (no MPS)
+# Test dense vector only with one explicit config
 state_cfg=dense_vector_dense_mpi.json modes="dense_vector" ./quimb_mpi.sh
+
+# Restrict the sweep to a chosen subset of configs
+EXPECTATION_CONFIGS="expectation_mps_mpi.json expectation_dense_mpi.json" ./quimb_mpi.sh
 
 # Use 4 MPI processes (if testing scalability)
 np=4 ./quimb_mpi.sh
@@ -75,8 +78,10 @@ np=4 ./quimb_mpi.sh
 | `nreps` | `1` | Repetitions per benchmark |
 | `filename` | `quimb_benchmark_mpi.dat` | Output log file |
 | `precision` | `complex128` | NumPy dtype (complex128 or complex64) |
-| `exp_cfg` | `expectation_mps_mpi.json` | Expectation mode config file (MPI variant) |
-| `state_cfg` | `dense_vector_mps_mpi.json` | State mode config file (MPI variant) |
+| `exp_cfg` | unset | Optional single expectation config; when unset, all `expectation*.json` files are swept |
+| `state_cfg` | unset | Optional single dense-vector config; when unset, all `dense_vector*.json` files are swept |
+| `EXPECTATION_CONFIGS` | unset | Optional space-separated subset of expectation configs to run |
+| `STATE_CONFIGS` | unset | Optional space-separated subset of dense-vector configs to run |
 
 ## Results
 
@@ -144,7 +149,7 @@ cd ../quimb && ./quimb_local.sh   # without MPI (single process)
 
 ## Tensor Network Options
 
-Quimb supports both MPS (Matrix Product State) and dense tensor network contractions. These can be mixed:
+Quimb supports both MPS (Matrix Product State) and dense tensor network contractions. By default the script sweeps every matching JSON file in this folder, or you can target individual configs:
 
 ```bash
 # Compare MPS vs dense at same nqubits with MPI
