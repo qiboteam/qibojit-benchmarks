@@ -1,1 +1,1 @@
-{"MPI_enabled": true, "expectation_enabled": true, "pauli_pattern": "XIIII"}
+{"MPI_enabled": true, "expectation_enabled": true, "use_mps": false, "pauli_pattern": "XIIII"}
