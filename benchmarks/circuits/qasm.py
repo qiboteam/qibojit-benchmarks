@@ -208,7 +208,7 @@ class QAOA(AbstractCircuit):
         super().__init__(nqubits)
         import networkx
         self.nparams = int(nparams)
-        self.seed = int(123)
+        self.seed = int(seed)
         if len(graph):
             import json
             with open(graph, "r") as file:
