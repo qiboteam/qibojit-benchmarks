@@ -215,7 +215,7 @@ class QAOA(AbstractCircuit):
                 data = json.load(file)
             self.graph = networkx.readwrite.json_graph.node_link_graph(data)
         else:
-            self.graph = networkx.random_regular_graph(3, self.nqubits)
+            self.graph = networkx.random_regular_graph(3, self.nqubits, seed=self.seed)
         self.parameters = {"nqubits": nqubits, "nparams": nparams,
                            "graph": graph, "seed": seed}
 
